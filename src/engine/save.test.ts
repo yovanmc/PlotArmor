@@ -91,4 +91,16 @@ describe('save', () => {
     expect(s.upgrades.prolific).toBe(2);
     expect(s.party[0].classId).toBe('protagonist'); // party reseeded into the class system
   });
+
+  it('reseeds (does not crash) when a saved party has an unknown classId', () => {
+    const corrupt = JSON.stringify({
+      schemaVersion: 3, lastSaved: 0, inspiration: '0', words: '0', royalties: '4',
+      party: [{ id: 'c0', name: 'Wizard', classId: 'wizard', level: 9, basePower: '5' }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '10', bookComplete: false, bookNumber: 1,
+      upgrades: {},
+    });
+    const s = deserialize(corrupt, 0);
+    expect(num.toNum(s.royalties)).toBe(4);              // progress kept
+    expect(s.party[0].classId).toBe('protagonist');      // unknown class -> whole party reseeded
+  });
 });

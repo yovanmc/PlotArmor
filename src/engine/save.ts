@@ -1,10 +1,15 @@
 // src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
 import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty } from './state';
-import { ClassId, findClass } from './content';
+import { ClassId, findClass, CLASSES } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
+// Migration is structural (the isV3Party guard inspects field shape), not version-gated.
+// SCHEMA_VERSION is stamped into the output so saves are self-describing.
 export const SCHEMA_VERSION = 3;
+
+// Derived from the authoritative class catalog so it can never drift out of sync.
+const KNOWN_CLASS_IDS = new Set<string>(CLASSES.map((c) => c.id));
 
 interface CharDTO { id: string; name: string; classId: string; level: number; basePower: string; }
 interface SaveDTO {
@@ -67,11 +72,10 @@ export function deserialize(raw: string, nowMs: number): GameState {
   }
   const numOr = (s: string | undefined, fallback: Num): Num => (typeof s === 'string' ? strToNum(s) : fallback);
 
-  const KNOWN_CLASSES = ['protagonist', 'antihero', 'support', 'debuffer', 'sidekick'];
   const isV3Party =
     Array.isArray(dto.party) && dto.party.length > 0 &&
     dto.party.every((c) => typeof (c as { classId?: unknown }).classId === 'string' &&
-      KNOWN_CLASSES.includes((c as { classId: string }).classId));
+      KNOWN_CLASS_IDS.has((c as { classId: string }).classId));
 
   const party: Character[] = isV3Party
     ? (dto.party as CharDTO[]).map((c, i) => ({
