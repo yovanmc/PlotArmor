@@ -1,3 +1,4 @@
+// src/engine/offline.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState } from './state';
@@ -6,16 +7,16 @@ import { OFFLINE_CAP_SECONDS } from './content';
 
 describe('offline', () => {
   it('computes elapsed seconds', () => {
-    expect(offlineSeconds(60_000, 0)).toBe(60);
+    expect(offlineSeconds(60_000, 0, OFFLINE_CAP_SECONDS)).toBe(60);
   });
 
-  it('clamps to the offline cap', () => {
+  it('clamps to the supplied cap', () => {
     const huge = OFFLINE_CAP_SECONDS * 1000 * 5;
-    expect(offlineSeconds(huge, 0)).toBe(OFFLINE_CAP_SECONDS);
+    expect(offlineSeconds(huge, 0, OFFLINE_CAP_SECONDS)).toBe(OFFLINE_CAP_SECONDS);
   });
 
   it('guards against a rewound clock (lastSaved in the future)', () => {
-    expect(offlineSeconds(0, 10_000)).toBe(0);
+    expect(offlineSeconds(0, 10_000, OFFLINE_CAP_SECONDS)).toBe(0);
   });
 
   it('applyOffline accrues resources and updates lastSaved', () => {

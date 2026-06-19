@@ -1,12 +1,13 @@
+// src/engine/offline.ts
 import { Num, ZERO, sub } from './num';
 import { GameState } from './state';
 import { step } from './loop';
-import { OFFLINE_CAP_SECONDS } from './content';
+import { effectiveOfflineCap } from './modifiers';
 
-export function offlineSeconds(nowMs: number, lastSavedMs: number): number {
+export function offlineSeconds(nowMs: number, lastSavedMs: number, capSeconds: number): number {
   const raw = (nowMs - lastSavedMs) / 1000;
   if (!Number.isFinite(raw) || raw <= 0) return 0; // rewound/zero/invalid
-  return Math.min(raw, OFFLINE_CAP_SECONDS);
+  return Math.min(raw, capSeconds);
 }
 
 export interface OfflineSummary {
@@ -21,7 +22,7 @@ export function applyOffline(
   state: GameState,
   nowMs: number,
 ): { state: GameState; summary: OfflineSummary } {
-  const seconds = offlineSeconds(nowMs, state.lastSaved);
+  const seconds = offlineSeconds(nowMs, state.lastSaved, effectiveOfflineCap(state));
   if (seconds === 0) {
     return {
       state: { ...state, lastSaved: nowMs },
