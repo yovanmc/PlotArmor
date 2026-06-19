@@ -15,7 +15,7 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins.** On top of v1, Royalties are a spendable
+**Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins & set bonuses.** On top of v1, Royalties are a spendable
 wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
 in-game via the **Publishing House** (a parchment modal opened from a live-balance
 entry button); books escalate in difficulty/size each publish, and the royalty
@@ -42,16 +42,19 @@ top of per-book leveling (the Protagonist grows on its own track instead). Stars
 permanent, earned mid-game boost — the harness verifies the loop still closes (book 1 in
 ~8 minutes, books 1–8 complete) with stars funded from boss drops.
 
-Characters now also collect **cosmetic `(class × world)` skins (Slice 3a of the party
-system)**: clearing a world's boss deterministically unlocks the next class's variant for
-that world (fixed order, no gacha; a full 5×8 collection fills in over ~5 books), and each
-fielded character can wear any skin its class has unlocked — shown as a per-world face
-emoji, a genre tag, and the world's accent on the card. Skins are **purely cosmetic for
-now**; the 2/3/5 **set bonus** that rewards a cohesive themed party is the next slice
-(3b). All headless-tested (129 passing tests, incl. a harness check that the full
-collection is earned through real play) plus a live DOM smoke of the built bundle (skin
-cycle equips per-world face/tag/accent, 0 console errors); `npm run build` is green.
-Balance constants are tunable placeholders.
+Characters now also collect `(class × world)` skins (Slice 3 of the party system): clearing
+a world's boss deterministically unlocks the next class's variant for that world (fixed
+order, no gacha; a full 5×8 collection fills in over ~5 books), and each fielded character
+can wear any skin its class has unlocked — shown as a per-world face emoji, a genre tag, and
+the world's accent on the card. Fielding a cohesive themed party then pays off: **2 / 3 / 5
+characters wearing the same world's skin grant a tier 1 / 2 / 3 set bonus**, whose effect
+type differs per world (e.g. Space → DPS, Wild West → Inspiration, Eldritch → boss-regen
+cut, Pirate Seas → Edit drop), folded into the same `effective*` read-paths as everything
+else. Multiple sets can stack, and the HUD lists the active ones. All headless-tested (142
+passing tests; the loop still closes with set bonuses, which only ever help a deliberately
+themed party) plus a live DOM smoke (a 2-member Space set raised Party DPS +15% and the HUD
+reflected it, 0 console errors); `npm run build` is green. The per-world axis mapping and all
+magnitudes are tunable placeholders.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
@@ -63,7 +66,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
 [party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md) ·
 [party Slice 2](docs/superpowers/plans/2026-06-19-plot-armor-party-slice2.md) ·
-[party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md).
+[party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md) ·
+[party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
