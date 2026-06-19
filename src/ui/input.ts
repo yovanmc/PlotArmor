@@ -12,7 +12,7 @@ export function wireInput(getState: () => GameState, setState: (s: GameState) =>
       const id = btn.getAttribute('data-id');
       if (id) setState(levelUp(getState(), id));
     } else if (action === 'recruit') {
-      setState(recruit(getState()));
+      setState(recruit(getState(), 'antihero')); // stopgap (Slice 1 Task 6 reads the chosen class from data-class)
     }
   });
 

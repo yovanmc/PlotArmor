@@ -41,7 +41,7 @@ function spendGreedy(s: GameState): GameState {
   for (let guard = 0; guard < 10000; guard++) {
     const buy = bestAffordablePurchase(cur);
     if (!buy) break;
-    cur = buy.kind === 'recruit' ? recruit(cur) : levelUp(cur, buy.id);
+    cur = buy.kind === 'recruit' ? recruit(cur, 'antihero') : levelUp(cur, buy.id); // stopgap (Slice 1 Task 7 gives the harness a composition strategy)
   }
   return cur;
 }

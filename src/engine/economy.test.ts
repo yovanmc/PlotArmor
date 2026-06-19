@@ -24,24 +24,33 @@ describe('economy actions', () => {
     let s = { ...initialState(0), inspiration: num.n('1e9') };
     while (s.party.length < RECRUIT_CAP) {
       const before = s.party.length;
-      s = eco.recruit(s);
+      s = eco.recruit(s, 'antihero');
       expect(s.party.length).toBe(before + 1);
     }
     expect(eco.canRecruit(s)).toBe(false);
-    expect(eco.recruit(s)).toBe(s);
+    expect(eco.recruit(s, 'antihero')).toBe(s);
   });
 
   it('frugalDrafts reduces the effective recruit cost actually charged', () => {
     const base = { ...initialState(0), inspiration: num.n('1e9') };
     const thrifty = { ...base, upgrades: { ...emptyUpgrades(), frugalDrafts: 4 } }; // -20%
-    const afterBase = eco.recruit(base);
-    const afterThrifty = eco.recruit(thrifty);
+    const afterBase = eco.recruit(base, 'antihero');
+    const afterThrifty = eco.recruit(thrifty, 'antihero');
     expect(num.gt(afterThrifty.inspiration, afterBase.inspiration)).toBe(true);
   });
 
   it('ensembleCast raises the cap so a 6th member can be recruited', () => {
     let s = { ...initialState(0), inspiration: num.n('1e12'), upgrades: { ...emptyUpgrades(), ensembleCast: true } };
-    while (eco.canRecruit(s)) s = eco.recruit(s);
+    while (eco.canRecruit(s)) s = eco.recruit(s, 'antihero');
     expect(s.party.length).toBe(RECRUIT_CAP + 1);
+  });
+
+  it('recruit(classId) adds a level-1 character of that class and charges inspiration', () => {
+    const s = { ...initialState(0), inspiration: num.n('1e9') };
+    const before = s.party.length;
+    const after = eco.recruit(s, 'debuffer');
+    expect(after.party.length).toBe(before + 1);
+    expect(after.party[after.party.length - 1].classId).toBe('debuffer');
+    expect(num.lt(after.inspiration, s.inspiration)).toBe(true);
   });
 });
