@@ -1,6 +1,6 @@
 // src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
-import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars } from './state';
+import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars, makeUnlockedVariants } from './state';
 import { ClassId, findClass, CLASSES, MAX_STAR } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
@@ -103,6 +103,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
         classId: c.classId as ClassId,
         level: typeof c.level === 'number' ? c.level : 1,
         basePower: numOr(c.basePower, findClass(c.classId as ClassId).classBasePower),
+        variantWorld: null, // STOPGAP — Task 5 reads c.variantWorld
       }))
     : makeStartingParty(); // pre-v3 / classless: reseed the ephemeral party
 
@@ -120,6 +121,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
     upgrades: mergeUpgrades(dto.upgrades),
     edits: numOr(dto.edits, ZERO),
     stars: sanitizeStars(dto.stars),
+    unlockedVariants: makeUnlockedVariants(), // STOPGAP — Task 5 reads dto.unlockedVariants
   };
 }
 

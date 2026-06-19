@@ -18,7 +18,7 @@ describe('loop.step', () => {
       ...initialState(0),
       zone: { zoneIndex: ZONE_COUNT - 1, encounterIndex: BOSS_INDEX },
       // give enough dps to beat the final boss quickly
-      party: [{ id: 'x', name: 'Hero', classId: 'protagonist' as const, level: 1, basePower: num.n('1e30') }],
+      party: [{ id: 'x', name: 'Hero', classId: 'protagonist' as const, level: 1, basePower: num.n('1e30'), variantWorld: null }],
       currentHp: num.n(1),
     };
     const r = step(atFinalBoss, 10);

@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, makeStartingParty, emptyUpgrades, characterPower } from './state';
-import { makeStars } from './state';
+import { makeStars, makeUnlockedVariants } from './state';
 import { STARTING_PARTY_SIZE, targetMaxHp, POWER_GROWTH } from './content';
 
 describe('state', () => {
@@ -34,9 +34,9 @@ describe('state', () => {
 
   it('characterPower = basePower * POWER_GROWTH^(level-1)', () => {
     // multiplicative growth starts at level 1, so a level-1 character's power == its basePower
-    expect(num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 1, basePower: num.n(2) }))).toBe(2);
+    expect(num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 1, basePower: num.n(2), variantWorld: null }))).toBe(2);
     expect(
-      num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 4, basePower: num.n(2) })),
+      num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 4, basePower: num.n(2), variantWorld: null })),
     ).toBeCloseTo(2 * Math.pow(POWER_GROWTH, 3), 5);
   });
 
@@ -70,5 +70,23 @@ describe('stars + Edits state (Slice 2)', () => {
   it('makeStars seeds every class at 1', () => {
     const stars = makeStars();
     expect(Object.values(stars).every((v) => v === 1)).toBe(true);
+  });
+});
+
+describe('variants state (Slice 3a)', () => {
+  it('characters start on the base look (variantWorld null)', () => {
+    const s = initialState(0);
+    expect(s.party.every((c) => c.variantWorld === null)).toBe(true);
+  });
+
+  it('initial unlockedVariants has an empty list for every class', () => {
+    const s = initialState(0);
+    expect(s.unlockedVariants.protagonist).toEqual([]);
+    expect(s.unlockedVariants.support).toEqual([]);
+  });
+
+  it('makeUnlockedVariants seeds an empty array per class', () => {
+    const u = makeUnlockedVariants();
+    expect(Object.values(u).every((arr) => Array.isArray(arr) && arr.length === 0)).toBe(true);
   });
 });

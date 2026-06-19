@@ -8,6 +8,7 @@ export interface Character {
   classId: ClassId;
   level: number;
   basePower: Num;
+  variantWorld: number | null; // cosmetic world skin (null = base look)
 }
 
 export interface ZoneState {
@@ -40,6 +41,7 @@ export interface GameState {
   upgrades: Upgrades;
   edits: Num;
   stars: Record<ClassId, number>;
+  unlockedVariants: Record<ClassId, number[]>;
 }
 
 export function emptyUpgrades(): Upgrades {
@@ -57,13 +59,21 @@ export function makeStars(): Record<ClassId, number> {
   return stars;
 }
 
+// Per-class unlocked world-variant indices, all empty at the start. Derived from
+// CLASSES so it can never drift out of sync with the class catalog.
+export function makeUnlockedVariants(): Record<ClassId, number[]> {
+  const u = {} as Record<ClassId, number[]>;
+  for (const c of CLASSES) u[c.id] = [];
+  return u;
+}
+
 export function characterPower(c: Character): Num {
   return mul(c.basePower, pow(n(POWER_GROWTH), c.level - 1));
 }
 
 export function makeCharacter(id: string, classId: ClassId, level = 1): Character {
   const def = findClass(classId);
-  return { id, name: def.name, classId, level, basePower: def.classBasePower };
+  return { id, name: def.name, classId, level, basePower: def.classBasePower, variantWorld: null };
 }
 
 export function makeStartingParty(level = 1): Character[] {
@@ -89,5 +99,6 @@ export function initialState(nowMs: number): GameState {
     upgrades: emptyUpgrades(),
     edits: ZERO,
     stars: makeStars(),
+    unlockedVariants: makeUnlockedVariants(),
   };
 }
