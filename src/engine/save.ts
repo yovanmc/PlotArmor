@@ -1,5 +1,5 @@
 import { Num, n, ZERO, ONE, numToStr, strToNum } from './num';
-import { GameState, Character, initialState } from './state';
+import { GameState, Character, initialState, emptyUpgrades } from './state';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
 export const SCHEMA_VERSION = 1;
@@ -75,6 +75,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
     bookComplete: typeof dto.bookComplete === 'boolean' ? dto.bookComplete : false,
     bookNumber: typeof dto.bookNumber === 'number' ? dto.bookNumber : 1,
     prestigeMultiplier: numOr(dto.prestigeMultiplier, ONE),
+    upgrades: emptyUpgrades(),
   };
 }
 
