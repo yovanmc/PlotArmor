@@ -1,17 +1,17 @@
 // src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
 import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars, makeUnlockedVariants } from './state';
-import { ClassId, findClass, CLASSES, MAX_STAR } from './content';
+import { ClassId, findClass, CLASSES, MAX_STAR, ZONE_COUNT } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
 // Migration is structural (the isV3Party guard inspects field shape), not version-gated.
 // SCHEMA_VERSION is stamped into the output so saves are self-describing.
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 // Derived from the authoritative class catalog so it can never drift out of sync.
 const KNOWN_CLASS_IDS = new Set<string>(CLASSES.map((c) => c.id));
 
-interface CharDTO { id: string; name: string; classId: string; level: number; basePower: string; }
+interface CharDTO { id: string; name: string; classId: string; level: number; basePower: string; variantWorld: number | null; }
 interface SaveDTO {
   schemaVersion: number;
   lastSaved: number;
@@ -26,6 +26,7 @@ interface SaveDTO {
   upgrades: Upgrades;
   edits: string;
   stars: Record<string, number>;
+  unlockedVariants: Record<string, number[]>;
 }
 
 function mergeUpgrades(u: Partial<Upgrades> | undefined): Upgrades {
@@ -60,6 +61,31 @@ function sanitizeStars(raw: unknown): Record<ClassId, number> {
   return out;
 }
 
+// A valid world index is an integer in [0, ZONE_COUNT); anything else -> null.
+function validWorld(v: unknown): number | null {
+  if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < ZONE_COUNT) return v;
+  return null;
+}
+
+// Read per-class unlocked worlds defensively: drop unknown class keys, drop
+// out-of-range worlds, dedup, default each class to []. Derived from CLASSES.
+function sanitizeUnlocked(raw: unknown): Record<ClassId, number[]> {
+  const out = makeUnlockedVariants();
+  if (raw && typeof raw === 'object') {
+    for (const c of CLASSES) {
+      const list = (raw as Record<string, unknown>)[c.id];
+      if (Array.isArray(list)) {
+        const seen = new Set<number>();
+        for (const v of list) {
+          const w = validWorld(v);
+          if (w !== null && !seen.has(w)) { seen.add(w); out[c.id].push(w); }
+        }
+      }
+    }
+  }
+  return out;
+}
+
 export function serialize(state: GameState): string {
   const dto: SaveDTO = {
     schemaVersion: SCHEMA_VERSION,
@@ -67,7 +93,7 @@ export function serialize(state: GameState): string {
     inspiration: numToStr(state.inspiration),
     words: numToStr(state.words),
     royalties: numToStr(state.royalties),
-    party: state.party.map((c) => ({ id: c.id, name: c.name, classId: c.classId, level: c.level, basePower: numToStr(c.basePower) })),
+    party: state.party.map((c) => ({ id: c.id, name: c.name, classId: c.classId, level: c.level, basePower: numToStr(c.basePower), variantWorld: c.variantWorld })),
     zone: { zoneIndex: state.zone.zoneIndex, encounterIndex: state.zone.encounterIndex },
     currentHp: numToStr(state.currentHp),
     bookComplete: state.bookComplete,
@@ -75,6 +101,7 @@ export function serialize(state: GameState): string {
     upgrades: state.upgrades,
     edits: numToStr(state.edits),
     stars: state.stars,
+    unlockedVariants: state.unlockedVariants,
   };
   return JSON.stringify(dto);
 }
@@ -103,7 +130,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
         classId: c.classId as ClassId,
         level: typeof c.level === 'number' ? c.level : 1,
         basePower: numOr(c.basePower, findClass(c.classId as ClassId).classBasePower),
-        variantWorld: null, // STOPGAP — Task 5 reads c.variantWorld
+        variantWorld: validWorld((c as { variantWorld?: unknown }).variantWorld),
       }))
     : makeStartingParty(); // pre-v3 / classless: reseed the ephemeral party
 
@@ -121,7 +148,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
     upgrades: mergeUpgrades(dto.upgrades),
     edits: numOr(dto.edits, ZERO),
     stars: sanitizeStars(dto.stars),
-    unlockedVariants: makeUnlockedVariants(), // STOPGAP — Task 5 reads dto.unlockedVariants
+    unlockedVariants: sanitizeUnlocked(dto.unlockedVariants),
   };
 }
 

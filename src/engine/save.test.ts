@@ -1,7 +1,7 @@
 // src/engine/save.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as num from './num';
-import { initialState, emptyUpgrades, makeCharacter } from './state';
+import { initialState, emptyUpgrades, makeCharacter, makeUnlockedVariants } from './state';
 import { serialize, deserialize, save, load, exportSave, importSave, SAVE_KEY } from './save';
 
 describe('save', () => {
@@ -21,7 +21,7 @@ describe('save', () => {
     expect(back.upgrades.ensembleCast).toBe(true);
     expect(back.party.length).toBe(s.party.length);
     expect(back.lastSaved).toBe(1234);
-    expect(back.schemaVersion).toBe(4);
+    expect(back.schemaVersion).toBe(5);
   });
 
   it('migrates a v1 save: keeps royalties as wallet, ignores prestigeMultiplier, defaults upgrades, reseeds party', () => {
@@ -33,7 +33,7 @@ describe('save', () => {
     const s = deserialize(v1, 9);
     expect(num.eq(s.royalties, num.n(4))).toBe(true);
     expect(s.upgrades).toEqual(emptyUpgrades());
-    expect(s.schemaVersion).toBe(4);
+    expect(s.schemaVersion).toBe(5);
     expect((s as unknown as Record<string, unknown>).prestigeMultiplier).toBeUndefined();
     // classless party → reseeded; progress is intact
     expect(s.party[0].classId).toBe('protagonist');
@@ -113,7 +113,7 @@ describe('save v4: Edits + stars', () => {
     expect(num.eq(back.edits, num.n(42))).toBe(true);
     expect(back.stars.support).toBe(4);
     expect(back.stars.debuffer).toBe(2);
-    expect(back.schemaVersion).toBe(4);
+    expect(back.schemaVersion).toBe(5);
   });
 
   it('migrates a pre-v4 save: defaults Edits to 0 and all stars to 1, keeps progress', () => {
@@ -140,5 +140,49 @@ describe('save v4: Edits + stars', () => {
     expect(s.stars.debuffer).toBe(1);  // negative -> floored up to 1
     expect((s.stars as Record<string, number>).wizard).toBeUndefined(); // unknown class ignored
     expect(num.toNum(s.edits)).toBe(5);
+  });
+});
+
+describe('save v5: variants', () => {
+  it('round-trips variantWorld and unlockedVariants', () => {
+    const fresh = initialState(0);
+    const s = {
+      ...fresh,
+      party: [{ ...fresh.party[0] }, { ...fresh.party[1], variantWorld: 2 }],
+      unlockedVariants: { ...makeUnlockedVariants(), antihero: [2], support: [1, 5] },
+    };
+    const back = deserialize(serialize(s), 0);
+    expect(back.party[1].variantWorld).toBe(2);
+    expect(back.unlockedVariants.antihero).toEqual([2]);
+    expect(back.unlockedVariants.support).toEqual([1, 5]);
+    expect(back.schemaVersion).toBe(5);
+  });
+
+  it('migrates a pre-v5 save: base look + empty unlocks, keeps progress', () => {
+    const v4 = JSON.stringify({
+      schemaVersion: 4, lastSaved: 0, inspiration: '500', words: '0', royalties: '9',
+      party: [{ id: 'c0', name: 'The Protagonist', classId: 'protagonist', level: 2, basePower: '1' }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '10', bookComplete: false, bookNumber: 1,
+      upgrades: {}, edits: '3', stars: { protagonist: 1, antihero: 1, support: 1, debuffer: 1, sidekick: 1 },
+    });
+    const s = deserialize(v4, 0);
+    expect(s.party[0].variantWorld).toBeNull();
+    expect(s.unlockedVariants.protagonist).toEqual([]);
+    expect(num.toNum(s.royalties)).toBe(9);
+    expect(num.toNum(s.edits)).toBe(3);
+  });
+
+  it('sanitizes corrupt variant data (drops unknown classes + out-of-range worlds, dedups)', () => {
+    const corrupt = JSON.stringify({
+      schemaVersion: 5, lastSaved: 0, inspiration: '0', words: '0', royalties: '0',
+      party: [{ id: 'c0', name: 'The Protagonist', classId: 'protagonist', level: 1, basePower: '1', variantWorld: 999 }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '10', bookComplete: false, bookNumber: 1,
+      upgrades: {}, edits: '0', stars: {},
+      unlockedVariants: { support: [1, 1, 99, -3, 2], wizard: [0] },
+    });
+    const s = deserialize(corrupt, 0);
+    expect(s.unlockedVariants.support).toEqual([1, 2]);     // dedup + drop out-of-range
+    expect((s.unlockedVariants as Record<string, number[]>).wizard).toBeUndefined(); // unknown class dropped
+    expect(s.party[0].variantWorld).toBeNull();             // out-of-range world -> base
   });
 });
