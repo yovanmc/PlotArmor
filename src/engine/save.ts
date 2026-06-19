@@ -1,6 +1,6 @@
 // src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
-import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty } from './state';
+import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars } from './state';
 import { ClassId, findClass, CLASSES } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
@@ -99,6 +99,8 @@ export function deserialize(raw: string, nowMs: number): GameState {
     bookComplete: typeof dto.bookComplete === 'boolean' ? dto.bookComplete : false,
     bookNumber: typeof dto.bookNumber === 'number' ? dto.bookNumber : 1,
     upgrades: mergeUpgrades(dto.upgrades),
+    edits: ZERO,              // STOPGAP — Task 6 reads dto.edits
+    stars: makeStars(),       // STOPGAP — Task 6 reads dto.stars
   };
 }
 

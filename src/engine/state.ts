@@ -1,6 +1,6 @@
 // src/engine/state.ts
 import { Num, n, mul, pow, ZERO } from './num';
-import { targetMaxHp, POWER_GROWTH, ClassId, findClass } from './content';
+import { targetMaxHp, POWER_GROWTH, ClassId, findClass, CLASSES } from './content';
 
 export interface Character {
   id: string;
@@ -38,6 +38,8 @@ export interface GameState {
   bookComplete: boolean;
   bookNumber: number;
   upgrades: Upgrades;
+  edits: Num;
+  stars: Record<ClassId, number>;
 }
 
 export function emptyUpgrades(): Upgrades {
@@ -45,6 +47,14 @@ export function emptyUpgrades(): Upgrades {
     prolific: 0, sharpProse: 0, pageTurner: 0, muse: 0, nightOwl: 0, frugalDrafts: 0,
     ensembleCast: false, ghostwriter: false,
   };
+}
+
+// Per-class star levels, all classes seeded at 1. Derived from CLASSES so it
+// can never drift out of sync with the class catalog.
+export function makeStars(): Record<ClassId, number> {
+  const stars = {} as Record<ClassId, number>;
+  for (const c of CLASSES) stars[c.id] = 1;
+  return stars;
 }
 
 export function characterPower(c: Character): Num {
@@ -77,5 +87,7 @@ export function initialState(nowMs: number): GameState {
     bookComplete: false,
     bookNumber: 1,
     upgrades: emptyUpgrades(),
+    edits: ZERO,
+    stars: makeStars(),
   };
 }

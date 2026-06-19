@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, makeStartingParty, emptyUpgrades, characterPower } from './state';
+import { makeStars } from './state';
 import { STARTING_PARTY_SIZE, targetMaxHp, POWER_GROWTH } from './content';
 
 describe('state', () => {
@@ -52,5 +53,22 @@ describe('state', () => {
     expect(party[0].classId).toBe('protagonist');
     expect(party[1].classId).toBe('antihero');
     expect(party.every((c) => num.gt(c.basePower, num.ZERO))).toBe(true);
+  });
+});
+
+describe('stars + Edits state (Slice 2)', () => {
+  it('initial state starts with 0 Edits and every class at 1 star', () => {
+    const s = initialState(0);
+    expect(num.eq(s.edits, num.ZERO)).toBe(true);
+    expect(s.stars.protagonist).toBe(1);
+    expect(s.stars.antihero).toBe(1);
+    expect(s.stars.support).toBe(1);
+    expect(s.stars.debuffer).toBe(1);
+    expect(s.stars.sidekick).toBe(1);
+  });
+
+  it('makeStars seeds every class at 1', () => {
+    const stars = makeStars();
+    expect(Object.values(stars).every((v) => v === 1)).toBe(true);
   });
 });
