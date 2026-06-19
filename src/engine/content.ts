@@ -228,11 +228,11 @@ export interface ClassDef {
 
 // ALL magnitudes + base powers are placeholders, tuned later against the balance harness.
 export const CLASSES: ClassDef[] = [
-  { id: 'protagonist', name: 'The Protagonist', classBasePower: n(1.5), ability: { kind: 'plotArmor', mag: 0.10 } },
-  { id: 'antihero',    name: 'Anti-hero',       classBasePower: n(1.5), ability: { kind: 'loneWolf', mag: 0.04 } },
-  { id: 'support',     name: 'Support',         classBasePower: n(0.8), ability: { kind: 'partyDps', mag: 0.03 } },
-  { id: 'debuffer',    name: 'Debuffer',        classBasePower: n(0.7), ability: { kind: 'regenCut', mag: 0.03 } },
-  { id: 'sidekick',    name: 'Sidekick',        classBasePower: n(0.7), ability: { kind: 'inspRate', mag: 0.03 } },
+  { id: 'protagonist', name: 'The Protagonist', classBasePower: n(1.0), ability: { kind: 'plotArmor', mag: 0.08 } },
+  { id: 'antihero',    name: 'Anti-hero',       classBasePower: n(1.0), ability: { kind: 'loneWolf', mag: 0.04 } },
+  { id: 'support',     name: 'Support',         classBasePower: n(0.6), ability: { kind: 'partyDps', mag: 0.025 } },
+  { id: 'debuffer',    name: 'Debuffer',        classBasePower: n(0.5), ability: { kind: 'regenCut', mag: 0.025 } },
+  { id: 'sidekick',    name: 'Sidekick',        classBasePower: n(0.5), ability: { kind: 'inspRate', mag: 0.025 } },
 ];
 
 export const PARTY_ABILITY_FLOOR = 0.10; // regen-cut floor shared with the shop `muse` upgrade
