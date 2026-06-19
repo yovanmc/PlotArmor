@@ -3,8 +3,8 @@ import * as num from './num';
 import * as C from './content';
 
 describe('content', () => {
-  it('has 3 zones with full encounter/boss metadata', () => {
-    expect(C.ZONE_COUNT).toBe(3);
+  it('has 8 zones with full encounter/boss metadata', () => {
+    expect(C.ZONE_COUNT).toBe(8);
     for (const z of C.ZONES) {
       expect(z.enemyEmojis.length).toBe(C.ENCOUNTERS_PER_ZONE);
       expect(z.enemyNames.length).toBe(C.ENCOUNTERS_PER_ZONE);

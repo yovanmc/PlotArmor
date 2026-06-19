@@ -15,17 +15,24 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**v2 (prestige depth + spend UI) complete.** On top of v1, Royalties are now a
-spendable wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time),
-books escalate in difficulty/size each publish, and the royalty payout scales with
-manuscript size. Royalties are now spendable in-game via the **Publishing House** —
-a parchment-themed modal listing all 8 upgrades (6 repeatable + 2 one-time unlocks),
-opened from a persistent entry button that displays the live Royalty balance.
-All headless-tested (76 passing tests); `npm run build` is green.
+**Playable loop, balanced, 8 genres.** On top of v1, Royalties are a spendable
+wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
+in-game via the **Publishing House** (a parchment modal opened from a live-balance
+entry button); books escalate in difficulty/size each publish, and the royalty
+payout scales with manuscript size.
+
+The core economy is now **tuned so the loop actually closes** — character power grows
+multiplicatively per level (`POWER_GROWTH`), so bought DPS keeps pace with exponential
+enemies. A greedy-play balance harness (`src/engine/balance.test.ts`) verifies book 1
+is publishable in ~13 minutes and books 1–8 all complete with no hard wall. Content is
+expanded from 3 to **8 genre zones** (Wild West, Zombie Apocalypse, Space, High Fantasy,
+Pirate Seas, Noir City, Eldritch Horror, Prehistoric). All headless-tested (78 passing
+tests); `npm run build` is green. Balance constants are tunable placeholders.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
-[spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md).
+[spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
+[balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md).

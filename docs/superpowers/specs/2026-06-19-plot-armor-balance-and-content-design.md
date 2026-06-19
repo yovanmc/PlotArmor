@@ -1,7 +1,7 @@
 # Plot Armor — Balance Fix + Content Expansion Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** Approved direction (owner chose "map the design, fix the loop, then add genre zones") — design map for review
+- **Status:** Implemented — 2026-06-19 (loop closes; verified by `src/engine/balance.test.ts`). Final tuning: `POWER_GROWTH=1.45`, `HP_GROWTH_PER_ZONE=6.5`, `REGEN_GROWTH_PER_ZONE=5.5`. Greedy book 1 ≈ 13 min; books 1–8 complete with no wall.
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, v2 prestige engine, v3 Publishing House shop (all shipped).

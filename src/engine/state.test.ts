@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, makeStartingParty, emptyUpgrades, characterPower } from './state';
-import { STARTING_PARTY_SIZE, targetMaxHp } from './content';
+import { STARTING_PARTY_SIZE, targetMaxHp, POWER_GROWTH } from './content';
 
 describe('state', () => {
   it('starts a fresh game with the right defaults', () => {
@@ -31,8 +31,12 @@ describe('state', () => {
     expect(party.length).toBe(STARTING_PARTY_SIZE);
   });
 
-  it('characterPower = basePower * level', () => {
-    expect(num.toNum(characterPower({ id: 'x', name: 'X', level: 4, basePower: num.n(2) }))).toBe(8);
+  it('characterPower = basePower * POWER_GROWTH^(level-1)', () => {
+    // multiplicative growth starts at level 1, so a level-1 character's power == its basePower
+    expect(num.toNum(characterPower({ id: 'x', name: 'X', level: 1, basePower: num.n(2) }))).toBe(2);
+    expect(
+      num.toNum(characterPower({ id: 'x', name: 'X', level: 4, basePower: num.n(2) })),
+    ).toBeCloseTo(2 * Math.pow(POWER_GROWTH, 3), 5);
   });
 
   it('emptyUpgrades has zeroed levels and false flags', () => {

@@ -1,6 +1,6 @@
 // src/engine/state.ts
-import { Num, n, mul, ZERO, ONE } from './num';
-import { STARTING_PARTY_SIZE, targetMaxHp } from './content';
+import { Num, n, mul, pow, ZERO, ONE } from './num';
+import { STARTING_PARTY_SIZE, targetMaxHp, POWER_GROWTH } from './content';
 
 export interface Character {
   id: string;
@@ -51,7 +51,7 @@ export function emptyUpgrades(): Upgrades {
 }
 
 export function characterPower(c: Character): Num {
-  return mul(c.basePower, n(c.level));
+  return mul(c.basePower, pow(n(POWER_GROWTH), c.level - 1));
 }
 
 export function makeStartingParty(level = 1): Character[] {

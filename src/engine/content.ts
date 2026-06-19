@@ -39,18 +39,51 @@ export const ZONES: ZoneDef[] = [
     enemyNames: ['Xeno Scout', 'Drone Swarm', 'War Mech', 'Asteroid', 'Void Spawn', 'Star Reaver'],
     bossEmoji: '👾', bossName: 'The Hollow Star',
   },
+  {
+    genre: 'High Fantasy', bg: '#1a1426', accent: '#c77dff',
+    enemyEmojis: ['👺', '🐺', '💀', '🧝', '🗿', '🧌'],
+    enemyNames: ['Goblin', 'Dire Wolf', 'Skeleton', 'Dark Elf', 'Stone Troll', 'Ogre'],
+    bossEmoji: '🐲', bossName: 'The Elder Dragon',
+  },
+  {
+    genre: 'Pirate Seas', bg: '#0e1f24', accent: '#3fae9f',
+    enemyEmojis: ['🗡️', '🐀', '💣', '🦈', '🐍', '☠️'],
+    enemyNames: ['Cutthroat', 'Cabin Rat', 'Cannoneer', 'Reef Shark', 'Sea Serpent', 'Cursed Sailor'],
+    bossEmoji: '🏴‍☠️', bossName: 'The Dread Captain',
+  },
+  {
+    genre: 'Noir City', bg: '#17171c', accent: '#b8bcc8',
+    enemyEmojis: ['🧤', '🥊', '💋', '👮', '🔫', '🍾'],
+    enemyNames: ['Pickpocket', 'Enforcer', 'Femme Fatale', 'Crooked Cop', 'Hitman', 'Bootlegger'],
+    bossEmoji: '🎩', bossName: 'Mr. Big',
+  },
+  {
+    genre: 'Eldritch Horror', bg: '#11160e', accent: '#9fe04a',
+    enemyEmojis: ['🕯️', '🐟', '👤', '👻', '🦑', '🌀'],
+    enemyNames: ['Cultist', 'Deep One', 'Crawling Shadow', 'Wraith', 'Spawn', 'Mind Fog'],
+    bossEmoji: '👁️', bossName: 'The Sleeper',
+  },
+  {
+    genre: 'Prehistoric', bg: '#241a10', accent: '#e07b39',
+    enemyEmojis: ['🦎', '🦅', '🐯', '🦣', '🦕', '🌋'],
+    enemyNames: ['Raptor', 'Pterodactyl', 'Sabertooth', 'Mammoth', 'Stegosaurus', 'Tar Pit'],
+    bossEmoji: '🦖', bossName: 'The Tyrant King',
+  },
 ];
 
 export const ZONE_COUNT = ZONES.length;
 export const TARGETS_PER_BOOK = ZONE_COUNT * (BOSS_INDEX + 1);
 
 // --- tunable scaling curves ---
+// Character power grows MULTIPLICATIVELY per level (power = basePower * POWER_GROWTH^(level-1)).
+// This is what lets bought DPS keep pace with exponential enemy scaling; at level 1 power == basePower.
+export const POWER_GROWTH = 1.45;
 const BASE_ENCOUNTER_HP = n(10);
 const HP_GROWTH_PER_ENCOUNTER = 1.6;
-const HP_GROWTH_PER_ZONE = 12;
+const HP_GROWTH_PER_ZONE = 6.5;
 const BOSS_HP_MULT = n(4);
 const BASE_BOSS_REGEN = n(3);
-const REGEN_GROWTH_PER_ZONE = 12;
+const REGEN_GROWTH_PER_ZONE = 5.5;
 const BASE_INSP_RATE = n(1);
 const INSP_GROWTH = 1.35; // per tier index
 const BASE_WORDS = n(50);
