@@ -64,3 +64,19 @@ describe('content: prestige catalog & costs', () => {
     expect(C.BOOK_SCALE).toBeGreaterThan(1);
   });
 });
+
+describe('content: classes', () => {
+  it('defines the four classes plus the protagonist with abilities', () => {
+    expect(C.CLASSES.map((c) => c.id).sort()).toEqual(
+      ['antihero', 'debuffer', 'protagonist', 'sidekick', 'support'],
+    );
+    for (const def of C.CLASSES) {
+      expect(typeof def.name).toBe('string');
+      expect(num.gt(def.classBasePower, num.ZERO)).toBe(true);
+      expect(typeof def.ability.kind).toBe('string');
+    }
+    expect(C.findClass('protagonist').ability.kind).toBe('plotArmor');
+    expect(C.findClass('debuffer').ability.kind).toBe('regenCut');
+    expect(() => C.findClass('nope' as C.ClassId)).toThrow();
+  });
+});

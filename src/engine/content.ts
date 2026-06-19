@@ -214,3 +214,31 @@ export function findUpgrade(id: UpgradeId): UpgradeDef {
   if (!def) throw new Error(`Unknown upgrade: ${id}`);
   return def;
 }
+
+// --- party classes (Slice 1) -------------------------------------------------
+export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
+export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';
+
+export interface ClassDef {
+  id: ClassId;
+  name: string;
+  classBasePower: Num;
+  ability: { kind: AbilityKind; mag: number }; // mag is per-level (× star later); placeholder values
+}
+
+// ALL magnitudes + base powers are placeholders, tuned later against the balance harness.
+export const CLASSES: ClassDef[] = [
+  { id: 'protagonist', name: 'The Protagonist', classBasePower: n(1.5), ability: { kind: 'plotArmor', mag: 0.10 } },
+  { id: 'antihero',    name: 'Anti-hero',       classBasePower: n(1.5), ability: { kind: 'loneWolf', mag: 0.04 } },
+  { id: 'support',     name: 'Support',         classBasePower: n(0.8), ability: { kind: 'partyDps', mag: 0.03 } },
+  { id: 'debuffer',    name: 'Debuffer',        classBasePower: n(0.7), ability: { kind: 'regenCut', mag: 0.03 } },
+  { id: 'sidekick',    name: 'Sidekick',        classBasePower: n(0.7), ability: { kind: 'inspRate', mag: 0.03 } },
+];
+
+export const PARTY_ABILITY_FLOOR = 0.10; // regen-cut floor shared with the shop `muse` upgrade
+
+export function findClass(id: ClassId): ClassDef {
+  const def = CLASSES.find((c) => c.id === id);
+  if (!def) throw new Error(`Unknown class: ${id}`);
+  return def;
+}
