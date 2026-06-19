@@ -15,7 +15,7 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**Playable loop, balanced, 8 genres, class-based party.** On top of v1, Royalties are a spendable
+**Playable loop, balanced, 8 genres, class-based party with stars.** On top of v1, Royalties are a spendable
 wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
 in-game via the **Publishing House** (a parchment modal opened from a live-balance
 entry button); books escalate in difficulty/size each publish, and the royalty
@@ -33,9 +33,17 @@ plus four recruitable classes — **Anti-hero** (Lone Wolf: amps only its own DP
 **Support** (amps the whole party's DPS), **Debuffer** (cuts boss regen), and
 **Sidekick** (raises the Inspiration rate). You choose which class to recruit, and the
 Protagonist's **Plot Armor** scales the party's DPS by the number of *distinct* classes
-fielded, so a varied roster beats a stack of clones. Stars/tiers and world-variants are
-deferred to later slices. All headless-tested (88 passing tests) plus a live DOM smoke of
-the built bundle; `npm run build` is green. Balance constants are tunable placeholders.
+fielded, so a varied roster beats a stack of clones.
+
+Classes now also carry **per-class star tiers (Slice 2 of the party system)**: 1★–5★
+ratings funded by **Edits**, a global currency dropped by **boss kills**. Spending Edits
+raises a class's star, which multiplies both its base power and its ability magnitude on
+top of per-book leveling (the Protagonist grows on its own track instead). Stars are a
+permanent, earned mid-game boost — the harness verifies the loop still closes (book 1 in
+~8 minutes, books 1–8 complete) with stars funded from boss drops. World-variant
+collection and set bonuses are deferred to Slice 3. All headless-tested (108 passing tests)
+plus a live DOM smoke of the built bundle (star-up click raises the star and DPS, 0 console
+errors); `npm run build` is green. Balance constants are tunable placeholders.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
@@ -45,7 +53,8 @@ Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
-[party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md).
+[party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md) ·
+[party Slice 2](docs/superpowers/plans/2026-06-19-plot-armor-party-slice2.md).
 
 Run it locally: `npm install` then `npm run dev`.
 

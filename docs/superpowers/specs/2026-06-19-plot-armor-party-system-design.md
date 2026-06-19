@@ -1,7 +1,7 @@
 # Plot Armor — Party System (Classes, Stars, Collection) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** **Slice 1 (MVP) IMPLEMENTED** (2026-06-19) — Protagonist + 4 classes with composition abilities, choose-a-class on recruit, save schema v3, harness-rebalanced; shipped on `main`. North-star locked; **Slices 2–3 now fully designed & locked (§6, §6b, §10), ready to plan**; Slice 4 (affinity) deferred (§9). Only tuning magnitudes remain open (§12).
+- **Status:** **Slices 1 & 2 IMPLEMENTED** (2026-06-19) — Slice 1: Protagonist + 4 classes with composition abilities, choose-a-class on recruit. Slice 2: per-class 5★ stars funded by global **Edits** dropped from bosses (save schema v4), scaling class power + ability magnitude; harness-reverified (loop closes with stars). Both shipped on `main`. North-star locked; **Slice 3 (collection + variants + 2/3/5 set bonus) fully designed & locked (§6b, §10), ready to plan**; Slice 4 (affinity) deferred (§9). Only tuning magnitudes remain open (§12).
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, prestige + Publishing House shop, and the balance fix + 8 genre zones (all shipped).
@@ -136,7 +136,7 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 Each slice ships working, tested software and points at the north-star.
 
 - **Slice 1 — Classes + abilities + Protagonist (no collection yet). ✅ IMPLEMENTED 2026-06-19.** Replaced the clone party with the Protagonist + the 4 classes (fixed 1★), abilities wired into `modifiers`, choose-a-class on recruit (Protagonist always fielded), save schema v3, full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
-- **Slice 2 — Stars + Edits (NEXT). [design LOCKED — §6]** Per-class 5★ stars; global **Edits** dropped by bosses; star-up (escalating cost) scaling class base power + ability magnitude on top of leveling; max-star overflow banked (prestige deferred); star pips on cards. Re-balance via the harness.
+- **Slice 2 — Stars + Edits. ✅ IMPLEMENTED 2026-06-19.** Per-class 5★ stars; global **Edits** dropped by bosses; star-up (escalating cost) scaling class base power + ability magnitude on top of leveling; max-star overflow reserved (prestige deferred); star pips + star-up buttons on cards; save schema v4 with migration. Harness funds stars from boss Edits and confirms the loop still closes (greedy book 1 ~8m, books 1–8 complete). 108 tests, build green, live DOM smoke passed.
 - **Slice 3 — Collection + variants + set bonus. [design LOCKED — §6b]** Deterministic earned acquisition (each world-boss clear unlocks the next variant in that world's set, fixed order, permanent — no gacha); cosmetic `(class × world)` roster incl. Protagonist cosmetic variants; **per-world set bonus at 2/3/5 fielded thresholds** (§6b); collection + party-selection UI (own visual pass); the Protagonist Royalties track (§7).
 - **Slice 4+ — Deferred layers (§9):** affinity, etc.
 
