@@ -34,4 +34,10 @@ describe('num', () => {
     expect(num.fmt(num.n(2_500_000))).toBe('2.50M');
     expect(num.fmt(num.n(1_000_000_000))).toBe('1.00B');
   });
+
+  it('floors to an integer magnitude', () => {
+    expect(num.eq(num.floorN(num.n(5.9)), num.n(5))).toBe(true);
+    expect(num.eq(num.floorN(num.n(5)), num.n(5))).toBe(true);
+    expect(num.eq(num.floorN(num.n('1.99e3')), num.n(1990))).toBe(true);
+  });
 });

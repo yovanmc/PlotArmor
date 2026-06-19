@@ -37,6 +37,7 @@ export const minN = (a: Num, b: Num): Num => a.min(b);
 export const toNum = (v: Num): number => v.toNumber();
 export const numToStr = (v: Num): string => v.toString();
 export const strToNum = (s: string): Num => new Decimal(s);
+export const floorN = (v: Num): Num => v.floor();
 
 const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
 
