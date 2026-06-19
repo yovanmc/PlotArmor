@@ -66,3 +66,27 @@ describe('progression', () => {
     expect(publish(s)).toBe(s);
   });
 });
+
+describe('boss Edit drops (Slice 2)', () => {
+  it('clearing a boss awards Edits', () => {
+    const atBoss = { ...initialState(0), zone: { zoneIndex: 0, encounterIndex: BOSS_INDEX } };
+    const after = onClear(atBoss);
+    expect(num.gt(after.edits, atBoss.edits)).toBe(true);
+  });
+
+  it('clearing a regular encounter awards no Edits', () => {
+    const atReg = { ...initialState(0), zone: { zoneIndex: 0, encounterIndex: 0 } };
+    const after = onClear(atReg);
+    expect(num.eq(after.edits, atReg.edits)).toBe(true);
+  });
+
+  it('awards Edits on the final boss too (the book-complete branch)', () => {
+    const finalBoss = {
+      ...initialState(0),
+      zone: { zoneIndex: ZONE_COUNT - 1, encounterIndex: BOSS_INDEX },
+    };
+    const after = onClear(finalBoss);
+    expect(after.bookComplete).toBe(true);
+    expect(num.gt(after.edits, finalBoss.edits)).toBe(true);
+  });
+});

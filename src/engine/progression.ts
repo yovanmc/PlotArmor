@@ -1,7 +1,7 @@
 // src/engine/progression.ts
 import { ZERO, add } from './num';
 import { GameState, makeStartingParty } from './state';
-import { ZONE_COUNT, isBossIndex } from './content';
+import { ZONE_COUNT, isBossIndex, bossEditDrop } from './content';
 import { effectiveWords, effectiveTargetMaxHp, startingPartyLevel } from './modifiers';
 import { royaltiesForBook } from './prestige';
 
@@ -10,14 +10,15 @@ export function onClear(state: GameState): GameState {
   const { zoneIndex, encounterIndex } = state.zone;
   const words = add(state.words, effectiveWords(state, zoneIndex, encounterIndex));
   const clearedBoss = isBossIndex(encounterIndex);
+  const edits = clearedBoss ? add(state.edits, bossEditDrop(state.bookNumber)) : state.edits;
 
   if (clearedBoss && zoneIndex >= ZONE_COUNT - 1) {
-    return { ...state, words, bookComplete: true };
+    return { ...state, words, edits, bookComplete: true };
   }
 
   const nz = clearedBoss ? zoneIndex + 1 : zoneIndex;
   const ne = clearedBoss ? 0 : encounterIndex + 1;
-  const advanced = { ...state, words, zone: { zoneIndex: nz, encounterIndex: ne } };
+  const advanced = { ...state, words, edits, zone: { zoneIndex: nz, encounterIndex: ne } };
   return { ...advanced, currentHp: effectiveTargetMaxHp(advanced, nz, ne) };
 }
 
