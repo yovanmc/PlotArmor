@@ -134,6 +134,7 @@ interface GameState {
   party: Character[];
   zone: ZoneState;
   currentEncounterHp: Decimal;   // remaining HP of the thing being fought
+  bookComplete: boolean;         // final boss down; awaiting player's Publish action
   bookNumber: number;            // increments on publish
   prestigeMultiplier: Decimal;   // permanent global bonus from royalties
   settings: { /* e.g., number format */ };
@@ -143,13 +144,17 @@ interface GameState {
 ## 6. Core systems
 
 ### 6.1 Resources & spend sinks
-- **Inspiration** — the spend currency. Accrues from combat. Spent to:
-  - **Recruit** a new character (flat-ish escalating cost per recruit, up to cap 5).
+- **Inspiration** — the spend currency. **Accrues continuously while fighting**,
+  at a rate set by your current depth/tier (deeper = higher rate). Because it is
+  rate-based, not kill-gated, you keep earning even while chipping a boss you can't
+  yet beat — so you always come back from being away with currency to spend.
+  Spent to:
+  - **Recruit** a new character (escalating cost per recruit, up to cap 5).
   - **Level** a character (geometric cost curve, e.g. `cost = base * r^level`).
   - No separate XP track — **every spend is a deliberate decision**.
-- **Words** — manuscript progress. Each clear adds Words; a manuscript bar climbs
-  toward a per-book target ("The End"). Progress only; never spent, so it never
-  competes with Inspiration.
+- **Words** — manuscript progress. **Granted per clear** (discrete); a manuscript
+  bar climbs toward a per-book target ("The End"). Progress only; never spent, so
+  it never competes with Inspiration.
 - **Royalties** — prestige currency from publishing (see 6.4).
 
 ### 6.2 Combat math (no-death "Plot Armor" throughput)
@@ -157,10 +162,11 @@ interface GameState {
   per character; `characterPower = basePower * f(level)` (e.g. `basePower * level`
   or a gentle exponential — tuned in implementation).
 - **Regular encounter** = an HP pool. Each tick: `currentEncounterHp -=
-  partyDPS * dt`. When it reaches 0 → **clear**: award Inspiration + Words, then
+  partyDPS * dt`. When it reaches 0 → **clear**: award **Words** and
   **auto-advance** to the next encounter (higher HP). `clearTime ≈ HP / partyDPS`.
-- Income accrues per clear (and/or continuously by damage), so the player is
-  **never at zero income** — a slow clear is the signal to go spend/level.
+- **Inspiration accrues continuously** at `inspirationRate(currentTarget) * dt`
+  (rate scales with depth/tier), independent of kills — so the player is **never at
+  zero income**, and a slow clear is the signal to go spend/level.
 - **Boss = DPS-check gate.** Boss has HP **plus regen** (or an enrage reset):
   effective damage per second = `partyDPS - bossRegen`. If `partyDPS <= bossRegen`,
   the boss never dies (heals/resets faster than you damage it) → a hard
@@ -175,10 +181,13 @@ interface GameState {
   climax → triggers publish (6.4).
 
 ### 6.4 Prestige (publish → next book)
-- On final-boss defeat: show a **publish summary** ("Your book is on sale!").
-- Award **Royalties**, scaled by book performance (e.g. function of total Words
-  written and/or book number). Each Royalty grants a **permanent global
-  multiplier** (`prestigeMultiplier`) applied to production/power.
+- On final-boss defeat: set `bookComplete = true` and **halt progression** (combat
+  stops at the climax). This is a deliberate gate so the prestige reset is **never
+  performed without the player's consent** — including offline (you return to a
+  "ready to publish" state rather than having your party auto-wiped while away).
+- The UI shows a **Publish** action; performing it awards **Royalties** (v1: one
+  prestige point per book) and grants a **permanent global multiplier**
+  (`prestigeMultiplier = 1 + royalties * ROYALTY_BONUS`) applied to production/power.
 - **Reset for next book:** party levels, recruited members beyond the starting 2,
   Inspiration, Words, and zone progress reset; **Royalties + prestigeMultiplier +
   bookNumber persist**. `bookNumber++`. Zones regenerate (same 3 genres in v1;
@@ -195,6 +204,9 @@ interface GameState {
   bounded chunks (e.g. `N` steps of `elapsed/N`, capped iteration budget) →
   produce a "While you were writing…" summary (Inspiration/Words gained, encounters
   cleared). Parity with live play is guaranteed because it's the same reducer.
+  Because Inspiration is rate-based (6.1), offline **always** earns it — even if you
+  were parked at a boss wall. Offline never auto-publishes: if you'd beat the final
+  boss, progression stops at `bookComplete` (6.4) for you to publish on return.
 - **Tick loop:** fixed logic timestep (e.g. **100 ms**) via an accumulator,
   decoupled from `requestAnimationFrame` render. Render reads current state each
   frame; logic advances in fixed steps. Robust to frame-rate variance.
@@ -266,6 +278,10 @@ interface GameState {
 
 - Exact power/level formula, cost curves, HP/reward scaling, boss regen thresholds.
 - `OFFLINE_CAP` value (default ~12h), autosave interval, logic tick (default 100ms).
-- Words-per-clear and per-book Words target; Royalty award formula and multiplier
-  magnitude.
+- Per-book Words target; Royalty multiplier magnitude (`ROYALTY_BONUS`).
 - Final genre order / names (default Wild West → Zombie → Space).
+
+**Resolved (2026-06-19):** reward timing — **Inspiration is continuous,
+rate-based** (scales with depth); **Words are per clear**. Royalty award is **one
+prestige point per book** in v1. Publish is a **player action** gated on
+`bookComplete` (never auto-resets the party, including offline).
