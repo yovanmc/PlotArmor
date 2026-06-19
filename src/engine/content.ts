@@ -215,6 +215,38 @@ export function findUpgrade(id: UpgradeId): UpgradeDef {
   return def;
 }
 
+// --- party stars + the Edits economy (Slice 2) -------------------------------
+// Stars are PER-CLASS (1..MAX_STAR). starStatMult scales class base power and
+// starAbilityMult scales class ability magnitude; both are 1 at 1 star so the
+// fresh game is identical to Slice 1. Edits are a global currency dropped by
+// bosses, spent to raise a class's star. ALL magnitudes are harness-tuned.
+export const MAX_STAR = 5;
+export const STAR_GROWTH = 1.6;          // class base-power multiplier per star
+export const STAR_ABILITY_GROWTH = 1.5;  // class ability-magnitude multiplier per star
+export const EDITS_BASE = n(2);          // Edits cost of the 1*->2* step
+export const STAR_COST_GROWTH = 2;       // star-up cost escalation per star
+export const EDITS_PER_BOSS = n(1);      // base Edits per boss kill (book 1)
+export const EDIT_BOOK_GROWTH = 1.25;    // gentle per-book growth of the boss drop
+
+export function starStatMult(stars: number): number {
+  return Math.pow(STAR_GROWTH, stars - 1);
+}
+
+export function starAbilityMult(stars: number): number {
+  return Math.pow(STAR_ABILITY_GROWTH, stars - 1);
+}
+
+// Edits to go from `currentStar` to `currentStar + 1`.
+export function starUpCost(currentStar: number): Num {
+  return mul(EDITS_BASE, pow(n(STAR_COST_GROWTH), currentStar - 1));
+}
+
+// Edits dropped by a boss kill in the given book. Grows gently with the book
+// number (stars are a bounded permanent boost, not a scaling mechanism).
+export function bossEditDrop(bookNumber: number): Num {
+  return mul(EDITS_PER_BOSS, pow(n(EDIT_BOOK_GROWTH), bookNumber - 1));
+}
+
 // --- party classes (Slice 1) -------------------------------------------------
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
 export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';

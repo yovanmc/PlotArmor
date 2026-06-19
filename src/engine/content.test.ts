@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import * as C from './content';
+import {
+  starStatMult, starAbilityMult, starUpCost, bossEditDrop, MAX_STAR,
+} from './content';
 
 describe('content', () => {
   it('has 8 zones with full encounter/boss metadata', () => {
@@ -78,5 +81,28 @@ describe('content: classes', () => {
     expect(C.findClass('protagonist').ability.kind).toBe('plotArmor');
     expect(C.findClass('debuffer').ability.kind).toBe('regenCut');
     expect(() => C.findClass('nope' as C.ClassId)).toThrow();
+  });
+});
+
+describe('stars + Edits (Slice 2)', () => {
+  it('MAX_STAR is 5', () => {
+    expect(MAX_STAR).toBe(5);
+  });
+
+  it('star multipliers are exactly 1 at 1 star and grow with stars', () => {
+    expect(starStatMult(1)).toBe(1);
+    expect(starAbilityMult(1)).toBe(1);
+    expect(starStatMult(5)).toBeGreaterThan(starStatMult(1));
+    expect(starAbilityMult(5)).toBeGreaterThan(starAbilityMult(1));
+  });
+
+  it('star-up cost rises with the current star', () => {
+    expect(num.gt(starUpCost(2), starUpCost(1))).toBe(true);
+    expect(num.gt(starUpCost(1), num.ZERO)).toBe(true);
+  });
+
+  it('boss Edit drop is positive and grows with the book number', () => {
+    expect(num.gt(bossEditDrop(1), num.ZERO)).toBe(true);
+    expect(num.gt(bossEditDrop(3), bossEditDrop(1))).toBe(true);
   });
 });
