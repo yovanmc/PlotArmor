@@ -1,7 +1,7 @@
 // src/engine/progression.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
-import { initialState, emptyUpgrades } from './state';
+import { initialState, emptyUpgrades, makeCharacter } from './state';
 import { onClear, publish } from './progression';
 import { BOSS_INDEX, ZONE_COUNT, targetMaxHp, targetWords, GHOSTWRITER_LEVEL } from './content';
 import { royaltiesForBook } from './prestige';
@@ -106,5 +106,18 @@ describe('boss Edit drops (Slice 2)', () => {
     const after = onClear(finalBoss);
     expect(after.bookComplete).toBe(true);
     expect(num.gt(after.edits, finalBoss.edits)).toBe(true);
+  });
+});
+
+describe('Edit-drop set bonus (Slice 3b)', () => {
+  it('a Pirate Seas set (world 4, editDrop axis) boosts the boss Edit drop', () => {
+    // 2 on world 4 = editDrop tier 1 (+0.25)
+    const party = [
+      { ...makeCharacter('c0', 'protagonist'), variantWorld: 4 },
+      { ...makeCharacter('c1', 'antihero'), variantWorld: 4 },
+    ];
+    const withSet = { ...initialState(0), party, zone: { zoneIndex: 0, encounterIndex: BOSS_INDEX } };
+    const noSet = { ...withSet, party: party.map((c) => ({ ...c, variantWorld: null })) };
+    expect(num.gt(onClear(withSet).edits, onClear(noSet).edits)).toBe(true);
   });
 });

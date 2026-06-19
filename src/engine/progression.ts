@@ -1,17 +1,19 @@
 // src/engine/progression.ts
-import { ZERO, add } from './num';
+import { ZERO, add, mul, n } from './num';
 import { GameState, makeStartingParty } from './state';
 import { ZONE_COUNT, isBossIndex, bossEditDrop } from './content';
 import { effectiveWords, effectiveTargetMaxHp, startingPartyLevel } from './modifiers';
 import { royaltiesForBook } from './prestige';
-import { unlockNextVariant } from './variants';
+import { unlockNextVariant, activeSetBonus } from './variants';
 
 // Called when the current target's HP reaches 0.
 export function onClear(state: GameState): GameState {
   const { zoneIndex, encounterIndex } = state.zone;
   const words = add(state.words, effectiveWords(state, zoneIndex, encounterIndex));
   const clearedBoss = isBossIndex(encounterIndex);
-  const edits = clearedBoss ? add(state.edits, bossEditDrop(state.bookNumber)) : state.edits;
+  const edits = clearedBoss
+    ? add(state.edits, mul(bossEditDrop(state.bookNumber), n(activeSetBonus(state.party).editDropMult)))
+    : state.edits;
   const unlockedVariants = clearedBoss
     ? unlockNextVariant(state.unlockedVariants, zoneIndex)
     : state.unlockedVariants;
