@@ -4,6 +4,7 @@ import { GameState, makeStartingParty } from './state';
 import { ZONE_COUNT, isBossIndex, bossEditDrop } from './content';
 import { effectiveWords, effectiveTargetMaxHp, startingPartyLevel } from './modifiers';
 import { royaltiesForBook } from './prestige';
+import { unlockNextVariant } from './variants';
 
 // Called when the current target's HP reaches 0.
 export function onClear(state: GameState): GameState {
@@ -11,14 +12,17 @@ export function onClear(state: GameState): GameState {
   const words = add(state.words, effectiveWords(state, zoneIndex, encounterIndex));
   const clearedBoss = isBossIndex(encounterIndex);
   const edits = clearedBoss ? add(state.edits, bossEditDrop(state.bookNumber)) : state.edits;
+  const unlockedVariants = clearedBoss
+    ? unlockNextVariant(state.unlockedVariants, zoneIndex)
+    : state.unlockedVariants;
 
   if (clearedBoss && zoneIndex >= ZONE_COUNT - 1) {
-    return { ...state, words, edits, bookComplete: true };
+    return { ...state, words, edits, unlockedVariants, bookComplete: true };
   }
 
   const nz = clearedBoss ? zoneIndex + 1 : zoneIndex;
   const ne = clearedBoss ? 0 : encounterIndex + 1;
-  const advanced = { ...state, words, edits, zone: { zoneIndex: nz, encounterIndex: ne } };
+  const advanced = { ...state, words, edits, unlockedVariants, zone: { zoneIndex: nz, encounterIndex: ne } };
   return { ...advanced, currentHp: effectiveTargetMaxHp(advanced, nz, ne) };
 }
 

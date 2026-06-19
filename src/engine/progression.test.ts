@@ -67,6 +67,24 @@ describe('progression', () => {
   });
 });
 
+describe('boss variant unlocks (Slice 3a)', () => {
+  it('clearing a boss unlocks the next variant for that world; a regular clear does not', () => {
+    const atBoss = { ...initialState(0), zone: { zoneIndex: 2, encounterIndex: BOSS_INDEX } };
+    const after = onClear(atBoss);
+    expect(after.unlockedVariants.protagonist).toEqual([2]); // world 2's first variant
+
+    const atReg = { ...initialState(0), zone: { zoneIndex: 2, encounterIndex: 0 } };
+    expect(onClear(atReg).unlockedVariants.protagonist).toEqual([]);
+  });
+
+  it('unlocks on the final boss (book-complete branch) too', () => {
+    const finalBoss = { ...initialState(0), zone: { zoneIndex: ZONE_COUNT - 1, encounterIndex: BOSS_INDEX } };
+    const after = onClear(finalBoss);
+    expect(after.bookComplete).toBe(true);
+    expect(after.unlockedVariants.protagonist).toEqual([ZONE_COUNT - 1]);
+  });
+});
+
 describe('boss Edit drops (Slice 2)', () => {
   it('clearing a boss awards Edits', () => {
     const atBoss = { ...initialState(0), zone: { zoneIndex: 0, encounterIndex: BOSS_INDEX } };
