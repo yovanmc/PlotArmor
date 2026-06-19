@@ -60,4 +60,7 @@ export function render(state: GameState): void {
   el('party').innerHTML = cards + recruitCard;
 
   el('publish').style.display = state.bookComplete ? 'block' : 'none';
+
+  const shopOpen = document.getElementById('shop-open');
+  if (shopOpen) shopOpen.textContent = `📖 Publishing House · 💰 ${fmt(state.royalties)}`;
 }
