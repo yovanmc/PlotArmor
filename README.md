@@ -15,8 +15,15 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-In design → implementation. Full v1 spec:
-[`docs/superpowers/specs/2026-06-19-plot-armor-design.md`](docs/superpowers/specs/2026-06-19-plot-armor-design.md).
+**v1 complete.** The full engine (numbers, content, combat, economy, progression,
+tick loop, offline catch-up, save/load) is implemented and headless-tested
+(44 passing tests), under a DOM/CSS render layer; `npm run build` is green. Full
+v1 spec:
+[`docs/superpowers/specs/2026-06-19-plot-armor-design.md`](docs/superpowers/specs/2026-06-19-plot-armor-design.md);
+implementation plan:
+[`docs/superpowers/plans/2026-06-19-plot-armor-v1.md`](docs/superpowers/plans/2026-06-19-plot-armor-v1.md).
+
+Run it locally: `npm install` then `npm run dev`.
 
 ## Stack
 
