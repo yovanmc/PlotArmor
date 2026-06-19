@@ -1,12 +1,12 @@
 // src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
 import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars } from './state';
-import { ClassId, findClass, CLASSES } from './content';
+import { ClassId, findClass, CLASSES, MAX_STAR } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
 // Migration is structural (the isV3Party guard inspects field shape), not version-gated.
 // SCHEMA_VERSION is stamped into the output so saves are self-describing.
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 // Derived from the authoritative class catalog so it can never drift out of sync.
 const KNOWN_CLASS_IDS = new Set<string>(CLASSES.map((c) => c.id));
@@ -24,6 +24,8 @@ interface SaveDTO {
   bookComplete: boolean;
   bookNumber: number;
   upgrades: Upgrades;
+  edits: string;
+  stars: Record<string, number>;
 }
 
 function mergeUpgrades(u: Partial<Upgrades> | undefined): Upgrades {
@@ -43,6 +45,21 @@ function mergeUpgrades(u: Partial<Upgrades> | undefined): Upgrades {
   };
 }
 
+// Read per-class stars defensively: every class defaults to 1, values are
+// clamped to [1, MAX_STAR], and unknown keys are dropped. Derived from CLASSES.
+function sanitizeStars(raw: unknown): Record<ClassId, number> {
+  const out = makeStars();
+  if (raw && typeof raw === 'object') {
+    for (const c of CLASSES) {
+      const v = (raw as Record<string, unknown>)[c.id];
+      if (typeof v === 'number' && Number.isFinite(v)) {
+        out[c.id] = Math.max(1, Math.min(MAX_STAR, Math.floor(v)));
+      }
+    }
+  }
+  return out;
+}
+
 export function serialize(state: GameState): string {
   const dto: SaveDTO = {
     schemaVersion: SCHEMA_VERSION,
@@ -56,6 +73,8 @@ export function serialize(state: GameState): string {
     bookComplete: state.bookComplete,
     bookNumber: state.bookNumber,
     upgrades: state.upgrades,
+    edits: numToStr(state.edits),
+    stars: state.stars,
   };
   return JSON.stringify(dto);
 }
@@ -99,8 +118,8 @@ export function deserialize(raw: string, nowMs: number): GameState {
     bookComplete: typeof dto.bookComplete === 'boolean' ? dto.bookComplete : false,
     bookNumber: typeof dto.bookNumber === 'number' ? dto.bookNumber : 1,
     upgrades: mergeUpgrades(dto.upgrades),
-    edits: ZERO,              // STOPGAP — Task 6 reads dto.edits
-    stars: makeStars(),       // STOPGAP — Task 6 reads dto.stars
+    edits: numOr(dto.edits, ZERO),
+    stars: sanitizeStars(dto.stars),
   };
 }
 

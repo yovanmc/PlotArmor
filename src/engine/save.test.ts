@@ -21,7 +21,7 @@ describe('save', () => {
     expect(back.upgrades.ensembleCast).toBe(true);
     expect(back.party.length).toBe(s.party.length);
     expect(back.lastSaved).toBe(1234);
-    expect(back.schemaVersion).toBe(3);
+    expect(back.schemaVersion).toBe(4);
   });
 
   it('migrates a v1 save: keeps royalties as wallet, ignores prestigeMultiplier, defaults upgrades, reseeds party', () => {
@@ -33,7 +33,7 @@ describe('save', () => {
     const s = deserialize(v1, 9);
     expect(num.eq(s.royalties, num.n(4))).toBe(true);
     expect(s.upgrades).toEqual(emptyUpgrades());
-    expect(s.schemaVersion).toBe(3);
+    expect(s.schemaVersion).toBe(4);
     expect((s as unknown as Record<string, unknown>).prestigeMultiplier).toBeUndefined();
     // classless party → reseeded; progress is intact
     expect(s.party[0].classId).toBe('protagonist');
@@ -102,5 +102,43 @@ describe('save', () => {
     const s = deserialize(corrupt, 0);
     expect(num.toNum(s.royalties)).toBe(4);              // progress kept
     expect(s.party[0].classId).toBe('protagonist');      // unknown class -> whole party reseeded
+  });
+});
+
+describe('save v4: Edits + stars', () => {
+  it('round-trips Edits and per-class stars', () => {
+    const fresh = initialState(0);
+    const s = { ...fresh, edits: num.n(42), stars: { ...fresh.stars, support: 4, debuffer: 2 } };
+    const back = deserialize(serialize(s), 0);
+    expect(num.eq(back.edits, num.n(42))).toBe(true);
+    expect(back.stars.support).toBe(4);
+    expect(back.stars.debuffer).toBe(2);
+    expect(back.schemaVersion).toBe(4);
+  });
+
+  it('migrates a pre-v4 save: defaults Edits to 0 and all stars to 1, keeps progress', () => {
+    const v3 = JSON.stringify({
+      schemaVersion: 3, lastSaved: 0, inspiration: '500', words: '0', royalties: '9',
+      party: [{ id: 'c0', name: 'The Protagonist', classId: 'protagonist', level: 2, basePower: '1' }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '10', bookComplete: false, bookNumber: 1, upgrades: {},
+    });
+    const s = deserialize(v3, 0);
+    expect(num.eq(s.edits, num.ZERO)).toBe(true);
+    expect(s.stars.protagonist).toBe(1);
+    expect(num.toNum(s.royalties)).toBe(9);
+  });
+
+  it('clamps and ignores corrupt star values', () => {
+    const corrupt = JSON.stringify({
+      schemaVersion: 4, lastSaved: 0, inspiration: '0', words: '0', royalties: '0',
+      party: [{ id: 'c0', name: 'The Protagonist', classId: 'protagonist', level: 1, basePower: '1' }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '10', bookComplete: false, bookNumber: 1, upgrades: {},
+      edits: '5', stars: { support: 99, debuffer: -4, wizard: 3 },
+    });
+    const s = deserialize(corrupt, 0);
+    expect(s.stars.support).toBe(5);   // clamped to MAX_STAR
+    expect(s.stars.debuffer).toBe(1);  // negative -> floored up to 1
+    expect((s.stars as Record<string, number>).wizard).toBeUndefined(); // unknown class ignored
+    expect(num.toNum(s.edits)).toBe(5);
   });
 });
