@@ -1,7 +1,7 @@
 # Plot Armor — Party System (Classes, Stars, Collection) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** **Slice 1 (MVP) IMPLEMENTED** (2026-06-19) — Protagonist + 4 classes with composition abilities, choose-a-class on recruit, save schema v3, harness-rebalanced; shipped on `main`. North-star locked; Slices 2–4 details still open (§12).
+- **Status:** **Slice 1 (MVP) IMPLEMENTED** (2026-06-19) — Protagonist + 4 classes with composition abilities, choose-a-class on recruit, save schema v3, harness-rebalanced; shipped on `main`. North-star locked; **Slices 2–3 now fully designed & locked (§6, §6b, §10), ready to plan**; Slice 4 (affinity) deferred (§9). Only tuning magnitudes remain open (§12).
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, prestige + Publishing House shop, and the balance fix + 8 genre zones (all shipped).
@@ -87,12 +87,23 @@ Each ability contribution ≈ `magPerLevelStar × level × starAbilityMult(stars
 
 ---
 
-## 6. Star system & the Edits economy **[PROPOSED]**
+## 6. Star system & the Edits economy **[LOCKED — Slice 2]**
 
-- **Stars:** 1★ → 5★. `starStatMult(s) = STAR_GROWTH^(s-1)` and a parallel `starAbilityMult`. (`STAR_GROWTH` tuned by the harness; ~1.6 is a starting guess.)
-- **Material — "Edits":** a new currency earned from clears (small per regular clear, a chunk per boss). Spent to raise a character's star.
-- **Star-up cost:** rising Edits per star (e.g., `EDITS_BASE × COST_GROWTH^(currentStar-1)`), so 4★→5★ is a real investment.
+- **Stars are PER-CLASS, 1★ → 5★** (thematically "review ratings" — a 5★ class is a perfectly-reviewed character). Investing a star raises *every* variant of that class; variants are skins over the class, so stars are never re-ground per variant. `starStatMult(s) = STAR_GROWTH^(s-1)` multiplies the class's base power AND a parallel `starAbilityMult` multiplies its ability magnitude, so stars **stack on top of** per-book leveling. (`STAR_GROWTH` harness-tuned; ~1.6 starting guess.) The **Protagonist has no stars** — its growth is the Royalties track (§7).
+- **Material — "Edits":** a new **global** currency (one shared wallet, not per-character). Dropped by **boss kills only** (a chunk per boss, scaling with book difficulty); regular clears drop nothing. You choose which class to spend the shared pool on — an allocation decision.
+- **Single sink:** Edits do exactly one thing — raise a class's star. No secondary sinks (deliberate; YAGNI).
+- **Star-up cost:** rising Edits per star (`EDITS_BASE × COST_GROWTH^(currentStar-1)`), so 4★→5★ is a real investment.
+- **Max-star overflow [reserved, NOT built in Slice 2]:** once a class is 5★, further Edits overflow into a future **star-prestige** track (a later slice). Slice 2 only banks the overflow value; the prestige mechanic itself is deferred.
+- **Visual:** a starred class shows its rating on the card (★ pips / tier frame) — cheap in the existing emoji+CSS layer, no art pipeline.
 - Edits persist across publishes (meta-currency, like Royalties).
+
+---
+
+## 6b. World set bonus **[LOCKED — Slice 3]**
+
+Fielding multiple variants (skins) of the **same world** grants a **set bonus**, based on **party makeup** — independent of the current zone (that's affinity, §9/Slice 4, kept separate). Breakpoints are **uniform across all worlds: 2 / 3 / 5** same-world variants fielded → tier 1 / 2 / 3. Tier 3 = the full 5-slot party themed (the Protagonist's cosmetic variant counts toward the set). The bonus *type* differs per world so each collection has its own identity (e.g., Space → DPS/"speed", Wild West → Inspiration income, Eldritch Horror → boss-regen cut, High Fantasy → Edit drop). Each bonus is a multiplier folded into the existing `modifiers.ts` `effective*` read-paths — the same pattern as shop upgrades and class abilities. Magnitudes harness-tuned.
+
+In Slice 3 alone a set bonus has no opportunity cost (per-class stars + free skin swaps → once collected you just run it), so it functions as the **payoff for completing a world's collection**. The moment-to-moment "set cohesion vs. zone affinity" tension is what Slice 4 (affinity) adds on top.
 
 ---
 
@@ -114,7 +125,7 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 
 ## 9. Deferred (post-MVP layers toward the north-star)
 
-- **Affinity** — turn world-variants mechanical: a variant is stronger in its home world. This is what makes the full 8-per-class collection a *power* reason, not just flavor.
+- **Affinity (Slice 4)** — a variant is stronger when fighting **in its home zone** (current-zone-matched). This is **distinct from the Slice 3 set bonus** (§6b), which is party-makeup-based; affinity adds the "field for cohesion vs. match the current zone" tension on top.
 - **World power-tiers** — alternatively/additionally, deeper-world variants flatly stronger.
 - **More classes / 6★+ / ascension**, richer Protagonist signature abilities, etc.
 
@@ -125,8 +136,8 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 Each slice ships working, tested software and points at the north-star.
 
 - **Slice 1 — Classes + abilities + Protagonist (no collection yet). ✅ IMPLEMENTED 2026-06-19.** Replaced the clone party with the Protagonist + the 4 classes (fixed 1★), abilities wired into `modifiers`, choose-a-class on recruit (Protagonist always fielded), save schema v3, full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
-- **Slice 2 — Stars + Edits.** Add star tiers, the Edits currency, star-up, and the permanent stat/ability scaling. Re-balance.
-- **Slice 3 — Collection + acquisition from worlds.** Unlock variants by clearing worlds, the cosmetic `(class × world)` roster, the collection UI, the Protagonist Royalties track.
+- **Slice 2 — Stars + Edits (NEXT). [design LOCKED — §6]** Per-class 5★ stars; global **Edits** dropped by bosses; star-up (escalating cost) scaling class base power + ability magnitude on top of leveling; max-star overflow banked (prestige deferred); star pips on cards. Re-balance via the harness.
+- **Slice 3 — Collection + variants + set bonus. [design LOCKED — §6b]** Deterministic earned acquisition (each world-boss clear unlocks the next variant in that world's set, fixed order, permanent — no gacha); cosmetic `(class × world)` roster incl. Protagonist cosmetic variants; **per-world set bonus at 2/3/5 fielded thresholds** (§6b); collection + party-selection UI (own visual pass); the Protagonist Royalties track (§7).
 - **Slice 4+ — Deferred layers (§9):** affinity, etc.
 
 > Decomposition rationale: each slice is independently testable and valuable. Slice 1 alone already transforms the party from clones into a composition puzzle.
@@ -142,14 +153,11 @@ Each slice ships working, tested software and points at the north-star.
 
 ---
 
-## 12. Open questions (for later slices — Slice 1 is fully specified)
+## 12. Open questions
 
-Slice 1 (the MVP) is locked. **Resolved:** class list + abilities (§4), Protagonist signature = "Plot Armor" (§4), Protagonist track = Royalties in the shop (§7), MVP scope = classes + abilities + Protagonist, fixed 1★, no collection. These remain open and will be decided when we design Slices 2–3:
+Slices 1–3 are now designed and locked. **Resolved across the design:** class list + abilities (§4); Protagonist "Plot Armor" (§4); stars are **per-class**, 5★, multiplicative on power + ability (§6); **Edits** are a **global** pool, **boss-drop only**, single sink = star-up, max-star overflow reserved for a deferred prestige (§6); acquisition is **deterministic/earned** (per world-boss clear, fixed order, permanent — no gacha) (Slice 3, §10); world **set bonus** at uniform **2/3/5** thresholds with per-world bonus types (§6b); **party cap stays 5**; affinity is Slice 4 and distinct from the set bonus (§9).
 
-1. **Star count & curve (§6)** — 5★ ceiling? `STAR_GROWTH` feel (how much stronger is a 5★)?
-2. **Edits source/sink (§6)** — drop rates, star-up cost shape.
-3. **Acquisition unlock rule (Slice 3)** — does clearing a world unlock that world's variants of *all* classes at 1★, or something more paced?
-4. **Party cap** — keep 5/6, or rethink now that slots carry classes?
+Remaining are **tuning magnitudes only** (harness-set, not blocking): `STAR_GROWTH`, the Edit boss-drop amount + `EDITS_BASE`/`COST_GROWTH`, the per-world set-bonus magnitudes per tier, and the acquisition cadence. These are dialed against the balance harness during each slice, not decided up front.
 
 ---
 
