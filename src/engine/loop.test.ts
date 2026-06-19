@@ -6,7 +6,7 @@ import { BOSS_INDEX, ZONE_COUNT, targetMaxHp, targetInspirationRate } from './co
 
 describe('loop.step', () => {
   it('accrues inspiration continuously and clears the first encounter', () => {
-    const s = initialState(0); // dps 3, encounter(0,0) hp 10 -> clears at t≈3.33s
+    const s = initialState(0); // dps ≈2.37 (Protagonist+Anti-hero w/ Lone Wolf + Plot Armor), encounter(0,0) hp 10 -> clears at t≈4.2s
     const r = step(s, 6);
     expect(r.clears).toBeGreaterThanOrEqual(1);
     expect(num.gt(r.state.inspiration, num.ZERO)).toBe(true);

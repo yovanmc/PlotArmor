@@ -15,10 +15,13 @@ import { levelUp, recruit, canLevel, canRecruit } from './economy';
 import { Num, n, ZERO, sub, div, gt, toNum, fmt } from './num';
 
 // --- representative play: build a fixed composition, then level everyone evenly ---
-// Recruits fill the slots after the starting Protagonist + Anti-hero (a Debuffer to
-// break bosses, a Support to amplify, then more bodies). Leveling the lowest-level
-// member each step keeps the party even, growing both DPS and the ability classes.
-const COMP: ClassId[] = ['debuffer', 'support', 'antihero', 'sidekick'];
+// The party cap is 5; the start is Protagonist + Anti-hero, leaving exactly 3 recruit
+// slots. We fill them with three DISTINCT new classes — a Debuffer to break boss regen,
+// a Support to amplify party DPS, and a Sidekick for Inspiration income — so the fielded
+// party is all 5 distinct classes. That maximizes the Protagonist's Plot Armor and makes
+// the harness exercise every ability kind (loneWolf, regenCut, partyDps, inspRate).
+// Leveling the lowest-level member each step keeps the party even as power grows.
+const COMP: ClassId[] = ['debuffer', 'support', 'sidekick'];
 
 function nextRecruitClass(s: GameState): ClassId | null {
   const recruitIndex = s.party.length - 2; // slots 0,1 are the starting Protagonist + Anti-hero
