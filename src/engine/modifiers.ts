@@ -7,7 +7,7 @@ import {
   baseLevelCost, baseRecruitCost,
   BOOK_SCALE, PROLIFIC_MAG, SHARP_MAG, PAGETURNER_MAG, MUSE_MAG, MUSE_FLOOR,
   FRUGAL_MAG, FRUGAL_FLOOR, NIGHT_OWL_HOURS_PER_LEVEL, GHOSTWRITER_LEVEL,
-  PARTY_ABILITY_FLOOR, findClass,
+  PARTY_ABILITY_FLOOR, findClass, AbilityKind,
 } from './content';
 
 // Per-book difficulty/size factor D(b) = BOOK_SCALE^(b-1). D(1) = 1 (book 1 == v1).
@@ -21,7 +21,7 @@ const pageTurnerMult = (s: GameState): number => 1 + PAGETURNER_MAG * s.upgrades
 const museMult = (s: GameState): number => Math.max(MUSE_FLOOR, 1 - MUSE_MAG * s.upgrades.muse);
 const frugalMult = (s: GameState): number => Math.max(FRUGAL_FLOOR, 1 - FRUGAL_MAG * s.upgrades.frugalDrafts);
 
-function abilitySum(party: Character[], kind: string): number {
+function abilitySum(party: Character[], kind: AbilityKind): number {
   let total = 0;
   for (const c of party) {
     const ab = findClass(c.classId).ability;
