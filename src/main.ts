@@ -7,6 +7,7 @@ import { AUTOSAVE_INTERVAL_MS } from './engine/content';
 import { fmt } from './engine/num';
 import { render } from './ui/render';
 import { wireInput } from './ui/input';
+import { wireShop } from './ui/shop';
 import { startLoop } from './ui/rafLoop';
 
 let state: GameState = load(Date.now()) ?? initialState(Date.now());
@@ -23,6 +24,7 @@ const setState = (s: GameState): void => {
 
 render(state);
 wireInput(getState, setState);
+wireShop(getState, setState);
 startLoop(getState, setState, () => {});
 
 // "While you were writing…" summary.

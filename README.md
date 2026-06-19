@@ -15,16 +15,20 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**v2 (prestige depth) engine complete.** On top of v1, Royalties are now a spendable
-wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), books escalate
-in difficulty/size each publish, and the royalty payout scales with manuscript size.
-All headless-tested (68 passing tests); `npm run build` is green. No spend UI yet —
-engine systems only.
+**v2 (prestige depth + spend UI) complete.** On top of v1, Royalties are now a
+spendable wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time),
+books escalate in difficulty/size each publish, and the royalty payout scales with
+manuscript size. Royalties are now spendable in-game via the **Publishing House** —
+a parchment-themed modal listing all 8 upgrades (6 repeatable + 2 one-time unlocks),
+opened from a persistent entry button that displays the live Royalty balance.
+All headless-tested (76 passing tests); `npm run build` is green.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
-[prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md).
+[prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
+[spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
-[prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md).
+[prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
+[spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md).
 
 Run it locally: `npm install` then `npm run dev`.
 

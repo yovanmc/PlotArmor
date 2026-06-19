@@ -1,7 +1,7 @@
 # Plot Armor — Publishing House (spend UI) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** Approved (brainstorming complete) — ready for implementation planning
+- **Status:** Implemented — 2026-06-19
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** [`2026-06-19-plot-armor-prestige-design.md`](2026-06-19-plot-armor-prestige-design.md) (prestige engine, shipped). This spec adds the **spend UI** that engine deferred.
