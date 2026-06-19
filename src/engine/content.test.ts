@@ -42,3 +42,25 @@ describe('content', () => {
     expect(C.targetsClearedInBook(1, 0)).toBe(C.BOSS_INDEX + 1);
   });
 });
+
+describe('content: prestige catalog & costs', () => {
+  it('exposes 6 repeatable upgrades and 2 one-time unlocks', () => {
+    expect(C.REPEATABLE_UPGRADES.length).toBe(6);
+    expect(C.ONE_TIME_UPGRADES.length).toBe(2);
+  });
+
+  it('findUpgrade returns a def by id and throws on unknown', () => {
+    expect(C.findUpgrade('prolific').kind).toBe('repeatable');
+    expect(C.findUpgrade('ensembleCast').kind).toBe('oneTime');
+    expect(() => C.findUpgrade('nope' as C.UpgradeId)).toThrow();
+  });
+
+  it('base spend costs grow with level / party size', () => {
+    expect(num.gt(C.baseLevelCost(2), C.baseLevelCost(1))).toBe(true);
+    expect(num.gt(C.baseRecruitCost(3), C.baseRecruitCost(2))).toBe(true);
+  });
+
+  it('book escalation constant is > 1', () => {
+    expect(C.BOOK_SCALE).toBeGreaterThan(1);
+  });
+});

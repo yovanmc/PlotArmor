@@ -105,3 +105,79 @@ export function targetEmoji(zoneIndex: number, encounterIndex: number): string {
 export function targetsClearedInBook(zoneIndex: number, encounterIndex: number): number {
   return zoneIndex * (BOSS_INDEX + 1) + encounterIndex;
 }
+
+// ---------------------------------------------------------------------------
+// Prestige depth (v2): escalation, royalty faucet, upgrade bounds — ALL tunable
+// ---------------------------------------------------------------------------
+
+export const BOOK_SCALE = 3;        // per-book difficulty/size growth; D(b) = BOOK_SCALE^(b-1)
+export const ROYALTY_K = n(1);      // royalty payout coefficient
+export const ROYALTY_W0 = n(10000); // royalty payout divisor (manuscript scale)
+
+export const PROLIFIC_MAG = 0.10;   // +10% inspiration rate per level
+export const SHARP_MAG = 0.10;      // +10% party DPS per level
+export const PAGETURNER_MAG = 0.10; // +10% words per clear per level
+export const MUSE_MAG = 0.05;       // -5% boss regen per level
+export const MUSE_FLOOR = 0.10;     // regen multiplier floor (>=10% of base; max 90% reduction)
+export const FRUGAL_MAG = 0.05;     // -5% spend costs per level
+export const FRUGAL_FLOOR = 0.25;   // cost multiplier floor (>=25% of base; max 75% reduction)
+export const NIGHT_OWL_HOURS_PER_LEVEL = 2; // +2h offline cap per level
+export const GHOSTWRITER_LEVEL = 5; // pre-leveled new-book start when owned
+
+// --- base spend-cost curves (the project's level/recruit cost curves) ---
+const LEVEL_BASE_COST = n(10);
+const LEVEL_COST_GROWTH = 1.5;
+const RECRUIT_BASE_COST = n(100);
+const RECRUIT_COST_GROWTH = 6;
+
+export function baseLevelCost(level: number): Num {
+  return mul(LEVEL_BASE_COST, pow(n(LEVEL_COST_GROWTH), level - 1));
+}
+
+export function baseRecruitCost(partySize: number): Num {
+  return mul(RECRUIT_BASE_COST, pow(n(RECRUIT_COST_GROWTH), partySize - 2));
+}
+
+// --- upgrade catalog (static data) ---
+export type RepeatableUpgradeId =
+  | 'prolific' | 'sharpProse' | 'pageTurner' | 'muse' | 'nightOwl' | 'frugalDrafts';
+export type OneTimeUpgradeId = 'ensembleCast' | 'ghostwriter';
+export type UpgradeId = RepeatableUpgradeId | OneTimeUpgradeId;
+
+export interface RepeatableUpgradeDef {
+  id: RepeatableUpgradeId;
+  kind: 'repeatable';
+  name: string;
+  desc: string;
+  baseCost: Num;
+  costGrowth: number;
+}
+export interface OneTimeUpgradeDef {
+  id: OneTimeUpgradeId;
+  kind: 'oneTime';
+  name: string;
+  desc: string;
+  cost: Num;
+}
+export type UpgradeDef = RepeatableUpgradeDef | OneTimeUpgradeDef;
+
+export const REPEATABLE_UPGRADES: RepeatableUpgradeDef[] = [
+  { id: 'prolific', kind: 'repeatable', name: 'Prolific', desc: '+10% Inspiration rate per level', baseCost: n(3), costGrowth: 2 },
+  { id: 'sharpProse', kind: 'repeatable', name: 'Sharp Prose', desc: '+10% party DPS per level', baseCost: n(3), costGrowth: 2 },
+  { id: 'pageTurner', kind: 'repeatable', name: 'Page-Turner', desc: '+10% Words per clear per level', baseCost: n(5), costGrowth: 2 },
+  { id: 'muse', kind: 'repeatable', name: 'Muse', desc: '-5% boss regen per level (max 90%)', baseCost: n(4), costGrowth: 2 },
+  { id: 'nightOwl', kind: 'repeatable', name: 'Night Owl', desc: '+2h offline cap per level', baseCost: n(2), costGrowth: 2 },
+  { id: 'frugalDrafts', kind: 'repeatable', name: 'Frugal Drafts', desc: '-5% level/recruit costs per level (max 75%)', baseCost: n(3), costGrowth: 2 },
+];
+
+export const ONE_TIME_UPGRADES: OneTimeUpgradeDef[] = [
+  { id: 'ensembleCast', kind: 'oneTime', name: 'Ensemble Cast', desc: 'Party cap 5 -> 6', cost: n(25) },
+  { id: 'ghostwriter', kind: 'oneTime', name: 'Ghostwriter', desc: 'Start each new book at level 5', cost: n(15) },
+];
+
+export function findUpgrade(id: UpgradeId): UpgradeDef {
+  const all: UpgradeDef[] = [...REPEATABLE_UPGRADES, ...ONE_TIME_UPGRADES];
+  const def = all.find((u) => u.id === id);
+  if (!def) throw new Error(`Unknown upgrade: ${id}`);
+  return def;
+}
