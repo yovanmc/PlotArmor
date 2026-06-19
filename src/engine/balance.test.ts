@@ -8,10 +8,10 @@ import {
   effectiveInspirationRate, effectivePartyDps, effectiveBossRegen,
   effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
 } from './modifiers';
-import { ClassId } from './content';
+import { ClassId, MAX_STAR } from './content';
 import { step } from './loop';
 import { publish } from './progression';
-import { levelUp, recruit, canLevel, canRecruit } from './economy';
+import { levelUp, recruit, starUp, canLevel, canRecruit, canStarUp } from './economy';
 import { Num, n, ZERO, sub, div, gt, toNum, fmt } from './num';
 
 // --- representative play: build a fixed composition, then level everyone evenly ---
@@ -37,6 +37,18 @@ function lowestLevelId(s: GameState): string {
   return id;
 }
 
+// The lowest-starred non-Protagonist class still able to advance (else null).
+function lowestStarClass(s: GameState): ClassId | null {
+  let best: ClassId | null = null;
+  let min = Infinity;
+  for (const c of s.party) {
+    if (c.classId === 'protagonist') continue;
+    const st = s.stars[c.classId];
+    if (st < MAX_STAR && st < min) { min = st; best = c.classId; }
+  }
+  return best;
+}
+
 // Cost of the next purchase the sim wants: a recruit while the comp is incomplete, else the cheapest level.
 function nextPurchaseCost(s: GameState): Num {
   if (nextRecruitClass(s)) return effectiveRecruitCost(s, s.party.length);
@@ -53,6 +65,8 @@ function spendGreedy(s: GameState): GameState {
   for (let guard = 0; guard < 100000; guard++) {
     const nextClass = nextRecruitClass(cur);
     if (nextClass && canRecruit(cur)) { cur = recruit(cur, nextClass); continue; }
+    const starClass = lowestStarClass(cur);
+    if (starClass && canStarUp(cur, starClass)) { cur = starUp(cur, starClass); continue; }
     const id = lowestLevelId(cur);
     if (canLevel(cur, id)) { cur = levelUp(cur, id); continue; }
     break;
