@@ -7,7 +7,7 @@ import {
   baseLevelCost, baseRecruitCost,
   BOOK_SCALE, PROLIFIC_MAG, SHARP_MAG, PAGETURNER_MAG, MUSE_MAG, MUSE_FLOOR,
   FRUGAL_MAG, FRUGAL_FLOOR, NIGHT_OWL_HOURS_PER_LEVEL, GHOSTWRITER_LEVEL,
-  PARTY_ABILITY_FLOOR, findClass, AbilityKind,
+  PARTY_ABILITY_FLOOR, findClass, AbilityKind, ClassId, starStatMult, starAbilityMult,
 } from './content';
 
 // Per-book difficulty/size factor D(b) = BOOK_SCALE^(b-1). D(1) = 1 (book 1 == v1).
@@ -21,11 +21,11 @@ const pageTurnerMult = (s: GameState): number => 1 + PAGETURNER_MAG * s.upgrades
 const museMult = (s: GameState): number => Math.max(MUSE_FLOOR, 1 - MUSE_MAG * s.upgrades.muse);
 const frugalMult = (s: GameState): number => Math.max(FRUGAL_FLOOR, 1 - FRUGAL_MAG * s.upgrades.frugalDrafts);
 
-function abilitySum(party: Character[], kind: AbilityKind): number {
+function abilitySum(party: Character[], kind: AbilityKind, stars: Record<ClassId, number>): number {
   let total = 0;
   for (const c of party) {
     const ab = findClass(c.classId).ability;
-    if (ab.kind === kind) total += ab.mag * c.level;
+    if (ab.kind === kind) total += ab.mag * c.level * starAbilityMult(stars[c.classId]);
   }
   return total;
 }
@@ -35,7 +35,7 @@ function distinctClassCount(party: Character[]): number {
 }
 
 export function effectiveInspirationRate(s: GameState, zoneIndex: number, encounterIndex: number): Num {
-  const sidekickMult = 1 + abilitySum(s.party, 'inspRate');
+  const sidekickMult = 1 + abilitySum(s.party, 'inspRate', s.stars);
   return mul(
     mul(mul(targetInspirationRate(zoneIndex, encounterIndex), bookDifficulty(s)), n(prolificMult(s))),
     n(sidekickMult),
@@ -47,8 +47,8 @@ export function effectiveTargetMaxHp(s: GameState, zoneIndex: number, encounterI
 }
 
 export function effectiveBossRegen(s: GameState, zoneIndex: number, encounterIndex: number): Num {
-  const shopReduction = 1 - museMult(s);                  // museMult already floored; this is the shop's cut
-  const partyReduction = abilitySum(s.party, 'regenCut'); // additional cut from Debuffers
+  const shopReduction = 1 - museMult(s);                              // museMult already floored; this is the shop's cut
+  const partyReduction = abilitySum(s.party, 'regenCut', s.stars);   // additional cut from Debuffers
   const combined = Math.max(PARTY_ABILITY_FLOOR, 1 - (shopReduction + partyReduction));
   return mul(mul(targetRegen(zoneIndex, encounterIndex), bookDifficulty(s)), n(combined));
 }
@@ -57,14 +57,21 @@ export function effectiveWords(s: GameState, zoneIndex: number, encounterIndex: 
   return mul(mul(targetWords(zoneIndex, encounterIndex), bookDifficulty(s)), n(pageTurnerMult(s)));
 }
 
+// A character's power including its CLASS star multiplier (stars live on state).
+export function effectiveCharacterPower(state: GameState, c: Character): Num {
+  return mul(characterPower(c), n(starStatMult(state.stars[c.classId])));
+}
+
 export function effectivePartyDps(s: GameState): Num {
   let sum = ZERO;
   for (const c of s.party) {
     const ab = findClass(c.classId).ability;
-    const selfMult = ab.kind === 'loneWolf' ? 1 + ab.mag * c.level : 1; // Lone Wolf amps only itself
-    sum = add(sum, mul(characterPower(c), n(selfMult)));
+    const selfMult = ab.kind === 'loneWolf'
+      ? 1 + ab.mag * c.level * starAbilityMult(s.stars[c.classId]) // Lone Wolf amps only itself
+      : 1;
+    sum = add(sum, mul(effectiveCharacterPower(s, c), n(selfMult)));
   }
-  const supportMult = 1 + abilitySum(s.party, 'partyDps');
+  const supportMult = 1 + abilitySum(s.party, 'partyDps', s.stars);
   const hasProtagonist = s.party.some((c) => c.classId === 'protagonist');
   const plotArmorMult = hasProtagonist
     ? 1 + findClass('protagonist').ability.mag * distinctClassCount(s.party)

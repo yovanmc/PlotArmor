@@ -8,6 +8,7 @@ import {
   targetInspirationRate, targetMaxHp, targetRegen, targetWords, baseLevelCost, baseRecruitCost,
 } from './content';
 import * as M from './modifiers';
+import { effectiveCharacterPower } from './modifiers';
 
 describe('modifiers: book-1, no-upgrades PARITY with raw v1 curves', () => {
   const s = initialState(0);
@@ -82,5 +83,30 @@ describe('modifiers: party-class abilities', () => {
       M.effectiveInspirationRate(withSidekick, 0, 0),
       M.effectiveInspirationRate(base, 0, 0),
     )).toBe(true);
+  });
+});
+
+describe('star scaling (Slice 2)', () => {
+  it('a higher star raises a character\'s effective power and the party DPS', () => {
+    const base = initialState(0);
+    const starred = { ...base, stars: { ...base.stars, antihero: 3 } };
+    const c = base.party.find((p) => p.classId === 'antihero')!;
+    expect(num.gt(effectiveCharacterPower(starred, c), effectiveCharacterPower(base, c))).toBe(true);
+    expect(num.gt(M.effectivePartyDps(starred), M.effectivePartyDps(base))).toBe(true);
+  });
+
+  it('effectiveCharacterPower equals raw characterPower at 1 star', () => {
+    const s = initialState(0);
+    const c = s.party[0];
+    expect(num.eq(effectiveCharacterPower(s, c), characterPower(c))).toBe(true);
+  });
+
+  it('starring a Support amplifies its party-DPS ability', () => {
+    const oneStar = {
+      ...initialState(0),
+      party: [makeCharacter('c0', 'protagonist'), makeCharacter('c1', 'support')],
+    };
+    const threeStar = { ...oneStar, stars: { ...oneStar.stars, support: 3 } };
+    expect(num.gt(M.effectivePartyDps(threeStar), M.effectivePartyDps(oneStar))).toBe(true);
   });
 });
