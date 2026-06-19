@@ -125,3 +125,25 @@ describe('world variants (Slice 3a)', () => {
     expect(worldGenre(0)).toBe('Wild West');
   });
 });
+
+import { WORLD_SET_BONUS, SET_THRESHOLDS, setTier } from './content';
+
+describe('set-bonus content (Slice 3b)', () => {
+  it('has one set-bonus def per world with 3 ascending tiers', () => {
+    expect(WORLD_SET_BONUS).toHaveLength(ZONE_COUNT);
+    for (const def of WORLD_SET_BONUS) {
+      expect(def.tiers).toHaveLength(3);
+      expect(def.tiers[0]).toBeLessThan(def.tiers[1]);
+      expect(def.tiers[1]).toBeLessThan(def.tiers[2]);
+    }
+  });
+
+  it('thresholds are 2/3/5 and setTier maps counts to tiers', () => {
+    expect(SET_THRESHOLDS).toEqual([2, 3, 5]);
+    expect(setTier(1)).toBe(0);
+    expect(setTier(2)).toBe(1);
+    expect(setTier(3)).toBe(2);
+    expect(setTier(4)).toBe(2);
+    expect(setTier(5)).toBe(3);
+  });
+});

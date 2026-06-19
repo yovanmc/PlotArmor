@@ -263,6 +263,42 @@ export function worldGenre(worldIndex: number): string {
   return ZONES[worldIndex].genre;
 }
 
+// --- world set bonus (Slice 3b) ---------------------------------------------
+// Fielding 2 / 3 / 5 characters wearing the SAME world's variant grants a tier
+// 1 / 2 / 3 bonus. Thresholds are uniform across worlds; the bonus AXIS differs
+// per world so each collection has its own identity. ALL magnitudes + the axis
+// mapping are harness-/owner-tuned placeholders.
+export type SetAxis = 'dps' | 'insp' | 'words' | 'editDrop' | 'regenCut';
+
+export interface SetBonusDef {
+  axis: SetAxis;
+  tiers: [number, number, number]; // magnitude at tier 1 / 2 / 3
+}
+
+export const SET_THRESHOLDS: [number, number, number] = [2, 3, 5];
+
+// How many same-world variants are fielded -> tier (0 = none).
+export function setTier(count: number): number {
+  if (count >= SET_THRESHOLDS[2]) return 3;
+  if (count >= SET_THRESHOLDS[1]) return 2;
+  if (count >= SET_THRESHOLDS[0]) return 1;
+  return 0;
+}
+
+// Index-aligned with ZONES. `dps`/`insp`/`words`/`editDrop` are +fraction
+// multipliers; `regenCut` is an additive reduction to boss regen (shares the
+// PARTY_ABILITY_FLOOR with the shop `muse` upgrade + Debuffers).
+export const WORLD_SET_BONUS: SetBonusDef[] = [
+  { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 0 Wild West — frontier hustle
+  { axis: 'regenCut', tiers: [0.05, 0.12, 0.25] }, // 1 Zombie Apocalypse — break the horde
+  { axis: 'dps',      tiers: [0.15, 0.35, 0.75] }, // 2 Space — "speed"
+  { axis: 'words',    tiers: [0.20, 0.50, 1.00] }, // 3 High Fantasy — epic tomes
+  { axis: 'editDrop', tiers: [0.25, 0.60, 1.20] }, // 4 Pirate Seas — plunder
+  { axis: 'dps',      tiers: [0.15, 0.35, 0.75] }, // 5 Noir City — sharp investigation
+  { axis: 'regenCut', tiers: [0.05, 0.12, 0.25] }, // 6 Eldritch Horror — dread weakens foes
+  { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 7 Prehistoric — primal abundance
+];
+
 // --- party classes (Slice 1) -------------------------------------------------
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
 export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';
