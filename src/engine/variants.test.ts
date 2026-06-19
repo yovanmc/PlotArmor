@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { initialState, makeCharacter } from './state';
-import { unlockNextVariant, setVariant, unlockedWorldsFor } from './variants';
+import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown } from './variants';
 import { makeUnlockedVariants } from './state';
 
 describe('variant acquisition', () => {
@@ -48,5 +48,47 @@ describe('equip / query', () => {
   it('unlockedWorldsFor returns the class list', () => {
     const s = { ...initialState(0), unlockedVariants: { ...makeUnlockedVariants(), support: [1, 5] } };
     expect(unlockedWorldsFor(s, 'support')).toEqual([1, 5]);
+  });
+});
+
+function partyOnWorlds(worlds: (number | null)[]) {
+  return worlds.map((w, i) => ({ ...makeCharacter(`c${i}`, 'antihero'), variantWorld: w }));
+}
+
+describe('set bonus', () => {
+  it('is neutral when fewer than 2 share a world', () => {
+    const b = activeSetBonus(partyOnWorlds([2, null, 0, null]));
+    expect(b.dpsMult).toBe(1);
+    expect(b.inspMult).toBe(1);
+    expect(b.wordsMult).toBe(1);
+    expect(b.editDropMult).toBe(1);
+    expect(b.regenCutAdd).toBe(0);
+  });
+
+  it('applies the world axis at the right tier (Space = DPS)', () => {
+    // 5 on Space (world 2, dps tier 3 = +0.75)
+    expect(activeSetBonus(partyOnWorlds([2, 2, 2, 2, 2])).dpsMult).toBeCloseTo(1.75, 5);
+    // 3 on Space (tier 2 = +0.35)
+    expect(activeSetBonus(partyOnWorlds([2, 2, 2, null, null])).dpsMult).toBeCloseTo(1.35, 5);
+    // 2 on Space (tier 1 = +0.15)
+    expect(activeSetBonus(partyOnWorlds([2, 2, null, null, null])).dpsMult).toBeCloseTo(1.15, 5);
+  });
+
+  it('regenCut worlds add to regenCutAdd', () => {
+    // 2 on Zombie (world 1, regenCut tier 1 = 0.05)
+    expect(activeSetBonus(partyOnWorlds([1, 1])).regenCutAdd).toBeCloseTo(0.05, 5);
+  });
+
+  it('stacks two different world sets at once', () => {
+    // 2 Space (dps tier1) + 2 Pirate (world 4, editDrop tier1)
+    const b = activeSetBonus(partyOnWorlds([2, 2, 4, 4]));
+    expect(b.dpsMult).toBeCloseTo(1.15, 5);
+    expect(b.editDropMult).toBeCloseTo(1.25, 5);
+  });
+
+  it('breakdown lists qualifying worlds with their count + tier', () => {
+    const bd = setBonusBreakdown(partyOnWorlds([2, 2, 2, 4, 4]));
+    expect(bd).toContainEqual({ world: 2, count: 3, tier: 2 });
+    expect(bd).toContainEqual({ world: 4, count: 2, tier: 1 });
   });
 });

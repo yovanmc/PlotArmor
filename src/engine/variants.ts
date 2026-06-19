@@ -1,8 +1,8 @@
 // src/engine/variants.ts
 // Variant ownership (per-class unlocked world skins) + equip. Cosmetic in
 // Slice 3a; the 2/3/5 set bonus is Slice 3b. Pure functions over GameState.
-import { ClassId, VARIANT_UNLOCK_ORDER } from './content';
-import { GameState } from './state';
+import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier } from './content';
+import { GameState, Character } from './state';
 
 // On clearing world `worldIndex`'s boss, unlock the next class's variant for that
 // world in VARIANT_UNLOCK_ORDER. Returns a NEW map (or the same one if the
@@ -38,4 +38,50 @@ export function setVariant(state: GameState, characterId: string, worldIndex: nu
     ...state,
     party: state.party.map((p) => (p.id === characterId ? { ...p, variantWorld: worldIndex } : p)),
   };
+}
+
+export interface SetBonus {
+  dpsMult: number;
+  inspMult: number;
+  wordsMult: number;
+  editDropMult: number;
+  regenCutAdd: number; // additive reduction to boss regen (shares the floor)
+}
+
+// How many fielded characters wear each world's variant (base look ignored).
+function worldCounts(party: Character[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const c of party) {
+    if (c.variantWorld !== null) counts.set(c.variantWorld, (counts.get(c.variantWorld) ?? 0) + 1);
+  }
+  return counts;
+}
+
+// Aggregate the active set bonuses across all fielded same-world groups.
+export function activeSetBonus(party: Character[]): SetBonus {
+  const b: SetBonus = { dpsMult: 1, inspMult: 1, wordsMult: 1, editDropMult: 1, regenCutAdd: 0 };
+  for (const [world, count] of worldCounts(party)) {
+    const tier = setTier(count);
+    if (tier === 0) continue;
+    const def = WORLD_SET_BONUS[world];
+    const mag = def.tiers[tier - 1];
+    switch (def.axis) {
+      case 'dps': b.dpsMult *= 1 + mag; break;
+      case 'insp': b.inspMult *= 1 + mag; break;
+      case 'words': b.wordsMult *= 1 + mag; break;
+      case 'editDrop': b.editDropMult *= 1 + mag; break;
+      case 'regenCut': b.regenCutAdd += mag; break;
+    }
+  }
+  return b;
+}
+
+// UI helper: the worlds currently granting a bonus, with count + tier.
+export function setBonusBreakdown(party: Character[]): { world: number; count: number; tier: number }[] {
+  const out: { world: number; count: number; tier: number }[] = [];
+  for (const [world, count] of worldCounts(party)) {
+    const tier = setTier(count);
+    if (tier > 0) out.push({ world, count, tier });
+  }
+  return out;
 }
