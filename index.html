@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plot Armor</title>
+  </head>
+  <body>
+    <h1>📚 Plot Armor</h1>
+    <div id="hud"></div>
+    <div id="enemy"></div>
+    <button id="publish" class="publish-btn">📖 Publish your book! (Prestige)</button>
+    <div id="party"></div>
+    <div class="toolbar">
+      <button id="export">Export save</button>
+      <button id="import">Import save</button>
+    </div>
+    <div id="offline-modal" class="modal">
+      <div class="modal-card">
+        <h2>Welcome back, author</h2>
+        <div id="offline-body"></div>
+        <button id="offline-close">Continue writing</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
