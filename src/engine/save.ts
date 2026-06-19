@@ -1,8 +1,9 @@
-import { Num, n, ZERO, ONE, numToStr, strToNum } from './num';
-import { GameState, Character, initialState, emptyUpgrades } from './state';
+// src/engine/save.ts
+import { Num, n, ZERO, numToStr, strToNum } from './num';
+import { GameState, Character, Upgrades, initialState, emptyUpgrades } from './state';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 interface CharDTO { id: string; name: string; level: number; basePower: string; }
 interface SaveDTO {
@@ -16,7 +17,24 @@ interface SaveDTO {
   currentHp: string;
   bookComplete: boolean;
   bookNumber: number;
-  prestigeMultiplier: string;
+  upgrades: Upgrades;
+}
+
+function mergeUpgrades(u: Partial<Upgrades> | undefined): Upgrades {
+  const e = emptyUpgrades();
+  if (!u || typeof u !== 'object') return e;
+  const numOrDefault = (v: unknown, d: number): number => (typeof v === 'number' ? v : d);
+  const boolOrDefault = (v: unknown, d: boolean): boolean => (typeof v === 'boolean' ? v : d);
+  return {
+    prolific: numOrDefault(u.prolific, e.prolific),
+    sharpProse: numOrDefault(u.sharpProse, e.sharpProse),
+    pageTurner: numOrDefault(u.pageTurner, e.pageTurner),
+    muse: numOrDefault(u.muse, e.muse),
+    nightOwl: numOrDefault(u.nightOwl, e.nightOwl),
+    frugalDrafts: numOrDefault(u.frugalDrafts, e.frugalDrafts),
+    ensembleCast: boolOrDefault(u.ensembleCast, e.ensembleCast),
+    ghostwriter: boolOrDefault(u.ghostwriter, e.ghostwriter),
+  };
 }
 
 export function serialize(state: GameState): string {
@@ -26,19 +44,18 @@ export function serialize(state: GameState): string {
     inspiration: numToStr(state.inspiration),
     words: numToStr(state.words),
     royalties: numToStr(state.royalties),
-    party: state.party.map((c) => ({
-      id: c.id, name: c.name, level: c.level, basePower: numToStr(c.basePower),
-    })),
+    party: state.party.map((c) => ({ id: c.id, name: c.name, level: c.level, basePower: numToStr(c.basePower) })),
     zone: { zoneIndex: state.zone.zoneIndex, encounterIndex: state.zone.encounterIndex },
     currentHp: numToStr(state.currentHp),
     bookComplete: state.bookComplete,
     bookNumber: state.bookNumber,
-    prestigeMultiplier: numToStr(state.prestigeMultiplier),
+    upgrades: state.upgrades,
   };
   return JSON.stringify(dto);
 }
 
-// Tolerant: missing fields fall back to a fresh state; unknown fields are ignored.
+// Tolerant: missing fields fall back to fresh defaults; unknown fields (incl. the v1
+// `prestigeMultiplier`) are ignored. A v1 save's `royalties` is preserved as the wallet.
 export function deserialize(raw: string, nowMs: number): GameState {
   const fresh = initialState(nowMs);
   let dto: Partial<SaveDTO>;
@@ -47,8 +64,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
   } catch {
     return fresh;
   }
-  const numOr = (s: string | undefined, fallback: Num): Num =>
-    typeof s === 'string' ? strToNum(s) : fallback;
+  const numOr = (s: string | undefined, fallback: Num): Num => (typeof s === 'string' ? strToNum(s) : fallback);
 
   const party: Character[] =
     Array.isArray(dto.party) && dto.party.length > 0
@@ -67,15 +83,11 @@ export function deserialize(raw: string, nowMs: number): GameState {
     words: numOr(dto.words, ZERO),
     royalties: numOr(dto.royalties, ZERO),
     party,
-    zone: {
-      zoneIndex: dto.zone?.zoneIndex ?? 0,
-      encounterIndex: dto.zone?.encounterIndex ?? 0,
-    },
+    zone: { zoneIndex: dto.zone?.zoneIndex ?? 0, encounterIndex: dto.zone?.encounterIndex ?? 0 },
     currentHp: numOr(dto.currentHp, fresh.currentHp),
     bookComplete: typeof dto.bookComplete === 'boolean' ? dto.bookComplete : false,
     bookNumber: typeof dto.bookNumber === 'number' ? dto.bookNumber : 1,
-    prestigeMultiplier: numOr(dto.prestigeMultiplier, ONE),
-    upgrades: emptyUpgrades(),
+    upgrades: mergeUpgrades(dto.upgrades),
   };
 }
 
@@ -103,6 +115,5 @@ export function exportSave(state: GameState): string {
 }
 
 export function importSave(encoded: string, nowMs: number): GameState {
-  const json = decodeURIComponent(escape(atob(encoded)));
-  return deserialize(json, nowMs);
+  return deserialize(decodeURIComponent(escape(atob(encoded))), nowMs);
 }

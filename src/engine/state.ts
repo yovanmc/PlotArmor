@@ -15,30 +15,27 @@ export interface ZoneState {
 }
 
 export interface Upgrades {
-  // repeatable -> level counts
   prolific: number;
   sharpProse: number;
   pageTurner: number;
   muse: number;
   nightOwl: number;
   frugalDrafts: number;
-  // one-time -> owned flags
   ensembleCast: boolean;
   ghostwriter: boolean;
 }
 
 export interface GameState {
   schemaVersion: number;
-  lastSaved: number; // epoch ms
+  lastSaved: number;
   inspiration: Num;
   words: Num;
-  royalties: Num; // prestige wallet (spent on upgrades)
+  royalties: Num;
   party: Character[];
   zone: ZoneState;
   currentHp: Num;
   bookComplete: boolean;
   bookNumber: number;
-  prestigeMultiplier: Num; // DEPRECATED: removed in M6 once nothing reads it
   upgrades: Upgrades;
 }
 
@@ -78,7 +75,6 @@ export function initialState(nowMs: number): GameState {
     currentHp: targetMaxHp(zone.zoneIndex, zone.encounterIndex),
     bookComplete: false,
     bookNumber: 1,
-    prestigeMultiplier: ONE,
     upgrades: emptyUpgrades(),
   };
 }
