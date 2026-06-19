@@ -1,12 +1,12 @@
 // src/engine/save.ts
-import { Num, n, ZERO, numToStr, strToNum } from './num';
-import { GameState, Character, Upgrades, initialState, emptyUpgrades } from './state';
-import { ClassId } from './content';
+import { Num, ZERO, numToStr, strToNum } from './num';
+import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty } from './state';
+import { ClassId, findClass } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
-interface CharDTO { id: string; name: string; level: number; basePower: string; }
+interface CharDTO { id: string; name: string; classId: string; level: number; basePower: string; }
 interface SaveDTO {
   schemaVersion: number;
   lastSaved: number;
@@ -45,7 +45,7 @@ export function serialize(state: GameState): string {
     inspiration: numToStr(state.inspiration),
     words: numToStr(state.words),
     royalties: numToStr(state.royalties),
-    party: state.party.map((c) => ({ id: c.id, name: c.name, level: c.level, basePower: numToStr(c.basePower) })),
+    party: state.party.map((c) => ({ id: c.id, name: c.name, classId: c.classId, level: c.level, basePower: numToStr(c.basePower) })),
     zone: { zoneIndex: state.zone.zoneIndex, encounterIndex: state.zone.encounterIndex },
     currentHp: numToStr(state.currentHp),
     bookComplete: state.bookComplete,
@@ -67,16 +67,21 @@ export function deserialize(raw: string, nowMs: number): GameState {
   }
   const numOr = (s: string | undefined, fallback: Num): Num => (typeof s === 'string' ? strToNum(s) : fallback);
 
-  const party: Character[] =
-    Array.isArray(dto.party) && dto.party.length > 0
-      ? dto.party.map((c, i) => ({
-          id: c?.id ?? `c${i}`,
-          name: c?.name ?? `Character ${i + 1}`,
-          classId: 'antihero' as ClassId, // stopgap (Slice 1 Task 5 finalizes classId persistence + migration)
-          level: typeof c?.level === 'number' ? c.level : 1,
-          basePower: numOr(c?.basePower, n(1)),
-        }))
-      : fresh.party;
+  const KNOWN_CLASSES = ['protagonist', 'antihero', 'support', 'debuffer', 'sidekick'];
+  const isV3Party =
+    Array.isArray(dto.party) && dto.party.length > 0 &&
+    dto.party.every((c) => typeof (c as { classId?: unknown }).classId === 'string' &&
+      KNOWN_CLASSES.includes((c as { classId: string }).classId));
+
+  const party: Character[] = isV3Party
+    ? (dto.party as CharDTO[]).map((c, i) => ({
+        id: c.id ?? `c${i}`,
+        name: c.name ?? `Character ${i + 1}`,
+        classId: c.classId as ClassId,
+        level: typeof c.level === 'number' ? c.level : 1,
+        basePower: numOr(c.basePower, findClass(c.classId as ClassId).classBasePower),
+      }))
+    : makeStartingParty(); // pre-v3 / classless: reseed the ephemeral party
 
   return {
     schemaVersion: SCHEMA_VERSION,
