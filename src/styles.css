@@ -1,1 +1,36 @@
-/* Filled in Milestone 8. */
+:root { --bg: #0b1020; --accent: #5ad7ff; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 1rem; min-height: 100vh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: var(--bg); color: #eee; transition: background 0.6s ease;
+}
+h1 { text-align: center; margin: 0.25rem 0 1rem; }
+#hud {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.5rem; background: #0003; padding: 0.75rem; border-radius: 8px;
+}
+#enemy { text-align: center; margin: 1.25rem auto; max-width: 440px; }
+.enemy-emoji { font-size: 4rem; line-height: 1; }
+.enemy-name { font-size: 1.2rem; margin: 0.35rem 0; }
+.boss-tag { background: crimson; color: #fff; padding: 0 0.4rem; border-radius: 4px; font-size: 0.7rem; vertical-align: middle; }
+.hpbar { height: 18px; background: #222; border-radius: 9px; overflow: hidden; border: 1px solid var(--accent); }
+.hpfill { height: 100%; background: linear-gradient(90deg, #e74c3c, #f39c12); transition: width 0.1s linear; }
+.hptext { font-size: 0.8rem; opacity: 0.85; margin-top: 0.3rem; }
+#party { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
+.card {
+  background: #0004; border: 1px solid var(--accent); border-radius: 8px;
+  padding: 0.75rem; width: 160px; text-align: center;
+}
+.cemoji { font-size: 2rem; }
+.cname { font-weight: 700; margin: 0.2rem 0; }
+.clevel { font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.5rem; }
+button {
+  cursor: pointer; background: var(--accent); color: #001018; border: none;
+  border-radius: 6px; padding: 0.4rem 0.6rem; font-weight: 600; font-size: 0.85rem;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.publish-btn { display: none; margin: 1rem auto; font-size: 1.1rem; padding: 0.6rem 1rem; }
+.toolbar { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.5rem; }
+.modal { display: none; position: fixed; inset: 0; background: #000a; align-items: center; justify-content: center; }
+.modal-card { background: #161b29; border: 1px solid var(--accent); border-radius: 10px; padding: 1.5rem; max-width: 360px; text-align: center; line-height: 1.6; }
