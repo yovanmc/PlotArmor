@@ -1,7 +1,7 @@
 # Plot Armor — Party System (Classes, Stars, Collection) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** North-star draft — for owner markup (brainstorming in progress; NOT yet approved for planning)
+- **Status:** Design APPROVED for Slice 1 (MVP) — ready for implementation planning. North-star locked; Slices 2–4 details still open (§12).
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, prestige + Publishing House shop, and the balance fix + 8 genre zones (all shipped).
@@ -56,21 +56,20 @@ GameState gains: `collection: OwnedCharacter[]`, `party` becomes `PartySlot[]` (
 
 ---
 
-## 4. Classes **[PROPOSED — mark up freely]**
+## 4. Classes **[LOCKED]** (names are working titles)
 
-Five classes; abilities mirror the existing modifier axes so they plug into combat cleanly and create tension with the shop upgrades:
+Four classes; abilities mirror the existing modifier axes so they plug into combat cleanly and create tension with the shop upgrades. They cover four distinct axes — DPS / amplify / weaken-enemy / economy — so composition is a real choice.
 
 | Class | Role | Stat lean | Ability (scales w/ level × stars) |
 |-------|------|-----------|-----------------------------------|
-| **Striker** | DPS | high | none / small self-damage bonus — the carry you can field several of |
-| **Muse** | enabler | low | reduces boss regen (the thing that walls boss kills) |
-| **Co-Author** | multiplier | medium | +% whole-party DPS |
-| **Narrator** | economy | medium | +% Words per clear → bigger manuscripts → more Royalties |
-| **Editor** | economy | low | +% Inspiration rate → faster leveling/recruiting |
+| **Anti-hero** | DPS carry | high | "Lone Wolf" — bonus to its OWN damage; scales hard, helps only itself |
+| **Support** | amplifier | medium | +% whole-party DPS (force-multiplier) |
+| **Debuffer** | boss-breaker | low–med | −% boss regen (sums with the shop `muse` upgrade, shared floor; future home for other enemy debuffs) |
+| **Sidekick** | economy | low–med | +% Inspiration rate → faster leveling/recruiting |
 
-**The Protagonist** is its own unit (not one of these): solid base power + a signature ability (**[PROPOSED]** a modest always-on party DPS buff), always available, upgraded via §7.
+**The Protagonist** is its own unit (not one of these): high base power, always available, upgraded via §7. Signature ability **"Plot Armor"** — +% party DPS for each DISTINCT class currently fielded (rewards a varied cast; deliberately distinct from Support's flat buff).
 
-Composition tension: party cap 5–6 means you can't field everything. Pure-Striker melts regulars but stalls on regen bosses (no Muse); a balanced party kills slower but breaks bosses and earns more. Every class still deals *some* damage via its stats, so no one is dead weight.
+Composition tension: party cap 5–6 means you can't field everything plus a good star spread. Pure-Anti-hero melts regulars but stalls on regen bosses (no Debuffer); a balanced party kills slower but breaks bosses and earns more; the Protagonist rewards fielding variety. Every class still deals *some* damage via its stats, so no one is dead weight.
 
 ---
 
@@ -78,13 +77,13 @@ Composition tension: party cap 5–6 means you can't field everything. Pure-Stri
 
 Class abilities are summed across the fielded party and folded into the existing `modifiers.ts` `effective*` functions, exactly like shop-upgrade multipliers are today:
 
-- **Striker / Protagonist stats** → `effectivePartyDps` (sum of `characterPower`).
-- **Co-Author** → an extra party-DPS multiplier in `effectivePartyDps` (sum of each Co-Author's contribution).
-- **Muse** → extra reduction in `effectiveBossRegen` (sums with the shop `muse` upgrade; shared floor).
-- **Narrator** → extra multiplier in `effectiveWords`.
-- **Editor** → extra multiplier in `effectiveInspirationRate`.
+- **Anti-hero / Protagonist stats** → `effectivePartyDps` (sum of `characterPower`); the Anti-hero's "Lone Wolf" is a per-character multiplier on its own `characterPower` in that sum.
+- **Support** → an extra party-DPS multiplier in `effectivePartyDps` (sum of each Support's contribution).
+- **Protagonist "Plot Armor"** → a party-DPS multiplier in `effectivePartyDps` scaling with the count of DISTINCT classes fielded.
+- **Debuffer** → extra reduction in `effectiveBossRegen` (sums with the shop `muse` upgrade; shared floor).
+- **Sidekick** → extra multiplier in `effectiveInspirationRate` (sums with the shop `prolific` upgrade).
 
-Each ability contribution ≈ `magPerLevelStar × level × starAbilityMult(stars)` (exact form set by the harness). This is the same shape as the shipped upgrade mults, so it's a known, testable pattern.
+Each ability contribution ≈ `magPerLevelStar × level × starAbilityMult(stars)` (exact form set by the harness). This is the same shape as the shipped upgrade mults, so it's a known, testable pattern. (Words and per-zone affinity are intentionally NOT covered by a class yet — Words still come from clears + the shop `pageTurner` upgrade.)
 
 ---
 
@@ -125,7 +124,7 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 
 Each slice ships working, tested software and points at the north-star.
 
-- **Slice 1 — Classes + abilities + Protagonist (no collection yet).** Replace the clone party with the Protagonist + the 5 classes (fixed 1★), abilities wired into `modifiers`, party-selection from a small fixed starter set, full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
+- **Slice 1 — Classes + abilities + Protagonist (no collection yet).** Replace the clone party with the Protagonist + the 4 classes (fixed 1★), abilities wired into `modifiers`, choose-a-class on recruit (Protagonist always fielded), full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
 - **Slice 2 — Stars + Edits.** Add star tiers, the Edits currency, star-up, and the permanent stat/ability scaling. Re-balance.
 - **Slice 3 — Collection + acquisition from worlds.** Unlock variants by clearing worlds, the cosmetic `(class × world)` roster, the collection UI, the Protagonist Royalties track.
 - **Slice 4+ — Deferred layers (§9):** affinity, etc.
@@ -143,16 +142,14 @@ Each slice ships working, tested software and points at the north-star.
 
 ---
 
-## 12. Open questions for markup
+## 12. Open questions (for later slices — Slice 1 is fully specified)
 
-1. **Class list (§4)** — right five? Different names/roles? Want a 6th? Is "Striker" redundant with the Protagonist?
-2. **Protagonist ability (§4)** — what's the hero's signature effect?
-3. **Protagonist track (§7)** — Royalties in the shop, or its own currency/milestones?
-4. **Star count & curve (§6)** — 5★ ceiling? `STAR_GROWTH` feel (how much stronger is a 5★)?
-5. **Edits source/sink (§6)** — drop rates, star-up cost shape.
-6. **Acquisition unlock rule (Slice 3)** — does clearing a world unlock that world's variants of *all* classes at 1★, or something more paced?
-7. **Party cap** — keep 5/6, or rethink now that slots carry classes?
-8. **MVP scope (§10, Slice 1)** — is "classes + abilities + Protagonist, fixed 1★, no collection yet" the right first slice, or do you want stars in the MVP too?
+Slice 1 (the MVP) is locked. **Resolved:** class list + abilities (§4), Protagonist signature = "Plot Armor" (§4), Protagonist track = Royalties in the shop (§7), MVP scope = classes + abilities + Protagonist, fixed 1★, no collection. These remain open and will be decided when we design Slices 2–3:
+
+1. **Star count & curve (§6)** — 5★ ceiling? `STAR_GROWTH` feel (how much stronger is a 5★)?
+2. **Edits source/sink (§6)** — drop rates, star-up cost shape.
+3. **Acquisition unlock rule (Slice 3)** — does clearing a world unlock that world's variants of *all* classes at 1★, or something more paced?
+4. **Party cap** — keep 5/6, or rethink now that slots carry classes?
 
 ---
 
