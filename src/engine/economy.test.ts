@@ -4,6 +4,7 @@ import * as num from './num';
 import { initialState, emptyUpgrades } from './state';
 import * as eco from './economy';
 import { baseLevelCost, RECRUIT_CAP } from './content';
+import { starUp, canStarUp } from './economy';
 
 describe('economy actions', () => {
   it('levelUp spends the (effective) cost and raises level when affordable', () => {
@@ -52,5 +53,28 @@ describe('economy actions', () => {
     expect(after.party.length).toBe(before + 1);
     expect(after.party[after.party.length - 1].classId).toBe('debuffer');
     expect(num.lt(after.inspiration, s.inspiration)).toBe(true);
+  });
+});
+
+describe('star-up (Slice 2)', () => {
+  it('star up spends Edits and raises the class star', () => {
+    const s = { ...initialState(0), edits: num.n('1e6') };
+    const after = starUp(s, 'support');
+    expect(after.stars.support).toBe(2);
+    expect(num.lt(after.edits, s.edits)).toBe(true);
+  });
+
+  it('refuses the Protagonist (it grows via Royalties, not stars)', () => {
+    const s = { ...initialState(0), edits: num.n('1e6') };
+    expect(canStarUp(s, 'protagonist')).toBe(false);
+    expect(starUp(s, 'protagonist')).toBe(s); // no-op, same reference
+  });
+
+  it('refuses past MAX_STAR and when Edits are insufficient', () => {
+    const fresh = initialState(0);
+    const maxed = { ...fresh, edits: num.n('1e9'), stars: { ...fresh.stars, support: 5 } };
+    expect(canStarUp(maxed, 'support')).toBe(false);
+    const broke = { ...fresh, edits: num.ZERO };
+    expect(canStarUp(broke, 'support')).toBe(false);
   });
 });

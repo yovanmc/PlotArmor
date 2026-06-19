@@ -1,7 +1,7 @@
 // src/engine/economy.ts
 import { sub, gte } from './num';
 import { GameState, makeCharacter } from './state';
-import { ClassId } from './content';
+import { ClassId, MAX_STAR, starUpCost } from './content';
 import { effectiveLevelCost, effectiveRecruitCost, effectivePartyCap } from './modifiers';
 
 export function canLevel(state: GameState, id: string): boolean {
@@ -34,4 +34,22 @@ export function recruit(state: GameState, classId: ClassId): GameState {
   const idx = state.party.length;
   const newChar = makeCharacter(`c${idx}`, classId);
   return { ...state, inspiration: sub(state.inspiration, cost), party: [...state.party, newChar] };
+}
+
+export function canStarUp(state: GameState, classId: ClassId): boolean {
+  if (classId === 'protagonist') return false; // Protagonist grows via Royalties (Slice 3)
+  const current = state.stars[classId];
+  if (current >= MAX_STAR) return false;
+  return gte(state.edits, starUpCost(current));
+}
+
+export function starUp(state: GameState, classId: ClassId): GameState {
+  if (!canStarUp(state, classId)) return state;
+  const current = state.stars[classId];
+  const cost = starUpCost(current);
+  return {
+    ...state,
+    edits: sub(state.edits, cost),
+    stars: { ...state.stars, [classId]: current + 1 },
+  };
 }
