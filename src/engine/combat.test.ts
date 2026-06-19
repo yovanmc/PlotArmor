@@ -18,28 +18,39 @@ describe('combat', () => {
   });
 
   it('chips HP when dt is too small to clear', () => {
-    const s = initialState(0); // dps 3, encounter(0,0) hp 10
+    const s = initialState(0);
     const info = targetInfo(s);
-    const r = advanceTarget(num.n(10), info, 3); // 3 dps * 3s = 9 dmg
+    // Pick a dt where dps*dt < hp so the target is not cleared; hp is 10 in encounter(0,0)
+    const hp = num.n(10);
+    const dps = num.toNum(info.netDps);
+    const dt = 1; // at any plausible DPS << 10, 1s of combat should not clear 10 hp
+    expect(dps * dt).toBeLessThan(num.toNum(hp)); // sanity: confirm the scenario is valid
+    const r = advanceTarget(hp, info, dt);
     expect(r.cleared).toBe(false);
-    expect(num.toNum(r.hp)).toBeCloseTo(1, 6);
-    expect(r.timeUsed).toBe(3);
+    expect(num.toNum(r.hp)).toBeCloseTo(num.toNum(hp) - dps * dt, 6);
+    expect(r.timeUsed).toBe(dt);
   });
 
   it('clears exactly and reports the partial time used', () => {
-    const s = initialState(0); // dps 3
+    const s = initialState(0);
     const info = targetInfo(s);
-    const r = advanceTarget(num.n(10), info, 6); // would clear at t=10/3≈3.333s
+    const hp = num.n(10);
+    const dps = num.toNum(info.netDps);
+    const expectedTtc = 10 / dps; // time to clear = hp / netDps
+    const dt = expectedTtc * 2; // give it twice the time it needs
+    const r = advanceTarget(hp, info, dt);
     expect(r.cleared).toBe(true);
     expect(num.toNum(r.hp)).toBe(0);
-    expect(r.timeUsed).toBeCloseTo(10 / 3, 6);
+    expect(r.timeUsed).toBeCloseTo(expectedTtc, 6);
   });
 
   it('boss wall: when dps <= regen the boss never clears and hp does not drop below start', () => {
-    // default dps = 3; zone-0 boss regen = 3 -> net = 0 (wall; hp stays constant)
-    const atBoss = { ...initialState(0), zone: { zoneIndex: 0, encounterIndex: BOSS_INDEX } };
+    // Use zone 1 boss: regen = BASE_BOSS_REGEN * REGEN_GROWTH_PER_ZONE^1 = 3 * 5.5 = 16.5,
+    // which exceeds the starting party DPS (~3.67 after abilities), creating a real wall.
+    const atBoss = { ...initialState(0), zone: { zoneIndex: 1, encounterIndex: BOSS_INDEX } };
     const info = targetInfo(atBoss);
-    const max = targetMaxHp(0, BOSS_INDEX);
+    expect(num.lte(info.netDps, num.ZERO)).toBe(true); // confirm wall scenario
+    const max = targetMaxHp(1, BOSS_INDEX);
     const damaged = num.sub(max, num.n(5));
     const r = advanceTarget(damaged, info, 10);
     expect(r.cleared).toBe(false);

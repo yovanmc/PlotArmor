@@ -1,7 +1,7 @@
 // src/engine/modifiers.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
-import { initialState, emptyUpgrades } from './state';
+import { initialState, emptyUpgrades, makeCharacter, characterPower } from './state';
 import {
   BOSS_INDEX, OFFLINE_CAP_SECONDS, RECRUIT_CAP, GHOSTWRITER_LEVEL, BOOK_SCALE,
   NIGHT_OWL_HOURS_PER_LEVEL, MUSE_FLOOR, FRUGAL_FLOOR,
@@ -21,8 +21,9 @@ describe('modifiers: book-1, no-upgrades PARITY with raw v1 curves', () => {
     expect(num.eq(M.effectiveWords(s, 0, 0), targetWords(0, 0))).toBe(true);
     expect(num.eq(M.effectiveInspirationRate(s, 0, 0), targetInspirationRate(0, 0))).toBe(true);
   });
-  it('party DPS equals sum of power (3) and costs equal base curves', () => {
-    expect(num.toNum(M.effectivePartyDps(s))).toBe(3);
+  it('party abilities raise DPS above the raw sum; costs equal base curves', () => {
+    const rawSum = s.party.reduce((acc, c) => num.add(acc, characterPower(c)), num.ZERO);
+    expect(num.gt(M.effectivePartyDps(s), rawSum)).toBe(true); // Plot Armor / Lone Wolf raise DPS above the raw sum
     expect(num.eq(M.effectiveLevelCost(s, 1), baseLevelCost(1))).toBe(true);
     expect(num.eq(M.effectiveRecruitCost(s, 2), baseRecruitCost(2))).toBe(true);
   });
@@ -42,7 +43,8 @@ describe('modifiers: escalation and upgrade effects', () => {
   });
   it('sharpProse multiplies DPS; prolific multiplies inspiration rate', () => {
     const s = { ...initialState(0), upgrades: { ...emptyUpgrades(), sharpProse: 5, prolific: 10 } };
-    expect(num.toNum(M.effectivePartyDps(s))).toBeCloseTo(3 * 1.5, 6);
+    const noSharp = { ...initialState(0), upgrades: { ...emptyUpgrades(), prolific: 10 } };
+    expect(num.gt(M.effectivePartyDps(s), M.effectivePartyDps(noSharp))).toBe(true);
     expect(num.toNum(M.effectiveInspirationRate(s, 0, 0))).toBeCloseTo(num.toNum(targetInspirationRate(0, 0)) * 2, 6);
   });
   it('muse and frugalDrafts reductions are clamped to their floors', () => {
@@ -56,5 +58,29 @@ describe('modifiers: escalation and upgrade effects', () => {
     expect(M.effectivePartyCap(s)).toBe(RECRUIT_CAP + 1);
     expect(M.effectiveOfflineCap(s)).toBe(OFFLINE_CAP_SECONDS + 3 * NIGHT_OWL_HOURS_PER_LEVEL * 3600);
     expect(M.startingPartyLevel(s)).toBe(GHOSTWRITER_LEVEL);
+  });
+});
+
+describe('modifiers: party-class abilities', () => {
+  it('a Support raises party DPS above the same party without it', () => {
+    const base = initialState(0);
+    const withSupport = { ...base, party: [...base.party, makeCharacter('s', 'support', 10)] };
+    expect(num.gt(M.effectivePartyDps(withSupport), M.effectivePartyDps(base))).toBe(true);
+  });
+  it('a Debuffer reduces effective boss regen', () => {
+    const base = { ...initialState(0) };
+    const withDebuffer = { ...base, party: [...base.party, makeCharacter('d', 'debuffer', 10)] };
+    expect(num.lt(
+      M.effectiveBossRegen(withDebuffer, 1, BOSS_INDEX),
+      M.effectiveBossRegen(base, 1, BOSS_INDEX),
+    )).toBe(true);
+  });
+  it('a Sidekick raises the inspiration rate', () => {
+    const base = initialState(0);
+    const withSidekick = { ...base, party: [...base.party, makeCharacter('k', 'sidekick', 10)] };
+    expect(num.gt(
+      M.effectiveInspirationRate(withSidekick, 0, 0),
+      M.effectiveInspirationRate(base, 0, 0),
+    )).toBe(true);
   });
 });
