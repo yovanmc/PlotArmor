@@ -63,3 +63,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   font-size: 0.9rem;
   min-height: 1.1em;
 }
+
+.cskin {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-style: italic;
+}

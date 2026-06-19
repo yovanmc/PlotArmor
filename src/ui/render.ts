@@ -4,7 +4,9 @@ import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
+  WORLD_FACE, worldGenre,
 } from '../engine/content';
+import { unlockedWorldsFor } from '../engine/variants';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
@@ -53,14 +55,29 @@ export function render(state: GameState): void {
       const starBtn = (!isProtagonist && stars < MAX_STAR)
         ? `<button data-action="starup" data-class="${c.classId}" ${canStarUp(state, c.classId) ? '' : 'disabled'}>★ Up (✏️${fmt(starUpCost(stars))})</button>`
         : '';
+
+      const face = c.variantWorld !== null ? WORLD_FACE[c.variantWorld] : '✍️';
+      const skinTag = c.variantWorld !== null ? `<div class="cskin">${worldGenre(c.variantWorld)}</div>` : '';
+      const accentStyle = c.variantWorld !== null ? ` style="border-color:${ZONES[c.variantWorld].accent}"` : '';
+      const worlds = unlockedWorldsFor(state, c.classId);
+      let variantBtn = '';
+      if (worlds.length > 0) {
+        const cycle: (number | null)[] = [null, ...worlds];
+        const idx = cycle.findIndex((w) => w === c.variantWorld);
+        const next = cycle[(idx + 1) % cycle.length];
+        variantBtn = `<button data-action="variant" data-id="${c.id}" data-next="${next === null ? 'base' : next}">🎭 Skin</button>`;
+      }
+
       return `
-      <div class="card">
-        <div class="cemoji">✍️</div>
+      <div class="card"${accentStyle}>
+        <div class="cemoji">${face}</div>
         <div class="cname">${c.name}</div>
+        ${skinTag}
         ${starRow}
         <div class="clevel">Lv ${c.level} · pow ${fmt(effectiveCharacterPower(state, c))}</div>
         <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (✒️${fmt(effectiveLevelCost(state, c.level))})</button>
         ${starBtn}
+        ${variantBtn}
       </div>`;
     })
     .join('');

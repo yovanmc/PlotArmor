@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { initialState } from '../engine/state';
+import { initialState, makeUnlockedVariants } from '../engine/state';
 import { render } from './render';
 import * as num from '../engine/num';
 
@@ -59,5 +59,26 @@ describe('stars + Edits UI (Slice 2)', () => {
     expect(party.querySelector('[data-action="starup"][data-class="antihero"]')).not.toBeNull();
     expect(party.querySelector('[data-action="starup"][data-class="protagonist"]')).toBeNull();
     expect(party.textContent).toContain('★');
+  });
+});
+
+describe('variant UI (Slice 3a)', () => {
+  beforeEach(() => { document.body.innerHTML = HTML; });
+
+  it('shows a skin tag and the world face when a character wears a variant', () => {
+    const base = { ...initialState(0), unlockedVariants: { ...makeUnlockedVariants(), antihero: [0] } };
+    base.party = base.party.map((c) => (c.classId === 'antihero' ? { ...c, variantWorld: 0 } : c));
+    render(base);
+    const party = document.getElementById('party')!;
+    expect(party.textContent).toContain('Wild West'); // skin tag
+  });
+
+  it('offers a variant cycle button only when the class has an unlocked variant', () => {
+    render(initialState(0)); // nothing unlocked
+    expect(document.querySelector('#party [data-action="variant"]')).toBeNull();
+
+    const withUnlock = { ...initialState(0), unlockedVariants: { ...makeUnlockedVariants(), antihero: [0] } };
+    render(withUnlock);
+    expect(document.querySelector('#party [data-action="variant"][data-id="c1"]')).not.toBeNull();
   });
 });
