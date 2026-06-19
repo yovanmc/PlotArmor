@@ -1,7 +1,7 @@
 # Plot Armor — Party System (Classes, Stars, Collection) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** Design APPROVED for Slice 1 (MVP) — ready for implementation planning. North-star locked; Slices 2–4 details still open (§12).
+- **Status:** **Slice 1 (MVP) IMPLEMENTED** (2026-06-19) — Protagonist + 4 classes with composition abilities, choose-a-class on recruit, save schema v3, harness-rebalanced; shipped on `main`. North-star locked; Slices 2–4 details still open (§12).
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, prestige + Publishing House shop, and the balance fix + 8 genre zones (all shipped).
@@ -124,7 +124,7 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 
 Each slice ships working, tested software and points at the north-star.
 
-- **Slice 1 — Classes + abilities + Protagonist (no collection yet).** Replace the clone party with the Protagonist + the 4 classes (fixed 1★), abilities wired into `modifiers`, choose-a-class on recruit (Protagonist always fielded), full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
+- **Slice 1 — Classes + abilities + Protagonist (no collection yet). ✅ IMPLEMENTED 2026-06-19.** Replaced the clone party with the Protagonist + the 4 classes (fixed 1★), abilities wired into `modifiers`, choose-a-class on recruit (Protagonist always fielded), save schema v3, full rebalance via the harness. Proves the composition gameplay. *(This is the MVP.)*
 - **Slice 2 — Stars + Edits.** Add star tiers, the Edits currency, star-up, and the permanent stat/ability scaling. Re-balance.
 - **Slice 3 — Collection + acquisition from worlds.** Unlock variants by clearing worlds, the cosmetic `(class × world)` roster, the collection UI, the Protagonist Royalties track.
 - **Slice 4+ — Deferred layers (§9):** affinity, etc.

@@ -15,7 +15,7 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**Playable loop, balanced, 8 genres.** On top of v1, Royalties are a spendable
+**Playable loop, balanced, 8 genres, class-based party.** On top of v1, Royalties are a spendable
 wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
 in-game via the **Publishing House** (a parchment modal opened from a live-balance
 entry button); books escalate in difficulty/size each publish, and the royalty
@@ -24,18 +24,28 @@ payout scales with manuscript size.
 The core economy is now **tuned so the loop actually closes** — character power grows
 multiplicatively per level (`POWER_GROWTH`), so bought DPS keeps pace with exponential
 enemies. A greedy-play balance harness (`src/engine/balance.test.ts`) verifies book 1
-is publishable in ~13 minutes and books 1–8 all complete with no hard wall. Content is
+is publishable in ~10 minutes and books 1–8 all complete with no hard wall. Content is
 expanded from 3 to **8 genre zones** (Wild West, Zombie Apocalypse, Space, High Fantasy,
-Pirate Seas, Noir City, Eldritch Horror, Prehistoric). All headless-tested (78 passing
-tests); `npm run build` is green. Balance constants are tunable placeholders.
+Pirate Seas, Noir City, Eldritch Horror, Prehistoric).
+
+The party is now **class-based (Slice 1 of the party system)**: a fixed **Protagonist**
+plus four recruitable classes — **Anti-hero** (Lone Wolf: amps only its own DPS),
+**Support** (amps the whole party's DPS), **Debuffer** (cuts boss regen), and
+**Sidekick** (raises the Inspiration rate). You choose which class to recruit, and the
+Protagonist's **Plot Armor** scales the party's DPS by the number of *distinct* classes
+fielded, so a varied roster beats a stack of clones. Stars/tiers and world-variants are
+deferred to later slices. All headless-tested (88 passing tests) plus a live DOM smoke of
+the built bundle; `npm run build` is green. Balance constants are tunable placeholders.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
-[balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md).
+[balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md) ·
+[party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
-[spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md).
+[spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
+[party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
