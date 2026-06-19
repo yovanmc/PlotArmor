@@ -110,3 +110,33 @@ describe('star scaling (Slice 2)', () => {
     expect(num.gt(M.effectivePartyDps(threeStar), M.effectivePartyDps(oneStar))).toBe(true);
   });
 });
+
+describe('set bonus in modifiers (Slice 3b)', () => {
+  // build a 5-Space party (world 2 = DPS set)
+  function spaceParty() {
+    const five = (['protagonist', 'antihero', 'support', 'debuffer', 'sidekick'] as const)
+      .map((cls, i) => ({ ...makeCharacter(`c${i}`, cls), variantWorld: 2 }));
+    return { ...initialState(0), party: five };
+  }
+
+  it('a full DPS set raises effectivePartyDps vs the same party on base looks', () => {
+    const set = spaceParty();
+    const base = { ...set, party: set.party.map((c) => ({ ...c, variantWorld: null })) };
+    expect(num.gt(M.effectivePartyDps(set), M.effectivePartyDps(base))).toBe(true);
+  });
+
+  it('a full Wild West set (Inspiration axis) raises effectiveInspirationRate', () => {
+    const wildwest = spaceParty();
+    wildwest.party = wildwest.party.map((c) => ({ ...c, variantWorld: 0 }));
+    const base = { ...wildwest, party: wildwest.party.map((c) => ({ ...c, variantWorld: null })) };
+    expect(num.gt(M.effectiveInspirationRate(wildwest, 0, 0), M.effectiveInspirationRate(base, 0, 0))).toBe(true);
+  });
+
+  it('a full Eldritch set (regenCut axis) lowers effectiveBossRegen', () => {
+    const eldritch = spaceParty();
+    eldritch.party = eldritch.party.map((c) => ({ ...c, variantWorld: 6 }));
+    const base = { ...eldritch, party: eldritch.party.map((c) => ({ ...c, variantWorld: null })) };
+    // boss encounter (zone 0, BOSS_INDEX) so regen is non-zero
+    expect(num.lt(M.effectiveBossRegen(eldritch, 0, BOSS_INDEX), M.effectiveBossRegen(base, 0, BOSS_INDEX))).toBe(true);
+  });
+});
