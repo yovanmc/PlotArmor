@@ -8,7 +8,7 @@ import {
   effectiveInspirationRate, effectivePartyDps, effectiveBossRegen,
   effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
 } from './modifiers';
-import { ClassId, MAX_STAR } from './content';
+import { ClassId, MAX_STAR, ZONE_COUNT } from './content';
 import { step } from './loop';
 import { publish } from './progression';
 import { levelUp, recruit, starUp, canLevel, canRecruit, canStarUp } from './economy';
@@ -76,8 +76,9 @@ function spendGreedy(s: GameState): GameState {
 
 interface BookResult { book: number; seconds: number; completed: boolean; wall?: string; }
 
-// Simulate greedy play across `books` books. Returns per-book in-game seconds to publish.
-function simulate(books: number, maxSecondsPerBook: number): BookResult[] {
+// Simulate greedy play across `books` books. Returns per-book in-game seconds to
+// publish plus the final GameState (so tests can inspect earned variants/stars).
+function simulate(books: number, maxSecondsPerBook: number): { results: BookResult[]; finalState: GameState } {
   let s = initialState(0);
   const results: BookResult[] = [];
 
@@ -115,7 +116,7 @@ function simulate(books: number, maxSecondsPerBook: number): BookResult[] {
     if (!s.bookComplete) break;
     s = publish(s);
   }
-  return results;
+  return { results, finalState: s };
 }
 
 function human(seconds: number): string {
@@ -128,7 +129,7 @@ function human(seconds: number): string {
 }
 
 describe('balance: the core loop closes', () => {
-  const results = simulate(8, 30 * 86400); // cap each book at 30 in-game days
+  const { results, finalState } = simulate(8, 30 * 86400); // cap each book at 30 in-game days
 
   const report = (globalThis as { process?: { env?: Record<string, string | undefined> } })
     .process?.env?.BALANCE_REPORT;
@@ -149,5 +150,14 @@ describe('balance: the core loop closes', () => {
   it('books 1-8 all complete (no hard wall)', () => {
     expect(results.length).toBe(8);
     expect(results.every((r) => r.completed)).toBe(true);
+  });
+
+  // Slice 3a: variants are earned by clearing world bosses. Each book clears all
+  // 8 worlds once, unlocking one class's variant per world per book, so after 8
+  // books every class should own every world's skin (the full 5x8 collection).
+  it('clearing 8 books unlocks the full variant collection through real play', () => {
+    const total = Object.values(finalState.unlockedVariants).reduce((sum, ws) => sum + ws.length, 0);
+    expect(finalState.unlockedVariants.protagonist.length).toBe(ZONE_COUNT);
+    expect(total).toBe(5 * ZONE_COUNT);
   });
 });
