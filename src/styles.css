@@ -50,9 +50,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .shop-row:last-child { border-bottom: none; }
 .shop-row-info { min-width: 0; }
 .shop-row-name { font-weight: 700; font-size: 0.95rem; }
-.shop-lv { font-weight: 400; opacity: 0.55; }
+.shop-lv { font-weight: 400; opacity: 0.72; }
 .shop-row-desc { font-size: 0.78rem; opacity: 0.75; }
 .shop-buy { background: #b8923c; color: #3a2a0e; white-space: nowrap; }
 .shop-buy:disabled { opacity: 0.38; cursor: not-allowed; }
-.shop-owned { font-size: 0.8rem; font-weight: 700; opacity: 0.6; white-space: nowrap; }
+.shop-owned { font-size: 0.8rem; font-weight: 700; opacity: 0.78; white-space: nowrap; }
 .shop-close-btn { background: #b8923c; color: #3a2a0e; display: block; margin: 1rem auto 0; }
