@@ -1,33 +1,34 @@
+// src/engine/combat.ts
 import { Num, n, ZERO, sub, mul, div, gt, minN } from './num';
 import { GameState } from './state';
-import { targetMaxHp, targetRegen, isBossIndex } from './content';
-import { partyDps } from './economy';
+import { isBossIndex } from './content';
+import { effectivePartyDps, effectiveBossRegen, effectiveTargetMaxHp } from './modifiers';
 
 export interface TargetInfo {
   maxHp: Num;
   regen: Num;
   isBoss: boolean;
-  netDps: Num; // partyDps - regen (regen is 0 for regular encounters)
+  netDps: Num; // effectivePartyDps - regen
 }
 
 export function targetInfo(state: GameState): TargetInfo {
   const { zoneIndex, encounterIndex } = state.zone;
-  const regen = targetRegen(zoneIndex, encounterIndex);
+  const regen = effectiveBossRegen(state, zoneIndex, encounterIndex);
   return {
-    maxHp: targetMaxHp(zoneIndex, encounterIndex),
+    maxHp: effectiveTargetMaxHp(state, zoneIndex, encounterIndex),
     regen,
     isBoss: isBossIndex(encounterIndex),
-    netDps: sub(partyDps(state), regen),
+    netDps: sub(effectivePartyDps(state), regen),
   };
 }
 
 export interface AdvanceResult {
   hp: Num;
   cleared: boolean;
-  timeUsed: number; // seconds of `dt` consumed (== ttc on clear, else == dt)
+  timeUsed: number;
 }
 
-// Apply up to `dt` seconds of combat to the current target.
+// Apply up to `dt` seconds of combat to the current target (unchanged logic).
 export function advanceTarget(currentHp: Num, info: TargetInfo, dt: number): AdvanceResult {
   if (gt(info.netDps, ZERO)) {
     const ttc = div(currentHp, info.netDps).toNumber();
@@ -36,7 +37,6 @@ export function advanceTarget(currentHp: Num, info: TargetInfo, dt: number): Adv
     }
     return { hp: sub(currentHp, mul(info.netDps, n(dt))), cleared: false, timeUsed: dt };
   }
-  // netDps <= 0 (boss wall): regenerate toward maxHp, never clears
-  const regened = sub(currentHp, mul(info.netDps, n(dt))); // subtracting a non-positive => increase
+  const regened = sub(currentHp, mul(info.netDps, n(dt))); // subtracting non-positive => increase
   return { hp: minN(regened, info.maxHp), cleared: false, timeUsed: dt };
 }
