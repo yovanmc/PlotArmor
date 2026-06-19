@@ -1,7 +1,7 @@
 # Plot Armor — Prestige Depth Design Spec (v2 systems)
 
 - **Date:** 2026-06-19
-- **Status:** Approved (brainstorming complete) — ready for implementation planning
+- **Status:** Implemented (engine) — 2026-06-19; spend UI deferred
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** [`2026-06-19-plot-armor-design.md`](2026-06-19-plot-armor-design.md) (v1, shipped). This spec adds the second design pass: a real **prestige spend layer**.

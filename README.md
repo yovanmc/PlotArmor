@@ -15,13 +15,16 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**v1 complete.** The full engine (numbers, content, combat, economy, progression,
-tick loop, offline catch-up, save/load) is implemented and headless-tested
-(44 passing tests), under a DOM/CSS render layer; `npm run build` is green. Full
-v1 spec:
-[`docs/superpowers/specs/2026-06-19-plot-armor-design.md`](docs/superpowers/specs/2026-06-19-plot-armor-design.md);
-implementation plan:
-[`docs/superpowers/plans/2026-06-19-plot-armor-v1.md`](docs/superpowers/plans/2026-06-19-plot-armor-v1.md).
+**v2 (prestige depth) engine complete.** On top of v1, Royalties are now a spendable
+wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), books escalate
+in difficulty/size each publish, and the royalty payout scales with manuscript size.
+All headless-tested (68 passing tests); `npm run build` is green. No spend UI yet —
+engine systems only.
+
+Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
+[prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md).
+Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
+[prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
