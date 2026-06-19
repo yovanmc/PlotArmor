@@ -1,6 +1,6 @@
 // src/engine/economy.ts
-import { n, sub, gte } from './num';
-import { GameState, Character, CHARACTER_NAMES } from './state';
+import { sub, gte } from './num';
+import { GameState, Character, makeCharacter } from './state';
 import { effectiveLevelCost, effectiveRecruitCost, effectivePartyCap } from './modifiers';
 
 export function canLevel(state: GameState, id: string): boolean {
@@ -31,11 +31,7 @@ export function recruit(state: GameState): GameState {
   if (!canRecruit(state)) return state;
   const cost = effectiveRecruitCost(state, state.party.length);
   const idx = state.party.length;
-  const newChar: Character = {
-    id: `c${idx}`,
-    name: CHARACTER_NAMES[idx] ?? `Character ${idx + 1}`,
-    level: 1,
-    basePower: n(1),
-  };
+  // stopgap (Slice 1 Task 4 finalizes recruit-by-class)
+  const newChar: Character = makeCharacter(`c${idx}`, 'antihero');
   return { ...state, inspiration: sub(state.inspiration, cost), party: [...state.party, newChar] };
 }

@@ -21,8 +21,8 @@ describe('modifiers: book-1, no-upgrades PARITY with raw v1 curves', () => {
     expect(num.eq(M.effectiveWords(s, 0, 0), targetWords(0, 0))).toBe(true);
     expect(num.eq(M.effectiveInspirationRate(s, 0, 0), targetInspirationRate(0, 0))).toBe(true);
   });
-  it('party DPS equals sum of power (2) and costs equal base curves', () => {
-    expect(num.toNum(M.effectivePartyDps(s))).toBe(2);
+  it('party DPS equals sum of power (3) and costs equal base curves', () => {
+    expect(num.toNum(M.effectivePartyDps(s))).toBe(3);
     expect(num.eq(M.effectiveLevelCost(s, 1), baseLevelCost(1))).toBe(true);
     expect(num.eq(M.effectiveRecruitCost(s, 2), baseRecruitCost(2))).toBe(true);
   });
@@ -42,7 +42,7 @@ describe('modifiers: escalation and upgrade effects', () => {
   });
   it('sharpProse multiplies DPS; prolific multiplies inspiration rate', () => {
     const s = { ...initialState(0), upgrades: { ...emptyUpgrades(), sharpProse: 5, prolific: 10 } };
-    expect(num.toNum(M.effectivePartyDps(s))).toBeCloseTo(2 * 1.5, 6);
+    expect(num.toNum(M.effectivePartyDps(s))).toBeCloseTo(3 * 1.5, 6);
     expect(num.toNum(M.effectiveInspirationRate(s, 0, 0))).toBeCloseTo(num.toNum(targetInspirationRate(0, 0)) * 2, 6);
   });
   it('muse and frugalDrafts reductions are clamped to their floors', () => {

@@ -6,7 +6,7 @@ import { BOSS_INDEX, ZONE_COUNT, targetMaxHp, targetInspirationRate } from './co
 
 describe('loop.step', () => {
   it('accrues inspiration continuously and clears the first encounter', () => {
-    const s = initialState(0); // dps 2, encounter(0,0) hp 10 -> clears at t=5
+    const s = initialState(0); // dps 3, encounter(0,0) hp 10 -> clears at t≈3.33s
     const r = step(s, 6);
     expect(r.clears).toBeGreaterThanOrEqual(1);
     expect(num.gt(r.state.inspiration, num.ZERO)).toBe(true);
@@ -18,7 +18,7 @@ describe('loop.step', () => {
       ...initialState(0),
       zone: { zoneIndex: ZONE_COUNT - 1, encounterIndex: BOSS_INDEX },
       // give enough dps to beat the final boss quickly
-      party: [{ id: 'x', name: 'Hero', level: 1, basePower: num.n('1e30') }],
+      party: [{ id: 'x', name: 'Hero', classId: 'protagonist' as const, level: 1, basePower: num.n('1e30') }],
       currentHp: num.n(1),
     };
     const r = step(atFinalBoss, 10);
@@ -28,7 +28,7 @@ describe('loop.step', () => {
 
   it('boss wall still earns inspiration (rate-based) without clearing', () => {
     const atBoss = {
-      ...initialState(0), // dps 2 < zone-0 boss regen 3 -> wall
+      ...initialState(0), // dps 3 == zone-0 boss regen 3 -> wall (net=0)
       zone: { zoneIndex: 0, encounterIndex: BOSS_INDEX },
       currentHp: targetMaxHp(0, BOSS_INDEX),
     };

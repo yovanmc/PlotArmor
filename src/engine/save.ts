@@ -1,6 +1,7 @@
 // src/engine/save.ts
 import { Num, n, ZERO, numToStr, strToNum } from './num';
 import { GameState, Character, Upgrades, initialState, emptyUpgrades } from './state';
+import { ClassId } from './content';
 
 export const SAVE_KEY = 'plotarmor.save.v1';
 export const SCHEMA_VERSION = 2;
@@ -71,6 +72,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
       ? dto.party.map((c, i) => ({
           id: c?.id ?? `c${i}`,
           name: c?.name ?? `Character ${i + 1}`,
+          classId: 'antihero' as ClassId, // stopgap (Slice 1 Task 5 finalizes classId persistence + migration)
           level: typeof c?.level === 'number' ? c.level : 1,
           basePower: numOr(c?.basePower, n(1)),
         }))

@@ -18,10 +18,10 @@ describe('state', () => {
     expect(s.upgrades).toEqual(emptyUpgrades());
   });
 
-  it('starting party members are level 1 with base power 1', () => {
+  it('starting party members are level 1 with positive base power and unique ids', () => {
     const party = makeStartingParty();
     expect(party.every((c) => c.level === 1)).toBe(true);
-    expect(party.every((c) => num.eq(c.basePower, num.ONE))).toBe(true);
+    expect(party.every((c) => num.gt(c.basePower, num.ZERO))).toBe(true);
     expect(new Set(party.map((c) => c.id)).size).toBe(party.length);
   });
 
@@ -33,9 +33,9 @@ describe('state', () => {
 
   it('characterPower = basePower * POWER_GROWTH^(level-1)', () => {
     // multiplicative growth starts at level 1, so a level-1 character's power == its basePower
-    expect(num.toNum(characterPower({ id: 'x', name: 'X', level: 1, basePower: num.n(2) }))).toBe(2);
+    expect(num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 1, basePower: num.n(2) }))).toBe(2);
     expect(
-      num.toNum(characterPower({ id: 'x', name: 'X', level: 4, basePower: num.n(2) })),
+      num.toNum(characterPower({ id: 'x', name: 'X', classId: 'protagonist', level: 4, basePower: num.n(2) })),
     ).toBeCloseTo(2 * Math.pow(POWER_GROWTH, 3), 5);
   });
 
@@ -45,5 +45,12 @@ describe('state', () => {
     expect(u.sharpProse).toBe(0);
     expect(u.ensembleCast).toBe(false);
     expect(u.ghostwriter).toBe(false);
+  });
+
+  it('starting party is the Protagonist (slot 0) plus an Anti-hero, each with a classId', () => {
+    const party = makeStartingParty();
+    expect(party[0].classId).toBe('protagonist');
+    expect(party[1].classId).toBe('antihero');
+    expect(party.every((c) => num.gt(c.basePower, num.ZERO))).toBe(true);
   });
 });

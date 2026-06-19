@@ -1,10 +1,11 @@
 // src/engine/state.ts
-import { Num, n, mul, pow, ZERO, ONE } from './num';
-import { STARTING_PARTY_SIZE, targetMaxHp, POWER_GROWTH } from './content';
+import { Num, n, mul, pow, ZERO } from './num';
+import { targetMaxHp, POWER_GROWTH, ClassId, findClass } from './content';
 
 export interface Character {
   id: string;
   name: string;
+  classId: ClassId;
   level: number;
   basePower: Num;
 }
@@ -39,10 +40,6 @@ export interface GameState {
   upgrades: Upgrades;
 }
 
-export const CHARACTER_NAMES = [
-  'Quill', 'Inkheart', 'Margin', 'Verse', 'Footnote', 'Epilogue', 'Prologue',
-];
-
 export function emptyUpgrades(): Upgrades {
   return {
     prolific: 0, sharpProse: 0, pageTurner: 0, muse: 0, nightOwl: 0, frugalDrafts: 0,
@@ -54,12 +51,16 @@ export function characterPower(c: Character): Num {
   return mul(c.basePower, pow(n(POWER_GROWTH), c.level - 1));
 }
 
+export function makeCharacter(id: string, classId: ClassId, level = 1): Character {
+  const def = findClass(classId);
+  return { id, name: def.name, classId, level, basePower: def.classBasePower };
+}
+
 export function makeStartingParty(level = 1): Character[] {
-  const party: Character[] = [];
-  for (let i = 0; i < STARTING_PARTY_SIZE; i++) {
-    party.push({ id: `c${i}`, name: CHARACTER_NAMES[i], level, basePower: ONE });
-  }
-  return party;
+  return [
+    makeCharacter('c0', 'protagonist', level),
+    makeCharacter('c1', 'antihero', level),
+  ];
 }
 
 export function initialState(nowMs: number): GameState {
