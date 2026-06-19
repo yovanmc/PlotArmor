@@ -1,6 +1,6 @@
 import { GameState } from '../engine/state';
 import { ClassId } from '../engine/content';
-import { levelUp, recruit } from '../engine/economy';
+import { levelUp, recruit, starUp } from '../engine/economy';
 import { publish } from '../engine/progression';
 import { exportSave, importSave } from '../engine/save';
 
@@ -15,6 +15,9 @@ export function wireInput(getState: () => GameState, setState: (s: GameState) =>
     } else if (action === 'recruit') {
       const classId = btn.getAttribute('data-class');
       if (classId) setState(recruit(getState(), classId as ClassId));
+    } else if (action === 'starup') {
+      const classId = btn.getAttribute('data-class');
+      if (classId) setState(starUp(getState(), classId as ClassId));
     }
   });
 

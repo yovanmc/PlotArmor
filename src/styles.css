@@ -56,3 +56,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .shop-buy:disabled { opacity: 0.38; cursor: not-allowed; }
 .shop-owned { font-size: 0.8rem; font-weight: 700; opacity: 0.78; white-space: nowrap; }
 .shop-close-btn { background: #b8923c; color: #3a2a0e; display: block; margin: 1rem auto 0; }
+
+.cstars {
+  letter-spacing: 1px;
+  color: #d9a441;
+  font-size: 0.9rem;
+  min-height: 1.1em;
+}

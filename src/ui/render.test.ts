@@ -43,3 +43,21 @@ describe('render', () => {
     expect(document.querySelector('#party [data-action="recruit"][data-class]')).not.toBeNull();
   });
 });
+
+describe('stars + Edits UI (Slice 2)', () => {
+  beforeEach(() => { document.body.innerHTML = HTML; });
+
+  it('shows the Edits balance in the HUD', () => {
+    render({ ...initialState(0), edits: num.n(12) });
+    expect(document.getElementById('hud')!.textContent).toContain('Edits');
+    expect(document.getElementById('hud')!.textContent).toContain('12');
+  });
+
+  it('shows star pips and a star-up button for a non-Protagonist class, but not for the Protagonist', () => {
+    render({ ...initialState(0), edits: num.n('1e6') });
+    const party = document.getElementById('party')!;
+    expect(party.querySelector('[data-action="starup"][data-class="antihero"]')).not.toBeNull();
+    expect(party.querySelector('[data-action="starup"][data-class="protagonist"]')).toBeNull();
+    expect(party.textContent).toContain('★');
+  });
+});

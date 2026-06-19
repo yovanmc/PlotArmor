@@ -1,15 +1,15 @@
 // src/ui/render.ts
-import { GameState, characterPower } from '../engine/state';
+import { GameState } from '../engine/state';
 import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
-  isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES,
+  isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
 } from '../engine/content';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
-  effectiveTargetMaxHp, effectiveBossRegen,
+  effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
 } from '../engine/modifiers';
-import { canLevel, canRecruit } from '../engine/economy';
+import { canLevel, canRecruit, canStarUp } from '../engine/economy';
 
 function el(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -34,6 +34,7 @@ export function render(state: GameState): void {
     <div>✒️ Inspiration: <strong>${fmt(state.inspiration)}</strong></div>
     <div>📖 Words: ${fmt(state.words)}</div>
     <div>💰 Royalties: ${fmt(state.royalties)}</div>
+    <div>✏️ Edits: ${fmt(state.edits)}</div>
     <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>`;
 
   el('enemy').innerHTML = `
@@ -43,15 +44,25 @@ export function render(state: GameState): void {
     <div class="hptext">${fmt(state.currentHp)} / ${fmt(maxHp)} HP${isBoss ? ` · regen ${fmt(effectiveBossRegen(state, zoneIndex, encounterIndex))}/s` : ''}</div>`;
 
   const cards = state.party
-    .map(
-      (c) => `
+    .map((c) => {
+      const stars = state.stars[c.classId];
+      const isProtagonist = c.classId === 'protagonist';
+      const starRow = isProtagonist
+        ? '<div class="cstars">—</div>'
+        : `<div class="cstars">${'★'.repeat(stars)}${'☆'.repeat(MAX_STAR - stars)}</div>`;
+      const starBtn = (!isProtagonist && stars < MAX_STAR)
+        ? `<button data-action="starup" data-class="${c.classId}" ${canStarUp(state, c.classId) ? '' : 'disabled'}>★ Up (✏️${fmt(starUpCost(stars))})</button>`
+        : '';
+      return `
       <div class="card">
         <div class="cemoji">✍️</div>
         <div class="cname">${c.name}</div>
-        <div class="clevel">Lv ${c.level} · pow ${fmt(characterPower(c))}</div>
+        ${starRow}
+        <div class="clevel">Lv ${c.level} · pow ${fmt(effectiveCharacterPower(state, c))}</div>
         <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (✒️${fmt(effectiveLevelCost(state, c.level))})</button>
-      </div>`,
-    )
+        ${starBtn}
+      </div>`;
+    })
     .join('');
   const recruitable = CLASSES.filter((cl) => cl.id !== 'protagonist');
   const recruitCard =
