@@ -82,3 +82,21 @@ describe('variant UI (Slice 3a)', () => {
     expect(document.querySelector('#party [data-action="variant"][data-id="c1"]')).not.toBeNull();
   });
 });
+
+describe('set-bonus HUD (Slice 3b)', () => {
+  beforeEach(() => { document.body.innerHTML = HTML; });
+
+  it('shows an active world set in the HUD when 2+ share a world', () => {
+    const s = initialState(0);
+    s.party = s.party.map((c) => ({ ...c, variantWorld: 2 })); // both starters on Space
+    render(s);
+    const hud = document.getElementById('hud')!.textContent!;
+    expect(hud).toContain('Space');
+    expect(hud).toMatch(/set/i);
+  });
+
+  it('shows no set line when nobody is in a set', () => {
+    render(initialState(0)); // all base looks
+    expect(document.getElementById('hud')!.textContent).not.toMatch(/set bonus/i);
+  });
+});

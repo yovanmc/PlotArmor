@@ -4,9 +4,9 @@ import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
-  WORLD_FACE, worldGenre,
+  WORLD_FACE, worldGenre, WORLD_SET_BONUS,
 } from '../engine/content';
-import { unlockedWorldsFor } from '../engine/variants';
+import { unlockedWorldsFor, setBonusBreakdown } from '../engine/variants';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
@@ -30,6 +30,13 @@ export function render(state: GameState): void {
     ? 100
     : Math.round((targetsClearedInBook(zoneIndex, encounterIndex) / TARGETS_PER_BOOK) * 100);
 
+  const sets = setBonusBreakdown(state.party);
+  const setLine = sets.length
+    ? `<div>🎭 Sets: ${sets
+        .map((s) => `${worldGenre(s.world)} ×${s.count} (+${Math.round(WORLD_SET_BONUS[s.world].tiers[s.tier - 1] * 100)}% ${WORLD_SET_BONUS[s.world].axis})`)
+        .join(', ')}</div>`
+    : '';
+
   el('hud').innerHTML = `
     <div>Book #${state.bookNumber} — <strong>${zone.genre}</strong></div>
     <div>📜 Manuscript: ${progress}%</div>
@@ -37,7 +44,8 @@ export function render(state: GameState): void {
     <div>📖 Words: ${fmt(state.words)}</div>
     <div>💰 Royalties: ${fmt(state.royalties)}</div>
     <div>✏️ Edits: ${fmt(state.edits)}</div>
-    <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>`;
+    <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>
+    ${setLine}`;
 
   el('enemy').innerHTML = `
     <div class="enemy-emoji">${targetEmoji(zoneIndex, encounterIndex)}</div>
