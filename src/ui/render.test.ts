@@ -36,4 +36,10 @@ describe('render', () => {
   it('does not throw when #shop-open is absent (the default fixture)', () => {
     expect(() => render(initialState(0))).not.toThrow();
   });
+
+  it('party cards show the class name and the recruit area offers a per-class button', () => {
+    render(initialState(0));
+    expect(document.getElementById('party')!.textContent).toContain('The Protagonist');
+    expect(document.querySelector('#party [data-action="recruit"][data-class]')).not.toBeNull();
+  });
 });

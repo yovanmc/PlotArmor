@@ -3,7 +3,7 @@ import { GameState, characterPower } from '../engine/state';
 import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
-  isBossIndex, targetName, targetEmoji, targetsClearedInBook,
+  isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES,
 } from '../engine/content';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
@@ -53,9 +53,17 @@ export function render(state: GameState): void {
       </div>`,
     )
     .join('');
+  const recruitable = CLASSES.filter((cl) => cl.id !== 'protagonist');
   const recruitCard =
     state.party.length < effectivePartyCap(state)
-      ? `<div class="card recruit"><div class="cemoji">➕</div><button data-action="recruit" ${canRecruit(state) ? '' : 'disabled'}>Introduce character (✒️${fmt(effectiveRecruitCost(state, state.party.length))})</button></div>`
+      ? `<div class="card recruit">
+           <div class="cemoji">➕</div>
+           ${recruitable
+             .map((cl) =>
+               `<button data-action="recruit" data-class="${cl.id}" ${canRecruit(state) ? '' : 'disabled'}>` +
+               `${cl.name} (✒️${fmt(effectiveRecruitCost(state, state.party.length))})</button>`)
+             .join('')}
+         </div>`
       : '';
   el('party').innerHTML = cards + recruitCard;
 

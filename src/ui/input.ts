@@ -1,4 +1,5 @@
 import { GameState } from '../engine/state';
+import { ClassId } from '../engine/content';
 import { levelUp, recruit } from '../engine/economy';
 import { publish } from '../engine/progression';
 import { exportSave, importSave } from '../engine/save';
@@ -12,7 +13,8 @@ export function wireInput(getState: () => GameState, setState: (s: GameState) =>
       const id = btn.getAttribute('data-id');
       if (id) setState(levelUp(getState(), id));
     } else if (action === 'recruit') {
-      setState(recruit(getState(), 'antihero')); // stopgap (Slice 1 Task 6 reads the chosen class from data-class)
+      const classId = btn.getAttribute('data-class');
+      if (classId) setState(recruit(getState(), classId as ClassId));
     }
   });
 
