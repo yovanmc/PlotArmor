@@ -106,3 +106,22 @@ describe('stars + Edits (Slice 2)', () => {
     expect(num.gt(bossEditDrop(3), bossEditDrop(1))).toBe(true);
   });
 });
+
+import { VARIANT_UNLOCK_ORDER, WORLD_FACE, worldGenre, ZONE_COUNT } from './content';
+
+describe('world variants (Slice 3a)', () => {
+  it('the variant unlock order lists every class exactly once', () => {
+    expect(VARIANT_UNLOCK_ORDER).toHaveLength(5);
+    expect(new Set(VARIANT_UNLOCK_ORDER).size).toBe(5);
+    expect(VARIANT_UNLOCK_ORDER).toContain('protagonist');
+  });
+
+  it('there is one face emoji per world', () => {
+    expect(WORLD_FACE).toHaveLength(ZONE_COUNT);
+    expect(WORLD_FACE.every((e) => typeof e === 'string' && e.length > 0)).toBe(true);
+  });
+
+  it('worldGenre returns the zone genre', () => {
+    expect(worldGenre(0)).toBe('Wild West');
+  });
+});

@@ -247,6 +247,22 @@ export function bossEditDrop(bookNumber: number): Num {
   return mul(EDITS_PER_BOSS, pow(n(EDIT_BOOK_GROWTH), bookNumber - 1));
 }
 
+// --- world variants (Slice 3a) ----------------------------------------------
+// A character can wear a cosmetic skin from any world its class has unlocked.
+// Variants are (classId x worldIndex); display-only in Slice 3a (the 2/3/5 set
+// bonus is Slice 3b). Clearing a world's boss unlocks the next class's variant
+// for that world in this FIXED order (deterministic, no RNG):
+export const VARIANT_UNLOCK_ORDER: ClassId[] = [
+  'protagonist', 'antihero', 'support', 'debuffer', 'sidekick',
+];
+
+// One "writer face" emoji per world (index-aligned with ZONES). Cosmetic only.
+export const WORLD_FACE: string[] = ['🤠', '🧟', '🚀', '🧙', '🏴‍☠️', '🕵️', '🐙', '🦴'];
+
+export function worldGenre(worldIndex: number): string {
+  return ZONES[worldIndex].genre;
+}
+
 // --- party classes (Slice 1) -------------------------------------------------
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
 export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';
