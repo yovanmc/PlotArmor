@@ -168,7 +168,8 @@ This is a per-book loadout decision, not a per-encounter one.
 
 - **World power-tiers** — deeper-world variants flatly stronger (alternative/addition to affinity).
 - **Max-star overflow → star-prestige ("Legacy")** — now its own LOCKED spec (`2026-06-20-plot-armor-star-prestige-design.md`), building. Realizes the §6-reserved overflow: an Edits-funded global power+ability multiplier.
-- **More classes / 6★+ / ascension**, richer Protagonist signature abilities, etc. (A new Words-axis class is the next planned addition after star-prestige.)
+- **A new Words-axis class (the Scribe)** — now its own LOCKED spec (`2026-06-20-plot-armor-scribe-class-design.md`), building. A 6th class on the uncovered Words axis (tempo + royalty income), forcing a 5-of-6 party selection at cap 5.
+- **6★+ / ascension**, richer Protagonist signature abilities, world power-tiers, etc. (world power-tiers considered and skipped — would flatten the affinity/set tension).
 
 ---
 
