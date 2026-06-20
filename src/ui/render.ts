@@ -6,7 +6,7 @@ import {
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
   WORLD_FACE, worldGenre, WORLD_SET_BONUS, AFFINITY_MAG,
 } from '../engine/content';
-import { unlockedWorldsFor, setBonusBreakdown } from '../engine/variants';
+import { unlockedWorldsFor, setBonusBreakdown, isInElement } from '../engine/variants';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
@@ -37,7 +37,7 @@ export function render(state: GameState): void {
         .join(', ')}</div>`
     : '';
 
-  const inElementCount = state.party.filter((c) => c.variantWorld !== null && c.variantWorld === zoneIndex).length;
+  const inElementCount = state.party.filter((c) => isInElement(c, zoneIndex)).length;
   const affinityLine = inElementCount > 0
     ? `<div>✨ In element: ${inElementCount} (+${Math.round(AFFINITY_MAG * 100)}% each)</div>`
     : '';
@@ -71,7 +71,7 @@ export function render(state: GameState): void {
       const face = c.variantWorld !== null ? WORLD_FACE[c.variantWorld] : '✍️';
       const skinTag = c.variantWorld !== null ? `<div class="cskin">${worldGenre(c.variantWorld)}</div>` : '';
       const accentStyle = c.variantWorld !== null ? ` style="border-color:${ZONES[c.variantWorld].accent}"` : '';
-      const inElement = c.variantWorld !== null && c.variantWorld === zoneIndex;
+      const inElement = isInElement(c, zoneIndex);
       const affinityTag = inElement ? `<div class="caffinity">✨ In element</div>` : '';
       const worlds = unlockedWorldsFor(state, c.classId);
       let variantBtn = '';

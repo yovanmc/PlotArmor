@@ -88,9 +88,15 @@ export function setBonusBreakdown(party: Character[]): { world: number; count: n
 
 // --- zone affinity (Slice 4) ------------------------------------------------
 // A fielded character is "in its element" when its equipped skin's world matches
-// the CURRENT zone (c.variantWorld === zoneIndex). While in its element, its whole
-// contribution is scaled by 1 + AFFINITY_MAG. Base-skin characters (variantWorld
-// === null) never equal a zone index, so affinity is neutral by default.
+// the CURRENT zone (c.variantWorld === zoneIndex). Base-skin characters
+// (variantWorld === null) never equal a zone index, so this is false by default.
+// Single source of truth shared by the engine boost AND the UI marker, so the
+// two can never drift apart.
+export function isInElement(c: Character, zoneIndex: number): boolean {
+  return c.variantWorld === zoneIndex;
+}
+
+// While in its element, a character's whole contribution is scaled by 1 + AFFINITY_MAG.
 export function affinityMult(c: Character, zoneIndex: number): number {
-  return c.variantWorld === zoneIndex ? 1 + AFFINITY_MAG : 1;
+  return isInElement(c, zoneIndex) ? 1 + AFFINITY_MAG : 1;
 }
