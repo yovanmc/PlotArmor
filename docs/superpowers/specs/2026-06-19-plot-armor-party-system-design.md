@@ -107,9 +107,14 @@ In Slice 3 alone a set bonus has no opportunity cost (per-class stars + free ski
 
 ---
 
-## 7. The Protagonist track **[PROPOSED]**
+## 7. The Protagonist track **[LOCKED]**
 
-The Protagonist doesn't earn stars from worlds; instead you spend **Royalties** in the **Publishing House** (reusing the shop) on a dedicated upgrade line that raises the Protagonist's stat tier and stars. This ties the singular hero to the prestige economy and gives Royalties another sink.
+The Protagonist doesn't earn stars from worlds; instead you **promote** it 1★→5★ by spending **Royalties** in the **Publishing House**, tying the singular hero to the prestige economy and giving Royalties another sink.
+
+- **Power model (reuse the star machinery):** the Protagonist's `stars.protagonist` slot (pinned at 1 in Slice 2) is allowed to rise to `MAX_STAR`. Its base power scales for free — `effectiveCharacterPower` already applies `starStatMult(stars[classId])` to every class. **Its Plot Armor signature scales with its stars too:** `plotArmorMult = 1 + mag × distinctClassCount × starAbilityMult(stars.protagonist)` (Plot Armor stays level-independent — stars are the permanent lever).
+- **Economy:** a Royalty-funded `promoteProtagonist(state)` / `canPromoteProtagonist(state)` (in `prestige.ts`, alongside `buyUpgrade`), with a rising `protagonistPromoteCost(currentStar)` Royalty curve; caps at `MAX_STAR = 5`.
+- **UI:** promotion lives in the **Publishing House** modal (a small "The Protagonist" section: current ★ + a "Promote ★ (💰 cost)" button) — NOT on the card. The Protagonist's card now shows its real ★ pips (instead of "—") but keeps no card star-up button (shop-only, unlike the Edits classes).
+- **No save change:** `stars.protagonist` is already serialized + sanitized. Neutral-default invariant holds (at 1★, `starStatMult`/`starAbilityMult` = 1 → fresh game unchanged). Cost magnitudes are harness-/owner-tuned placeholders.
 
 ---
 
