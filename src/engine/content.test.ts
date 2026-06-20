@@ -71,7 +71,7 @@ describe('content: prestige catalog & costs', () => {
 describe('content: classes', () => {
   it('defines the four classes plus the protagonist with abilities', () => {
     expect(C.CLASSES.map((c) => c.id).sort()).toEqual(
-      ['antihero', 'debuffer', 'protagonist', 'sidekick', 'support'],
+      ['antihero', 'debuffer', 'protagonist', 'scribe', 'sidekick', 'support'],
     );
     for (const def of C.CLASSES) {
       expect(typeof def.name).toBe('string');
@@ -80,6 +80,7 @@ describe('content: classes', () => {
     }
     expect(C.findClass('protagonist').ability.kind).toBe('plotArmor');
     expect(C.findClass('debuffer').ability.kind).toBe('regenCut');
+    expect(C.findClass('scribe').ability.kind).toBe('words');
     expect(() => C.findClass('nope' as C.ClassId)).toThrow();
   });
 });
@@ -127,8 +128,8 @@ import { VARIANT_UNLOCK_ORDER, WORLD_FACE, worldGenre, ZONE_COUNT } from './cont
 
 describe('world variants (Slice 3a)', () => {
   it('the variant unlock order lists every class exactly once', () => {
-    expect(VARIANT_UNLOCK_ORDER).toHaveLength(5);
-    expect(new Set(VARIANT_UNLOCK_ORDER).size).toBe(5);
+    expect(VARIANT_UNLOCK_ORDER).toHaveLength(6);
+    expect(new Set(VARIANT_UNLOCK_ORDER).size).toBe(6);
     expect(VARIANT_UNLOCK_ORDER).toContain('protagonist');
   });
 

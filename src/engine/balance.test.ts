@@ -8,7 +8,7 @@ import {
   effectiveInspirationRate, effectivePartyDps, effectiveBossRegen,
   effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
 } from './modifiers';
-import { ClassId, MAX_STAR, ZONE_COUNT } from './content';
+import { CLASSES, ClassId, MAX_STAR, ZONE_COUNT } from './content';
 import { step } from './loop';
 import { publish } from './progression';
 import { levelUp, recruit, starUp, canLevel, canRecruit, canStarUp } from './economy';
@@ -158,6 +158,6 @@ describe('balance: the core loop closes', () => {
   it('clearing 8 books unlocks the full variant collection through real play', () => {
     const total = Object.values(finalState.unlockedVariants).reduce((sum, ws) => sum + ws.length, 0);
     expect(finalState.unlockedVariants.protagonist.length).toBe(ZONE_COUNT);
-    expect(total).toBe(5 * ZONE_COUNT);
+    expect(total).toBe(CLASSES.length * ZONE_COUNT);
   });
 });

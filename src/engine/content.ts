@@ -270,7 +270,7 @@ export function legacyCost(level: number): Num {
 // bonus is Slice 3b). Clearing a world's boss unlocks the next class's variant
 // for that world in this FIXED order (deterministic, no RNG):
 export const VARIANT_UNLOCK_ORDER: ClassId[] = [
-  'protagonist', 'antihero', 'support', 'debuffer', 'sidekick',
+  'protagonist', 'antihero', 'support', 'debuffer', 'sidekick', 'scribe',
 ];
 
 // One "writer face" emoji per world (index-aligned with ZONES). Cosmetic only.
@@ -335,8 +335,8 @@ export function protagonistPromoteCost(currentStar: number): Num {
 }
 
 // --- party classes (Slice 1) -------------------------------------------------
-export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
-export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';
+export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick' | 'scribe';
+export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate' | 'words';
 
 export interface ClassDef {
   id: ClassId;
@@ -352,6 +352,7 @@ export const CLASSES: ClassDef[] = [
   { id: 'support',     name: 'Support',         classBasePower: n(0.6), ability: { kind: 'partyDps', mag: 0.025 } },
   { id: 'debuffer',    name: 'Debuffer',        classBasePower: n(0.5), ability: { kind: 'regenCut', mag: 0.025 } },
   { id: 'sidekick',    name: 'Sidekick',        classBasePower: n(0.5), ability: { kind: 'inspRate', mag: 0.025 } },
+  { id: 'scribe',      name: 'Scribe',          classBasePower: n(0.5), ability: { kind: 'words', mag: 0.025 } },
 ];
 
 export const PARTY_ABILITY_FLOOR = 0.10; // regen-cut floor shared with the shop `muse` upgrade

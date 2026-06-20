@@ -40,7 +40,7 @@ describe('collection gallery', () => {
     expect(body).toContain('Support');
     expect(body).toContain('Debuffer');
     expect(body).toContain('Sidekick');
-    expect(body).toMatch(/2 \/ 40/); // 2 unlocked of 40
+    expect(body).toMatch(/2 \/ 48/); // 2 unlocked of 48 (6 classes x 8 worlds)
   });
 
   it('renders a Base tile plus eight world tiles in the detail pane', () => {

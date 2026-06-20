@@ -15,9 +15,9 @@ describe('variant acquisition', () => {
 
   it('is a no-op once every class owns that world', () => {
     let u = makeUnlockedVariants();
-    for (let i = 0; i < 5; i++) u = unlockNextVariant(u, 0);
+    for (let i = 0; i < 6; i++) u = unlockNextVariant(u, 0);
     const before = JSON.stringify(u);
-    u = unlockNextVariant(u, 0);          // 6th clear: nothing left to unlock
+    u = unlockNextVariant(u, 0);          // 7th clear: nothing left to unlock
     expect(JSON.stringify(u)).toBe(before);
   });
 
