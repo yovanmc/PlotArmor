@@ -8,7 +8,7 @@ import {
   targetInspirationRate, targetMaxHp, targetRegen, targetWords, baseLevelCost, baseRecruitCost,
 } from './content';
 import * as M from './modifiers';
-import { effectiveCharacterPower } from './modifiers';
+import { effectiveCharacterPower, effectivePartyDps } from './modifiers';
 
 describe('modifiers: book-1, no-upgrades PARITY with raw v1 curves', () => {
   const s = initialState(0);
@@ -108,6 +108,28 @@ describe('star scaling (Slice 2)', () => {
     };
     const threeStar = { ...oneStar, stars: { ...oneStar.stars, support: 3 } };
     expect(num.gt(M.effectivePartyDps(threeStar), M.effectivePartyDps(oneStar))).toBe(true);
+  });
+});
+
+describe('Plot Armor scales with the Protagonist star (Protagonist track)', () => {
+  it('a promoted Protagonist raises party DPS vs a 1-star Protagonist', () => {
+    const base = initialState(0); // protagonist at 1 star
+    const promoted = { ...base, stars: { ...base.stars, protagonist: 4 } };
+    expect(num.gt(effectivePartyDps(promoted), effectivePartyDps(base))).toBe(true);
+  });
+
+  it('the Plot Armor multiplier itself grows with the Protagonist star', () => {
+    // Hold base power constant by comparing the ratio contributed beyond raw sum.
+    // A 1-protagonist + 1-antihero party: raise ONLY the protagonist star and
+    // confirm DPS rises by MORE than the protagonist's own base-power increase.
+    const base = initialState(0);
+    const promoted = { ...base, stars: { ...base.stars, protagonist: 5 } };
+    const baseDps = num.toNum(effectivePartyDps(base));
+    const promotedDps = num.toNum(effectivePartyDps(promoted));
+    // base-power-only scaling would multiply just the protagonist's share; Plot
+    // Armor scaling multiplies the whole-party product, so the gain is larger.
+    // Without the Plot Armor edit: ratio ~3.72; with it: ratio ~5.81. Threshold: 4.5.
+    expect(promotedDps / baseDps).toBeGreaterThan(4.5);
   });
 });
 

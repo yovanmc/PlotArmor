@@ -78,7 +78,7 @@ export function effectivePartyDps(s: GameState): Num {
   const supportMult = 1 + abilitySum(s.party, 'partyDps', s.stars);
   const hasProtagonist = s.party.some((c) => c.classId === 'protagonist');
   const plotArmorMult = hasProtagonist
-    ? 1 + findClass('protagonist').ability.mag * distinctClassCount(s.party)
+    ? 1 + findClass('protagonist').ability.mag * distinctClassCount(s.party) * starAbilityMult(s.stars.protagonist)
     : 1;
   const setMult = activeSetBonus(s.party).dpsMult;
   return mul(mul(mul(mul(sum, n(sharpMult(s))), n(supportMult)), n(plotArmorMult)), n(setMult));
