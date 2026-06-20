@@ -112,3 +112,22 @@ describe('Protagonist card pips (Protagonist track)', () => {
     expect(document.querySelector('#party [data-action="starup"][data-class="protagonist"]')).toBeNull();
   });
 });
+
+describe('zone affinity UI (Slice 4)', () => {
+  beforeEach(() => { document.body.innerHTML = HTML; });
+
+  it('marks a fielded character in its element and shows the HUD affinity line', () => {
+    const s = initialState(0); // zone 0
+    s.party = s.party.map((c) => (c.classId === 'antihero' ? { ...c, variantWorld: 0 } : c));
+    render(s);
+    expect(document.getElementById('party')!.textContent).toContain('✨');
+    expect(document.getElementById('hud')!.textContent).toMatch(/in element/i);
+  });
+
+  it('shows no affinity line when nobody matches the current zone', () => {
+    const s = initialState(0); // zone 0
+    s.party = s.party.map((c) => (c.classId === 'antihero' ? { ...c, variantWorld: 3 } : c)); // skin != zone
+    render(s);
+    expect(document.getElementById('hud')!.textContent).not.toMatch(/in element/i);
+  });
+});

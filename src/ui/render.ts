@@ -4,7 +4,7 @@ import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
-  WORLD_FACE, worldGenre, WORLD_SET_BONUS,
+  WORLD_FACE, worldGenre, WORLD_SET_BONUS, AFFINITY_MAG,
 } from '../engine/content';
 import { unlockedWorldsFor, setBonusBreakdown } from '../engine/variants';
 import {
@@ -37,6 +37,11 @@ export function render(state: GameState): void {
         .join(', ')}</div>`
     : '';
 
+  const inElementCount = state.party.filter((c) => c.variantWorld !== null && c.variantWorld === zoneIndex).length;
+  const affinityLine = inElementCount > 0
+    ? `<div>✨ In element: ${inElementCount} (+${Math.round(AFFINITY_MAG * 100)}% each)</div>`
+    : '';
+
   el('hud').innerHTML = `
     <div>Book #${state.bookNumber} — <strong>${zone.genre}</strong></div>
     <div>📜 Manuscript: ${progress}%</div>
@@ -45,7 +50,8 @@ export function render(state: GameState): void {
     <div>💰 Royalties: ${fmt(state.royalties)}</div>
     <div>✏️ Edits: ${fmt(state.edits)}</div>
     <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>
-    ${setLine}`;
+    ${setLine}
+    ${affinityLine}`;
 
   el('enemy').innerHTML = `
     <div class="enemy-emoji">${targetEmoji(zoneIndex, encounterIndex)}</div>
@@ -65,6 +71,8 @@ export function render(state: GameState): void {
       const face = c.variantWorld !== null ? WORLD_FACE[c.variantWorld] : '✍️';
       const skinTag = c.variantWorld !== null ? `<div class="cskin">${worldGenre(c.variantWorld)}</div>` : '';
       const accentStyle = c.variantWorld !== null ? ` style="border-color:${ZONES[c.variantWorld].accent}"` : '';
+      const inElement = c.variantWorld !== null && c.variantWorld === zoneIndex;
+      const affinityTag = inElement ? `<div class="caffinity">✨ In element</div>` : '';
       const worlds = unlockedWorldsFor(state, c.classId);
       let variantBtn = '';
       if (worlds.length > 0) {
@@ -79,6 +87,7 @@ export function render(state: GameState): void {
         <div class="cemoji">${face}</div>
         <div class="cname">${c.name}</div>
         ${skinTag}
+        ${affinityTag}
         ${starRow}
         <div class="clevel">Lv ${c.level} · pow ${fmt(effectiveCharacterPower(state, c))}</div>
         <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (✒️${fmt(effectiveLevelCost(state, c.level))})</button>
