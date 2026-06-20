@@ -58,8 +58,9 @@ export function effectiveBossRegen(s: GameState, zoneIndex: number, encounterInd
 }
 
 export function effectiveWords(s: GameState, zoneIndex: number, encounterIndex: number): Num {
+  const scribeMult = 1 + abilitySum(s.party, 'words', s.stars, zoneIndex) * legacyMult(s.legacy);
   const setMult = activeSetBonus(s.party).wordsMult;
-  return mul(mul(mul(targetWords(zoneIndex, encounterIndex), bookDifficulty(s)), n(pageTurnerMult(s))), n(setMult));
+  return mul(mul(mul(mul(targetWords(zoneIndex, encounterIndex), bookDifficulty(s)), n(pageTurnerMult(s))), n(scribeMult)), n(setMult));
 }
 
 // A character's power including its CLASS star multiplier (stars live on state).

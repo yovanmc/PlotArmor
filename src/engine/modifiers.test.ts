@@ -232,3 +232,15 @@ describe('star-prestige Legacy scaling', () => {
     expect(num.eq(effectiveCharacterPower(s, c), effectiveCharacterPower({ ...s, legacy: 0 }, c))).toBe(true);
   });
 });
+
+describe('Scribe (Words-axis class)', () => {
+  it('a fielded Scribe raises effectiveWords above the same party without it', () => {
+    const base = initialState(0);
+    const withScribe = { ...base, party: [...base.party, makeCharacter('w', 'scribe', 10)] };
+    expect(num.gt(M.effectiveWords(withScribe, 0, 0), M.effectiveWords(base, 0, 0))).toBe(true);
+  });
+
+  it('is neutral with no Scribe fielded — effectiveWords equals the raw curve at book 1', () => {
+    expect(num.eq(M.effectiveWords(initialState(0), 0, 0), targetWords(0, 0))).toBe(true);
+  });
+});
