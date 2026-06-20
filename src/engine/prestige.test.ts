@@ -45,3 +45,26 @@ describe('prestige: royaltiesForBook faucet', () => {
     expect(num.gt(P.royaltiesForBook(num.n('1e8')), num.ONE)).toBe(true);
   });
 });
+
+import { canPromoteProtagonist, promoteProtagonist } from './prestige';
+
+describe('Protagonist promotion (Protagonist track)', () => {
+  it('promotes by spending Royalties and raising the protagonist star', () => {
+    const s = { ...initialState(0), royalties: num.n('1e6') };
+    const after = promoteProtagonist(s);
+    expect(after.stars.protagonist).toBe(2);
+    expect(num.lt(after.royalties, s.royalties)).toBe(true);
+  });
+
+  it('refuses without enough Royalties (no-op, same ref)', () => {
+    const s = { ...initialState(0), royalties: num.ZERO };
+    expect(canPromoteProtagonist(s)).toBe(false);
+    expect(promoteProtagonist(s)).toBe(s);
+  });
+
+  it('refuses past MAX_STAR', () => {
+    const fresh = initialState(0);
+    const maxed = { ...fresh, royalties: num.n('1e9'), stars: { ...fresh.stars, protagonist: 5 } };
+    expect(canPromoteProtagonist(maxed)).toBe(false);
+  });
+});

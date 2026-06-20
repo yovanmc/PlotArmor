@@ -1,7 +1,7 @@
 // src/engine/prestige.ts
 import { Num, n, ONE, sub, mul, div, pow, gte, maxN, floorN } from './num';
 import { GameState } from './state';
-import { findUpgrade, UpgradeId, ROYALTY_K, ROYALTY_W0 } from './content';
+import { findUpgrade, UpgradeId, ROYALTY_K, ROYALTY_W0, MAX_STAR, protagonistPromoteCost } from './content';
 
 export function upgradeCost(state: GameState, id: UpgradeId): Num {
   const def = findUpgrade(id);
@@ -34,4 +34,20 @@ export function buyUpgrade(state: GameState, id: UpgradeId): GameState {
 export function royaltiesForBook(wordsThisBook: Num): Num {
   const root = pow(div(wordsThisBook, ROYALTY_W0), 0.5); // sqrt via fractional pow
   return maxN(floorN(mul(ROYALTY_K, root)), ONE);
+}
+
+export function canPromoteProtagonist(state: GameState): boolean {
+  const cur = state.stars.protagonist;
+  if (cur >= MAX_STAR) return false;
+  return gte(state.royalties, protagonistPromoteCost(cur));
+}
+
+export function promoteProtagonist(state: GameState): GameState {
+  if (!canPromoteProtagonist(state)) return state;
+  const cur = state.stars.protagonist;
+  return {
+    ...state,
+    royalties: sub(state.royalties, protagonistPromoteCost(cur)),
+    stars: { ...state.stars, protagonist: cur + 1 },
+  };
 }
