@@ -167,7 +167,8 @@ This is a per-book loadout decision, not a per-encounter one.
 ### Further deferred (beyond Slice 4)
 
 - **World power-tiers** — deeper-world variants flatly stronger (alternative/addition to affinity).
-- **More classes / 6★+ / ascension**, richer Protagonist signature abilities, max-star overflow → star-prestige (the overflow reserved in §6), etc.
+- **Max-star overflow → star-prestige ("Legacy")** — now its own LOCKED spec (`2026-06-20-plot-armor-star-prestige-design.md`), building. Realizes the §6-reserved overflow: an Edits-funded global power+ability multiplier.
+- **More classes / 6★+ / ascension**, richer Protagonist signature abilities, etc. (A new Words-axis class is the next planned addition after star-prestige.)
 
 ---
 
