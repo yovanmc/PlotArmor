@@ -69,7 +69,7 @@ describe('content: prestige catalog & costs', () => {
 });
 
 describe('content: classes', () => {
-  it('defines the four classes plus the protagonist with abilities', () => {
+  it('defines the five classes plus the protagonist with abilities', () => {
     expect(C.CLASSES.map((c) => c.id).sort()).toEqual(
       ['antihero', 'debuffer', 'protagonist', 'scribe', 'sidekick', 'support'],
     );

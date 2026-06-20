@@ -94,12 +94,22 @@ buy. Neutral at level 0 (no save/balance churn for existing games); persisted vi
 headless-tested (183 passing tests) plus a live DOM smoke; `npm run build` is green. The Legacy
 magnitudes are tunable placeholders for the upcoming feel pass.
 
+A sixth class joins the roster: the **Scribe**, on the one ability axis no class touched before —
+**Words**. A fielded Scribe boosts manuscript output, which both finishes books faster and raises the
+royalty payout (royalties scale with words written). Because the party cap is 5 and there are now six
+classes, you finally have to choose which five to field — a real composition decision. It composes with
+everything already built (stars, zone affinity, set bonus, and the Legacy multiplier all flow through the
+same ability path). No save change — existing games gain the Scribe at 1★ automatically. All
+headless-tested (185 passing tests) plus a live DOM smoke; `npm run build` is green. The Scribe's
+magnitudes are tunable placeholders for the upcoming feel pass.
+
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
 [balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md) ·
 [party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md) ·
-[star-prestige design](docs/superpowers/specs/2026-06-20-plot-armor-star-prestige-design.md).
+[star-prestige design](docs/superpowers/specs/2026-06-20-plot-armor-star-prestige-design.md) ·
+[Scribe class design](docs/superpowers/specs/2026-06-20-plot-armor-scribe-class-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
@@ -110,7 +120,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md) ·
 [party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md) ·
 [collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md) ·
-[star-prestige](docs/superpowers/plans/2026-06-20-plot-armor-star-prestige.md).
+[star-prestige](docs/superpowers/plans/2026-06-20-plot-armor-star-prestige.md) ·
+[Scribe class](docs/superpowers/plans/2026-06-20-plot-armor-scribe-class.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
