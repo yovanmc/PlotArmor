@@ -3,6 +3,7 @@ import { GameState } from '../engine/state';
 import { fmt } from '../engine/num';
 import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId, MAX_STAR, protagonistPromoteCost, legacyCost } from '../engine/content';
 import { upgradeCost, canBuy, isOwned, buyUpgrade, canPromoteProtagonist, promoteProtagonist, canBuyLegacy, buyLegacy } from '../engine/prestige';
+import { ICON, starPips } from './icons';
 
 function el(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -10,8 +11,8 @@ function el(id: string): HTMLElement {
 
 function rowHtml(state: GameState, id: UpgradeId, name: string, desc: string, levelLabel: string): string {
   const control = isOwned(state, id)
-    ? `<span class="shop-owned">✓ Owned</span>`
-    : `<button class="shop-buy" data-action="buy" data-id="${id}" ${canBuy(state, id) ? '' : 'disabled'}>💰 ${fmt(upgradeCost(state, id))}</button>`;
+    ? `<span class="shop-owned">${ICON.owned} Owned</span>`
+    : `<button class="shop-buy" data-action="buy" data-id="${id}" ${canBuy(state, id) ? '' : 'disabled'}>${ICON.royalties} ${fmt(upgradeCost(state, id))}</button>`;
   return `
     <div class="shop-row">
       <div class="shop-row-info">
@@ -32,12 +33,12 @@ export function renderShop(state: GameState): void {
 
   const protStars = state.stars.protagonist;
   const promoteControl = protStars >= MAX_STAR
-    ? '<span class="shop-owned">★★★★★ Max</span>'
-    : `<button class="shop-buy" data-action="promote" ${canPromoteProtagonist(state) ? '' : 'disabled'}>💰 ${fmt(protagonistPromoteCost(protStars))}</button>`;
+    ? `<span class="shop-owned">${starPips(MAX_STAR, MAX_STAR)} Max</span>`
+    : `<button class="shop-buy" data-action="promote" ${canPromoteProtagonist(state) ? '' : 'disabled'}>${ICON.royalties} ${fmt(protagonistPromoteCost(protStars))}</button>`;
   const protRow = `
     <div class="shop-row">
       <div class="shop-row-info">
-        <div class="shop-row-name">The Protagonist <span class="shop-lv">${'★'.repeat(protStars)}${'☆'.repeat(MAX_STAR - protStars)}</span></div>
+        <div class="shop-row-name">The Protagonist <span class="shop-lv">${starPips(protStars, MAX_STAR)}</span></div>
         <div class="shop-row-desc">Promote the lead: +stats and a stronger Plot Armor</div>
       </div>
       ${promoteControl}
@@ -49,17 +50,17 @@ export function renderShop(state: GameState): void {
         <div class="shop-row-name">Legacy <span class="shop-lv">Lv ${state.legacy}</span></div>
         <div class="shop-row-desc">Spend surplus Edits: permanent +power & ability to the whole roster</div>
       </div>
-      <button class="shop-buy" data-action="legacy" ${canBuyLegacy(state) ? '' : 'disabled'}>✏️ ${fmt(legacyCost(state.legacy))}</button>
+      <button class="shop-buy" data-action="legacy" ${canBuyLegacy(state) ? '' : 'disabled'}>${ICON.edits} ${fmt(legacyCost(state.legacy))}</button>
     </div>`;
 
   el('shop-body').innerHTML = `
     <div class="shop-head">
       <span class="shop-title">Publishing House</span>
-      <span class="shop-balance">💰 ${fmt(state.royalties)}</span>
+      <span class="shop-balance">${ICON.royalties} ${fmt(state.royalties)}</span>
     </div>
     <div class="shop-section-label">The Protagonist</div>
     ${protRow}
-    <div class="shop-section-label">Legacy · ✏️ ${fmt(state.edits)}</div>
+    <div class="shop-section-label">Legacy · ${ICON.edits} ${fmt(state.edits)}</div>
     ${legacyRow}
     <div class="shop-section-label">Upgrades</div>
     ${repeatable}

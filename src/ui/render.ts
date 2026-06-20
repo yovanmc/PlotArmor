@@ -12,6 +12,7 @@ import {
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
 } from '../engine/modifiers';
 import { canLevel, canRecruit, canStarUp } from '../engine/economy';
+import { ICON, starPips } from './icons';
 
 function el(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -32,29 +33,29 @@ export function render(state: GameState): void {
 
   const sets = setBonusBreakdown(state.party);
   const setLine = sets.length
-    ? `<div>🎭 Sets: ${sets
+    ? `<div>${ICON.sets} Sets: ${sets
         .map((s) => `${worldGenre(s.world)} ×${s.count} (+${Math.round(WORLD_SET_BONUS[s.world].tiers[s.tier - 1] * 100)}% ${WORLD_SET_BONUS[s.world].axis})`)
         .join(', ')}</div>`
     : '';
 
   const eTier = ensembleTier(distinctWorldsFielded(state.party));
   const ensembleLine = eTier > 0
-    ? `<div>🌈 Ensemble T${eTier}: in-element ×${(1 + AFFINITY_MAG * (1 + ENSEMBLE_AFFINITY_AMP[eTier - 1])).toFixed(2)}</div>`
+    ? `<div>${ICON.ensemble} Ensemble T${eTier}: in-element ×${(1 + AFFINITY_MAG * (1 + ENSEMBLE_AFFINITY_AMP[eTier - 1])).toFixed(2)}</div>`
     : '';
 
   const inElementCount = state.party.filter((c) => isInElement(c, zoneIndex)).length;
   const affinityLine = inElementCount > 0
-    ? `<div>✨ In element: ${inElementCount} (+${Math.round(AFFINITY_MAG * 100)}% each)</div>`
+    ? `<div>${ICON.inElement} In element: ${inElementCount} (+${Math.round(AFFINITY_MAG * 100)}% each)</div>`
     : '';
 
   el('hud').innerHTML = `
     <div>Book #${state.bookNumber} — <strong>${zone.genre}</strong></div>
-    <div>📜 Manuscript: ${progress}%</div>
-    <div>✒️ Inspiration: <strong>${fmt(state.inspiration)}</strong></div>
-    <div>📖 Words: ${fmt(state.words)}</div>
-    <div>💰 Royalties: ${fmt(state.royalties)}</div>
-    <div>✏️ Edits: ${fmt(state.edits)}</div>
-    <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>
+    <div>${ICON.manuscript} Manuscript: ${progress}%</div>
+    <div>${ICON.inspiration} Inspiration: <strong>${fmt(state.inspiration)}</strong></div>
+    <div>${ICON.words} Words: ${fmt(state.words)}</div>
+    <div>${ICON.royalties} Royalties: ${fmt(state.royalties)}</div>
+    <div>${ICON.edits} Edits: ${fmt(state.edits)}</div>
+    <div>${ICON.dps} Party DPS: ${fmt(effectivePartyDps(state))}</div>
     ${setLine}
     ${ensembleLine}
     ${affinityLine}`;
@@ -69,16 +70,16 @@ export function render(state: GameState): void {
     .map((c) => {
       const stars = state.stars[c.classId];
       const isProtagonist = c.classId === 'protagonist';
-      const starRow = `<div class="cstars">${'★'.repeat(stars)}${'☆'.repeat(MAX_STAR - stars)}</div>`;
+      const starRow = `<div class="cstars">${starPips(stars, MAX_STAR)}</div>`;
       const starBtn = (!isProtagonist && stars < MAX_STAR)
-        ? `<button data-action="starup" data-class="${c.classId}" ${canStarUp(state, c.classId) ? '' : 'disabled'}>★ Up (✏️${fmt(starUpCost(stars))})</button>`
+        ? `<button data-action="starup" data-class="${c.classId}" ${canStarUp(state, c.classId) ? '' : 'disabled'}>${ICON.starFull} Up (${ICON.edits}${fmt(starUpCost(stars))})</button>`
         : '';
 
-      const face = c.variantWorld !== null ? WORLD_FACE[c.variantWorld] : '✍️';
+      const face = c.variantWorld !== null ? WORLD_FACE[c.variantWorld] : ICON.baseFace;
       const skinTag = c.variantWorld !== null ? `<div class="cskin">${worldGenre(c.variantWorld)}</div>` : '';
       const accentStyle = c.variantWorld !== null ? ` style="border-color:${ZONES[c.variantWorld].accent}"` : '';
       const inElement = isInElement(c, zoneIndex);
-      const affinityTag = inElement ? `<div class="caffinity">✨ In element</div>` : '';
+      const affinityTag = inElement ? `<div class="caffinity">${ICON.inElement} In element</div>` : '';
       return `
       <div class="card"${accentStyle}>
         <div class="cemoji">${face}</div>
@@ -87,7 +88,7 @@ export function render(state: GameState): void {
         ${affinityTag}
         ${starRow}
         <div class="clevel">Lv ${c.level} · pow ${fmt(effectiveCharacterPower(state, c))}</div>
-        <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (✒️${fmt(effectiveLevelCost(state, c.level))})</button>
+        <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (${ICON.inspiration}${fmt(effectiveLevelCost(state, c.level))})</button>
         ${starBtn}
       </div>`;
     })
@@ -96,11 +97,11 @@ export function render(state: GameState): void {
   const recruitCard =
     state.party.length < effectivePartyCap(state)
       ? `<div class="card recruit">
-           <div class="cemoji">➕</div>
+           <div class="cemoji">${ICON.recruitAdd}</div>
            ${recruitable
              .map((cl) =>
                `<button data-action="recruit" data-class="${cl.id}" ${canRecruit(state) ? '' : 'disabled'}>` +
-               `${cl.name} (✒️${fmt(effectiveRecruitCost(state, state.party.length))})</button>`)
+               `${cl.name} (${ICON.inspiration}${fmt(effectiveRecruitCost(state, state.party.length))})</button>`)
              .join('')}
          </div>`
       : '';
@@ -109,5 +110,5 @@ export function render(state: GameState): void {
   el('publish').style.display = state.bookComplete ? 'block' : 'none';
 
   const shopOpen = document.getElementById('shop-open');
-  if (shopOpen) shopOpen.textContent = `📖 Publishing House · 💰 ${fmt(state.royalties)}`;
+  if (shopOpen) shopOpen.textContent = `${ICON.publishingHouse} Publishing House · ${ICON.royalties} ${fmt(state.royalties)}`;
 }

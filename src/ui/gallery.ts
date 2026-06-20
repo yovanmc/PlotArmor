@@ -2,6 +2,7 @@
 import { GameState, Character } from '../engine/state';
 import { CLASSES, ClassId, MAX_STAR, WORLD_FACE, worldGenre, ZONES } from '../engine/content';
 import { setVariant } from '../engine/variants';
+import { ICON, starPips } from './icons';
 
 const WORLD_COUNT = WORLD_FACE.length;
 
@@ -18,7 +19,7 @@ function fieldedOf(state: GameState, classId: ClassId): Character | undefined {
 }
 
 function pips(n: number): string {
-  return '★'.repeat(n) + '☆'.repeat(MAX_STAR - n);
+  return starPips(n, MAX_STAR);
 }
 
 export function renderGallery(state: GameState): void {
@@ -27,7 +28,7 @@ export function renderGallery(state: GameState): void {
 
   const list = CLASSES.map((c) => {
     const fielded = fieldedOf(state, c.id);
-    const face = fielded && fielded.variantWorld !== null ? WORLD_FACE[fielded.variantWorld] : '✍️';
+    const face = fielded && fielded.variantWorld !== null ? WORLD_FACE[fielded.variantWorld] : ICON.baseFace;
     const count = state.unlockedVariants[c.id].length;
     const sel = c.id === selectedClass ? ' gal-row-sel' : '';
     return `
@@ -49,9 +50,9 @@ export function renderGallery(state: GameState): void {
   const baseWorn = !!fielded && worn === null;
   const baseTile = `
     <button class="gal-tile${baseWorn ? ' gal-tile-worn' : ''}" data-action="equip" data-world="base" ${fielded ? '' : 'disabled'}>
-      <span class="gal-tile-face">✍️</span>
+      <span class="gal-tile-face">${ICON.baseFace}</span>
       <span class="gal-tile-label">Base</span>
-      ${baseWorn ? '<span class="gal-spark">✨</span>' : ''}
+      ${baseWorn ? `<span class="gal-spark">${ICON.worn}</span>` : ''}
     </button>`;
 
   const worldTiles = WORLD_FACE.map((face, w) => {
@@ -64,8 +65,8 @@ export function renderGallery(state: GameState): void {
               ${isUnlocked ? `style="border-color:${ZONES[w].accent}"` : ''}>
         <span class="gal-tile-face">${face}</span>
         <span class="gal-tile-label">${worldGenre(w)}</span>
-        ${isUnlocked ? '' : '<span class="gal-lock">🔒</span>'}
-        ${isWorn ? '<span class="gal-spark">✨</span>' : ''}
+        ${isUnlocked ? '' : `<span class="gal-lock">${ICON.locked}</span>`}
+        ${isWorn ? `<span class="gal-spark">${ICON.worn}</span>` : ''}
       </button>`;
   }).join('');
 

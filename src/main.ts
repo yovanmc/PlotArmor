@@ -10,6 +10,7 @@ import { wireInput } from './ui/input';
 import { wireShop } from './ui/shop';
 import { wireGallery } from './ui/gallery';
 import { startLoop } from './ui/rafLoop';
+import { ICON } from './ui/icons';
 
 let state: GameState = load(Date.now()) ?? initialState(Date.now());
 
@@ -34,9 +35,9 @@ if (summary.seconds > 1) {
   const modal = document.getElementById('offline-modal')!;
   document.getElementById('offline-body')!.innerHTML =
     `While you were writing for ${Math.round(summary.seconds / 60)} min:<br>` +
-    `✒️ +${fmt(summary.inspirationGained)} Inspiration<br>` +
-    `📖 +${fmt(summary.wordsGained)} Words<br>` +
-    `⚔️ ${summary.clears} encounters cleared`;
+    `${ICON.inspiration} +${fmt(summary.inspirationGained)} Inspiration<br>` +
+    `${ICON.words} +${fmt(summary.wordsGained)} Words<br>` +
+    `${ICON.dps} ${summary.clears} encounters cleared`;
   modal.style.display = 'flex';
   document.getElementById('offline-close')!.addEventListener('click', () => {
     modal.style.display = 'none';
