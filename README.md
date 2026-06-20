@@ -94,14 +94,24 @@ buy. Neutral at level 0 (no save/balance churn for existing games); persisted vi
 headless-tested (183 passing tests) plus a live DOM smoke; `npm run build` is green. The Legacy
 magnitudes are tunable placeholders for the upcoming feel pass.
 
-A sixth class joins the roster: the **Scribe**, on the one ability axis no class touched before —
-**Words**. A fielded Scribe boosts manuscript output, which both finishes books faster and raises the
-royalty payout (royalties scale with words written). Because the party cap is 5 and there are now six
-classes, you finally have to choose which five to field — a real composition decision. It composes with
-everything already built (stars, zone affinity, set bonus, and the Legacy multiplier all flow through the
-same ability path). No save change — existing games gain the Scribe at 1★ automatically. All
-headless-tested (185 passing tests) plus a live DOM smoke; `npm run build` is green. The Scribe's
-magnitudes are tunable placeholders for the upcoming feel pass.
+A sixth class joins the roster. It first shipped as the **Scribe** (a Words/royalty class), but a
+tuning-pass audit found Words don't gate book completion — they only set the royalty payout — so it was
+pivoted into a genuine combat class: **The Critic**, a damage-over-time boss-slayer. Its DoT ticks for a
+percentage of the *enemy's max HP* per second, so it shreds high-HP bosses, caps clear-time against the
+exponential HP wall, and punches through boss regen. The internal id stays `scribe`, so there is no save
+change (existing games keep the class). With a party cap of 5 and six classes, fielding it is a real
+5-of-6 choice.
+
+The makeup/loadout game finally gets the tension it was designed for. A **tuning pass** rebalanced
+everything against a new measurement harness (the greedy-play sim plus a loadout/parity analyzer in
+`analysis.ts`): a new **Ensemble (diversity) set** — fielding 3 / 4 / 5 *distinct* worlds — amplifies zone
+affinity, so spreading skins ("rainbow") now competes head-to-head with committing to one world ("mono"),
+and the previously dominant same-world set bonus was rebalanced down to make room. The late game is
+**steeper** (book 8 is now ~1.7 h of greedy play, up from ~36 min) while book 1 is unchanged. Magnitudes
+are tuned to measured target bands — rainbow/mono ≈ 0.97 and Critic/baseline ≈ 0.95 (both within ±15%),
+book 8 in the 1–2 h band — locked by harness assertions. No save change (schema stays v6). All
+headless-tested (194 passing tests) plus a live DOM smoke (Ensemble HUD line, The Critic recruit + DoT
+contribution, 0 console errors); `npm run build` is green.
 
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
@@ -109,7 +119,8 @@ Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md) ·
 [party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md) ·
 [star-prestige design](docs/superpowers/specs/2026-06-20-plot-armor-star-prestige-design.md) ·
-[Scribe class design](docs/superpowers/specs/2026-06-20-plot-armor-scribe-class-design.md).
+[Scribe class design](docs/superpowers/specs/2026-06-20-plot-armor-scribe-class-design.md) ·
+[tuning pass design](docs/superpowers/specs/2026-06-20-plot-armor-tuning-pass-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
@@ -121,7 +132,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md) ·
 [collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md) ·
 [star-prestige](docs/superpowers/plans/2026-06-20-plot-armor-star-prestige.md) ·
-[Scribe class](docs/superpowers/plans/2026-06-20-plot-armor-scribe-class.md).
+[Scribe class](docs/superpowers/plans/2026-06-20-plot-armor-scribe-class.md) ·
+[tuning pass](docs/superpowers/plans/2026-06-20-plot-armor-tuning-pass.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
