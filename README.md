@@ -56,6 +56,14 @@ themed party) plus a live DOM smoke (a 2-member Space set raised Party DPS +15% 
 reflected it, 0 console errors); `npm run build` is green. The per-world axis mapping and all
 magnitudes are tunable placeholders.
 
+The **Protagonist** has its own growth path — it earns no Edits stars; instead you **promote**
+it 1★→5★ by spending **Royalties** in the Publishing House. Each promotion scales its base
+power and strengthens its **Plot Armor** signature, tying the lead to the prestige economy and
+giving Royalties another sink. All headless-tested (151 passing tests) plus a live DOM smoke (a
+promotion raised the lead ★☆☆☆☆→★★☆☆☆, spent the Royalties, and lifted Party DPS 2.4→3.3 —
+reflecting both the stat and Plot Armor scaling, 0 console errors); `npm run build` is green.
+Promotion costs are tunable placeholders.
+
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
@@ -67,7 +75,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md) ·
 [party Slice 2](docs/superpowers/plans/2026-06-19-plot-armor-party-slice2.md) ·
 [party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md) ·
-[party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md).
+[party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md) ·
+[Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
