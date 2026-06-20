@@ -76,6 +76,16 @@ entirely from existing data (no save change), neutral when nobody is in their el
 is unaffected — book 1 still publishes in ~7.7 min, books 1–8 complete). All headless-tested (163 passing
 tests); `npm run build` is green. The affinity magnitude is a tunable placeholder.
 
+The skins finally get a home: a **Collection screen (§8 of the party system)**. A `🎴 Collection`
+button opens a master-detail modal — your five characters on the left (each with its worn skin, star
+tier, and worlds-collected count, plus an `N / 40` completion bar), and the selected character's full
+set of world skins on the right (unlocked ones in the world's accent, locked ones dimmed with 🔒, the
+worn one ringed). Click any unlocked skin to equip it on that character — this replaces the old per-card
+cycle button, which matters now that zone affinity makes skin choice strategic. It's a pure UI layer over
+the existing data (no save change, no balance impact). All headless-tested (169 passing tests) plus a live
+DOM smoke (equipping from the gallery updated the worn tile and the battle card, 0 console errors);
+`npm run build` is green.
+
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
@@ -89,7 +99,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md) ·
 [party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md) ·
 [Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md) ·
-[party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md).
+[party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md) ·
+[collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
