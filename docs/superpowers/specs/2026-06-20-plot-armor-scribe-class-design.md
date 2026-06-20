@@ -1,7 +1,7 @@
 # Plot Armor — The Scribe (Words-axis class) Design Spec
 
 - **Date:** 2026-06-20
-- **Status:** **LOCKED** — ready to plan.
+- **Status:** **SHIPPED, then PARTLY SUPERSEDED.** The Words-axis class shipped 2026-06-20, but during the tuning pass the Words ability was found to only affect royalty income (book completion is boss-gated, not words-gated). The owner pivoted the class from Words-income into a **DoT combat class, "The Critic"** (`id` unchanged, `'scribe'`). The combat identity is specified in `2026-06-20-plot-armor-tuning-pass-design.md` §5 — that supersedes §2–§4 below.
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Builds on:** the party system (Slices 1–4 + Protagonist track + §8 gallery + star-prestige), all shipped on `main`.
 - **Realizes:** the "more classes" item from the party-system spec §9, on the one uncovered ability axis.

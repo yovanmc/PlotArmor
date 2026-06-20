@@ -12,7 +12,7 @@ Three owner-chosen targets, each grounded in a measured or structural problem:
 
 1. **Rainbow must compete with mono.** The party-system design intended a per-book "mono (same-world) vs rainbow (diverse-world) loadout tension." Measurement of the shipped magnitudes shows it does not exist: a mono tier-3 DPS set averages **≈ ×1.86** party-DPS across a book, while a rainbow loadout averages **≈ ×1.06**. Mono dominates by ~+86% to ~+6%. The cause is structural, not a slightly-off number (see §3).
 2. **Steeper late grind.** Greedy-play pacing is currently ~7.7 min to publish book 1, rising to ~36 min for book 8. The owner wants the endgame to be a longer idle commitment: **book 8 ≈ 1–2 h**, with the early game unchanged.
-3. **Scribe on par with a combat slot.** The Scribe's Words boost (faster books + bigger royalty payout) should be worth roughly as much as fielding a fifth combat/utility class — a genuine 5-of-6 choice, not a trap or an auto-include.
+3. **The Critic — pivot the Scribe into a combat class, on par with the other combat slots.** Investigation during this pass found the Scribe's Words boost only raises royalty income; it does **not** speed books — completion is gated on clearing the final zone boss, not on words (verified in `progression.ts:21-22`, `render.ts:29-31,103`; the manuscript bar is *encounters cleared*, not words). Rather than leave it a niche income class, the owner chose to convert it into a genuine combat class: **The Critic**, a damage-over-time (DoT) boss-slayer (see §5). It must pull its weight versus the existing combat classes.
 
 ## 2. The Ensemble (diversity) set bonus **[LOCKED]**
 
@@ -55,18 +55,37 @@ Honesty flag: this is a deliberate nerf to the Slice-3b same-world set bonus. Th
 - **Target:** greedy-play **book 8 ≈ 1–2 h**, with books 1–8 all still completing (no hard wall). Book 1 stays ~7–8 min.
 - **Interplay to watch:** royalty payout scales with manuscript size, which scales with `D(b)`; raising `BOOK_SCALE` raises both the wall *and* the player's income/power tools. The harness must confirm the loop still closes. If `BOOK_SCALE` alone over-inflates HP faster than purchasable power can follow, secondarily nudge `POWER_GROWTH` or the repeatable-upgrade magnitudes — `BOOK_SCALE` is the first lever, these are fallback. Magnitudes are harness-derived.
 
-## 5. Scribe parity **[LOCKED approach]**
+## 5. The Critic — Scribe combat pivot **[LOCKED]**
 
-- **Knobs:** the Scribe's `classBasePower` (currently `0.5`) and its Words `mag` (currently `0.025`).
-- **Metric:** a book published by a comp that fields the **Scribe** vs the same comp that fields a **combat/utility class** in that slot should finish in ~the same time (the Scribe trades direct DPS for tempo + royalty income; "on par" is measured on time-to-publish, not on DPS).
-- **Target band:** Scribe-comp and combat-comp publish times within **±15%** on a representative mid-book. Magnitudes harness-derived (§6).
+The Scribe is converted from a Words-income class into a damage-over-time combat class, **The Critic** (display name; internal `id` stays `'scribe'` → no save/collection churn, existing saves keep the class at its current stars/skins). Theme: a scathing review that festers and tears the work apart over the long fight.
+
+**Revert the Words ability.** No class uses the `'words'` `AbilityKind` after this pivot:
+- Remove `'words'` from the `AbilityKind` union.
+- Remove the `scribeMult` term from `effectiveWords`, reverting it to `targetWords × bookDifficulty × pageTurnerMult × setMult`. Words remain a royalty-income mechanic — the High-Fantasy `'words'` **set** axis (a `SetAxis`, distinct from `AbilityKind`) and the `pageTurner` upgrade still feed `effectiveWords`; only the per-class boost is removed.
+
+**The DoT ability — "% max-HP bleed".** New `AbilityKind: 'dot'`. The continuous-DPS engine has no tick/status system, so the DoT is a damage *rate* proportional to the **current encounter's max HP**:
+
+```
+dotSum   = abilitySum(party, 'dot', stars, zoneIndex, ensembleAmp) * legacyMult(legacy)
+dotBonus = dotSum × effectiveTargetMaxHp(state, zoneIndex, encounterIndex)
+effectivePartyDps = (sum × sharp × support × plotArmor × set) + dotBonus
+```
+
+- Added at the **end**, independent of the party multipliers (Support / Plot Armor / Sharp / set) — a bleed is a separate damage source, not an amplified attack. It carries its own scaling (stars / affinity / Ensemble / Legacy) through `abilitySum`.
+- Because it is a fraction of *max* HP, it is automatically a **boss-slayer** (bosses dwarf trash in HP), it **caps clear-time against the exponential HP wall** (synergy with §4's steeper pacing), and it **punches through boss regen** (flat DPS the boss can't out-heal). No hard boss-only gate needed.
+- `effectivePartyDps` reads `s.zone.encounterIndex` (already on state) to fetch the current encounter's max HP via the in-module `effectiveTargetMaxHp`; no signature change.
+- Catalog: `{ id: 'scribe', name: 'The Critic', classBasePower: n(0.5), ability: { kind: 'dot', mag: <placeholder> } }`.
+
+**Neutral-default:** no Critic fielded → `dotSum = 0` → `dotBonus = 0` → `effectivePartyDps` unchanged → book-1 parity and the default harness loop unaffected.
+
+**Parity metric (now a true combat comparison):** since The Critic is combat, compare head-to-head — a comp fielding The Critic vs the same comp fielding another combat class — book publish times within **±15%** on a representative book (§6). The Critic should shine on boss-heavy / late books and lag on quick-trash books; "on par" means comparable overall, not identical per-zone. Knobs: `classBasePower` and the DoT `mag` (placeholders, harness-derived).
 
 ## 6. The measurement instrument **[LOCKED]**
 
 Tuning is done from numbers, not vibes. Extend the existing greedy-play balance harness (`src/engine/balance.test.ts`, which already simulates real-engine play and reports per-book timings) with two comparisons. Keep pure analysis helpers in a small sibling module `src/engine/analysis.ts` (DOM-free, imports only num/content/state/variants/modifiers) so they are unit-testable and reusable; the test file drives them.
 
 1. **`compareLoadouts()`** — build a mono party and a rainbow party at fixed equal power/level on a representative zone set, compute each one's total book output (sum of `effectivePartyDps` across the book's zones, or time-to-clear a representative book), and return the rainbow/mono ratio. The §3 parity assertion checks this ratio is within the ±15% band.
-2. **`compareScribeVsCombat()`** — simulate a book with a Scribe in the comp vs a combat class in the comp, return the publish-time ratio. The §5 assertion checks the ±15% band.
+2. **`compareCriticVsCombat()`** — simulate a book with The Critic in the comp vs another combat class in the comp, return the publish-time ratio. The §5 assertion checks the ±15% band. Requires parameterizing the greedy `simulate`/`COMP` to accept a comp override; keep the existing default `simulate(8, …)` call unchanged.
 3. **Pacing assertions** — extend the existing simulation report to surface book-8 time; assert book 8 is both **above a floor** (steeper than today) and **completes** (below a ceiling). Avoid a tight point-assertion on book-8 minutes (greedy-sim noise); assert a range.
 
 All verbose output stays gated behind `BALANCE_REPORT=1` (existing pattern; read via the existing `globalThis` cast, no `@types/node`).
@@ -75,7 +94,7 @@ All verbose output stays gated behind `BALANCE_REPORT=1` (existing pattern; read
 
 - **No save-schema change.** The Ensemble set, like the same-world set, derives entirely from fielded `variantWorld`s. Schema stays **v6**.
 - **Default game still neutral where it should be.** A fresh game wears no skins → affinity, same-world set, and Ensemble are all inert (tier 0); `BOOK_SCALE` is identity at book 1. So the **book-1 no-upgrades parity tests stay byte-identical**, and the `affinityMult` default-param keeps every current caller unchanged.
-- **Intentional test churn.** The §3 rebalance deliberately moves the live-number assertions that field a set or affinity (e.g. the "Space ×2 → +15% dps" style tests in `modifiers.test.ts`): those expected values change to the new magnitudes. The §4 pacing change moves book-2-plus timing assertions. This churn is expected and is part of the work — update the assertions to the new tuned values; do **not** weaken assertions to `toBeGreaterThan(0)` to dodge the update.
+- **Intentional test churn.** The §3 rebalance deliberately moves the live-number assertions that field a set or affinity (e.g. the "Space ×2 → +15% dps" style tests in `modifiers.test.ts`): those expected values change to the new magnitudes. The §4 pacing change moves book-2-plus timing assertions. The §5 pivot: rename the class display to **The Critic** (grep `src` for the `'Scribe'` string and update display assertions; the `id` stays `'scribe'`, so collection/save/recruit-by-id are untouched), change its ability kind `'words'`→`'dot'` (update the content-test ability-kind assertion), remove the `'words'` `AbilityKind`, and replace the earlier `effectiveWords`-Scribe tests with DoT tests on `effectivePartyDps`. This churn is expected and part of the work — update assertions to the new values; do **not** weaken assertions to `toBeGreaterThan(0)` to dodge the update.
 
 ## 8. Verification **[LOCKED]**
 
@@ -90,4 +109,5 @@ All verbose output stays gated behind `BALANCE_REPORT=1` (existing pattern; read
 - Magnitudes in this spec are **starting points / ceilings**, not final values — the final numbers come from the harness and the owner's feel-test.
 - Parity is a **±15% band**, not exact equality; mono and rainbow remain different shapes (burst-in-home-zone vs spread), just no longer one strictly dominating.
 - No new world axes, no new classes, no save-schema change, no UI restructure (only an added HUD line for the Ensemble set, mirroring the existing set line).
+- The Scribe's *identity* changes this pass (Words-income → DoT combat "The Critic"). That is intentional, not scope creep — it corrects a feature whose shipped mechanic (Words) never matched its stated premise (tempo). The `id` stays `'scribe'`, so there is no save-schema change and the collection/stars/skins carry over.
 - The harness is a greedy approximation of play, not a human; "on par" is approximate by construction. Final feel is the owner's call on `npm run dev`.
