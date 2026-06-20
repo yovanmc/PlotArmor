@@ -247,6 +247,23 @@ export function bossEditDrop(bookNumber: number): Num {
   return mul(EDITS_PER_BOSS, pow(n(EDIT_BOOK_GROWTH), bookNumber - 1));
 }
 
+// --- star-prestige: the Legacy track (Edits sink past 5★) --------------------
+// Once classes are maxed at 5★, surplus Edits buy global "Legacy" levels. Each
+// level multiplies EVERY character's power AND ability magnitude by LEGACY_GROWTH
+// (legacyMult(0) === 1, so it is neutral by default). LEGACY_BASE is high enough
+// that raising stars stays the better early buy. ALL three are tunable placeholders.
+export const LEGACY_GROWTH = 1.5;        // global power+ability multiplier per Legacy level
+export const LEGACY_BASE = n(128);       // Edits cost of the first Legacy level
+export const LEGACY_COST_GROWTH = 2;     // cost escalation per level
+
+export function legacyMult(level: number): number {
+  return Math.pow(LEGACY_GROWTH, level);
+}
+
+export function legacyCost(level: number): Num {
+  return mul(LEGACY_BASE, pow(n(LEGACY_COST_GROWTH), level));
+}
+
 // --- world variants (Slice 3a) ----------------------------------------------
 // A character can wear a cosmetic skin from any world its class has unlocked.
 // Variants are (classId x worldIndex); display-only in Slice 3a (the 2/3/5 set

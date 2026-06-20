@@ -107,6 +107,22 @@ describe('stars + Edits (Slice 2)', () => {
   });
 });
 
+import { legacyMult, legacyCost, LEGACY_BASE } from './content';
+
+describe('star-prestige Legacy curve', () => {
+  it('legacyMult is 1 at level 0 and grows with level', () => {
+    expect(legacyMult(0)).toBe(1);
+    expect(legacyMult(2)).toBeGreaterThan(legacyMult(1));
+    expect(legacyMult(1)).toBeGreaterThan(1);
+  });
+
+  it('legacyCost starts at LEGACY_BASE and rises with level', () => {
+    expect(num.eq(legacyCost(0), LEGACY_BASE)).toBe(true);
+    expect(num.gt(legacyCost(1), legacyCost(0))).toBe(true);
+    expect(num.gt(legacyCost(3), legacyCost(2))).toBe(true);
+  });
+});
+
 import { VARIANT_UNLOCK_ORDER, WORLD_FACE, worldGenre, ZONE_COUNT } from './content';
 
 describe('world variants (Slice 3a)', () => {
