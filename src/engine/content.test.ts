@@ -156,4 +156,12 @@ describe('Protagonist promotion cost (Protagonist track)', () => {
     expect(num.gt(protagonistPromoteCost(2), protagonistPromoteCost(1))).toBe(true);
     expect(num.gt(protagonistPromoteCost(4), protagonistPromoteCost(3))).toBe(true);
   });
+
+  it('charges base × growth^(currentStar-1) — first promotion costs base, not base×growth', () => {
+    // base=3, growth=2 → promoting FROM 1★ costs 3, from 2★ costs 6, from 4★ costs 24.
+    // Pins the off-by-one: exponent is currentStar-1, so 1★ pays the base cost.
+    expect(num.toNum(protagonistPromoteCost(1))).toBe(3);
+    expect(num.toNum(protagonistPromoteCost(2))).toBe(6);
+    expect(num.toNum(protagonistPromoteCost(4))).toBe(24);
+  });
 });
