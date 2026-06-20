@@ -299,6 +299,17 @@ export const WORLD_SET_BONUS: SetBonusDef[] = [
   { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 7 Prehistoric — primal abundance
 ];
 
+// --- Protagonist track (Royalty-funded promotion) ---------------------------
+// The Protagonist has no Edits stars; it is PROMOTED 1*->MAX_STAR with Royalties
+// in the Publishing House. Cost rises per star. Tunable placeholders (Royalties
+// are scarce, so this is a long-term prestige sink).
+export const PROTAGONIST_PROMOTE_BASE = n(3);  // Royalties for 1*->2*
+export const PROTAGONIST_PROMOTE_GROWTH = 2;   // cost escalation per star
+
+export function protagonistPromoteCost(currentStar: number): Num {
+  return mul(PROTAGONIST_PROMOTE_BASE, pow(n(PROTAGONIST_PROMOTE_GROWTH), currentStar - 1));
+}
+
 // --- party classes (Slice 1) -------------------------------------------------
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick';
 export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate';

@@ -147,3 +147,13 @@ describe('set-bonus content (Slice 3b)', () => {
     expect(setTier(5)).toBe(3);
   });
 });
+
+import { protagonistPromoteCost } from './content';
+
+describe('Protagonist promotion cost (Protagonist track)', () => {
+  it('is positive and rises with the current star', () => {
+    expect(num.gt(protagonistPromoteCost(1), num.ZERO)).toBe(true);
+    expect(num.gt(protagonistPromoteCost(2), protagonistPromoteCost(1))).toBe(true);
+    expect(num.gt(protagonistPromoteCost(4), protagonistPromoteCost(3))).toBe(true);
+  });
+});
