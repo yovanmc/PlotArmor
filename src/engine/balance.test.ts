@@ -13,6 +13,7 @@ import { step } from './loop';
 import { publish } from './progression';
 import { levelUp, recruit, starUp, canLevel, canRecruit, canStarUp } from './economy';
 import { Num, n, ZERO, sub, div, gt, toNum, fmt } from './num';
+import { compareLoadouts } from './analysis';
 
 // --- representative play: build a fixed composition, then level everyone evenly ---
 // The party cap is 5; the start is Protagonist + Anti-hero, leaving exactly 3 recruit
@@ -23,11 +24,11 @@ import { Num, n, ZERO, sub, div, gt, toNum, fmt } from './num';
 // Leveling the lowest-level member each step keeps the party even as power grows.
 const COMP: ClassId[] = ['debuffer', 'support', 'sidekick'];
 
-function nextRecruitClass(s: GameState): ClassId | null {
+function nextRecruitClass(s: GameState, comp: ClassId[]): ClassId | null {
   const recruitIndex = s.party.length - 2; // slots 0,1 are the starting Protagonist + Anti-hero
-  if (recruitIndex < 0 || recruitIndex >= COMP.length) return null;
+  if (recruitIndex < 0 || recruitIndex >= comp.length) return null;
   if (s.party.length >= effectivePartyCap(s)) return null;
-  return COMP[recruitIndex];
+  return comp[recruitIndex];
 }
 
 function lowestLevelId(s: GameState): string {
@@ -50,8 +51,8 @@ function lowestStarClass(s: GameState): ClassId | null {
 }
 
 // Cost of the next purchase the sim wants: a recruit while the comp is incomplete, else the cheapest level.
-function nextPurchaseCost(s: GameState): Num {
-  if (nextRecruitClass(s)) return effectiveRecruitCost(s, s.party.length);
+function nextPurchaseCost(s: GameState, comp: ClassId[]): Num {
+  if (nextRecruitClass(s, comp)) return effectiveRecruitCost(s, s.party.length);
   let min = effectiveLevelCost(s, s.party[0].level);
   for (const c of s.party) {
     const lc = effectiveLevelCost(s, c.level);
@@ -60,10 +61,10 @@ function nextPurchaseCost(s: GameState): Num {
   return min;
 }
 
-function spendGreedy(s: GameState): GameState {
+function spendGreedy(s: GameState, comp: ClassId[]): GameState {
   let cur = s;
   for (let guard = 0; guard < 100000; guard++) {
-    const nextClass = nextRecruitClass(cur);
+    const nextClass = nextRecruitClass(cur, comp);
     if (nextClass && canRecruit(cur)) { cur = recruit(cur, nextClass); continue; }
     const starClass = lowestStarClass(cur);
     if (starClass && canStarUp(cur, starClass)) { cur = starUp(cur, starClass); continue; }
@@ -78,7 +79,7 @@ interface BookResult { book: number; seconds: number; completed: boolean; wall?:
 
 // Simulate greedy play across `books` books. Returns per-book in-game seconds to
 // publish plus the final GameState (so tests can inspect earned variants/stars).
-function simulate(books: number, maxSecondsPerBook: number): { results: BookResult[]; finalState: GameState } {
+function simulate(books: number, maxSecondsPerBook: number, comp: ClassId[] = COMP): { results: BookResult[]; finalState: GameState } {
   let s = initialState(0);
   const results: BookResult[] = [];
 
@@ -90,7 +91,7 @@ function simulate(books: number, maxSecondsPerBook: number): { results: BookResu
       if (t > maxSecondsPerBook) { wall = `time cap (${fmt(n(t))}s) at zone ${s.zone.zoneIndex}/enc ${s.zone.encounterIndex}`; break; }
       if (iters++ > 500_000) { wall = `iter cap at zone ${s.zone.zoneIndex}/enc ${s.zone.encounterIndex}`; break; }
 
-      s = spendGreedy(s);
+      s = spendGreedy(s, comp);
 
       const { zoneIndex, encounterIndex } = s.zone;
       const dps = effectivePartyDps(s);
@@ -105,7 +106,7 @@ function simulate(books: number, maxSecondsPerBook: number): { results: BookResu
       } else {
         // stuck on a regenerating boss: accrue inspiration until the next level is affordable
         const rate = effectiveInspirationRate(s, zoneIndex, encounterIndex);
-        const deficit = sub(nextPurchaseCost(s), s.inspiration);
+        const deficit = sub(nextPurchaseCost(s, comp), s.inspiration);
         const dt = toNum(div(deficit, rate));
         if (!isFinite(dt) || dt <= 0) { wall = `regen wall at zone ${zoneIndex} (DPS ${fmt(dps)} <= regen ${fmt(regen)})`; break; }
         const res = step(s, dt + 1e-6);
@@ -128,6 +129,12 @@ function human(seconds: number): string {
   return `${(seconds / 31_557_600).toExponential(1)}yr`;
 }
 
+function publishTime(comp: ClassId[]): number {
+  const { results } = simulate(2, 30 * 86400, comp); // 2 books: 1 ramp + 1 measured
+  const b2 = results.find((r) => r.book === 2);
+  return b2 && b2.completed ? b2.seconds : Infinity;
+}
+
 describe('balance: the core loop closes', () => {
   const { results, finalState } = simulate(8, 30 * 86400); // cap each book at 30 in-game days
 
@@ -139,6 +146,15 @@ describe('balance: the core loop closes', () => {
     );
     // eslint-disable-next-line no-console
     console.log('\n=== balance: greedy time-to-publish ===\n' + lines.join('\n') + '\n');
+    const lo = compareLoadouts();
+    const critic = publishTime(['debuffer', 'support', 'scribe']);    // The Critic in the flex slot
+    const baseline = publishTime(['debuffer', 'support', 'sidekick']); // the default flex pick
+    // eslint-disable-next-line no-console
+    console.log(`loadout rainbow/mono ratio: ${(lo.ratio).toFixed(3)} (mono ${lo.mono.toFixed(1)}, rainbow ${lo.rainbow.toFixed(1)})`);
+    // eslint-disable-next-line no-console
+    console.log(`critic/baseline publish ratio (book 2): ${(critic / baseline).toFixed(3)} (critic ${human(critic)}, baseline ${human(baseline)})`);
+    // eslint-disable-next-line no-console
+    console.log(`book 8: ${human(results.find((r) => r.book === 8)!.seconds)}`);
   }
 
   it('book 1 is publishable within 2 in-game hours of greedy play', () => {
