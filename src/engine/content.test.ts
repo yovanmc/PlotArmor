@@ -80,7 +80,8 @@ describe('content: classes', () => {
     }
     expect(C.findClass('protagonist').ability.kind).toBe('plotArmor');
     expect(C.findClass('debuffer').ability.kind).toBe('regenCut');
-    expect(C.findClass('scribe').ability.kind).toBe('words');
+    expect(C.findClass('scribe').ability.kind).toBe('dot');
+    expect(C.findClass('scribe').name).toBe('The Critic');
     expect(() => C.findClass('nope' as C.ClassId)).toThrow();
   });
 });

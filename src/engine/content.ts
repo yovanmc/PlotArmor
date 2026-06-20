@@ -336,7 +336,7 @@ export function protagonistPromoteCost(currentStar: number): Num {
 
 // --- party classes (Slice 1) -------------------------------------------------
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick' | 'scribe';
-export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate' | 'words';
+export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate' | 'dot';
 
 export interface ClassDef {
   id: ClassId;
@@ -352,7 +352,7 @@ export const CLASSES: ClassDef[] = [
   { id: 'support',     name: 'Support',         classBasePower: n(0.6), ability: { kind: 'partyDps', mag: 0.025 } },
   { id: 'debuffer',    name: 'Debuffer',        classBasePower: n(0.5), ability: { kind: 'regenCut', mag: 0.025 } },
   { id: 'sidekick',    name: 'Sidekick',        classBasePower: n(0.5), ability: { kind: 'inspRate', mag: 0.025 } },
-  { id: 'scribe',      name: 'Scribe',          classBasePower: n(0.5), ability: { kind: 'words', mag: 0.025 } },
+  { id: 'scribe',      name: 'The Critic',      classBasePower: n(0.5), ability: { kind: 'dot', mag: 0.003 } },
 ];
 
 export const PARTY_ABILITY_FLOOR = 0.10; // regen-cut floor shared with the shop `muse` upgrade

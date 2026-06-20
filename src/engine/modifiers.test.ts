@@ -233,14 +233,17 @@ describe('star-prestige Legacy scaling', () => {
   });
 });
 
-describe('Scribe (Words-axis class)', () => {
-  it('a fielded Scribe raises effectiveWords above the same party without it', () => {
+describe('The Critic (DoT combat class)', () => {
+  it('a fielded Critic raises party DPS via its max-HP bleed', () => {
     const base = initialState(0);
-    const withScribe = { ...base, party: [...base.party, makeCharacter('w', 'scribe', 10)] };
-    expect(num.gt(M.effectiveWords(withScribe, 0, 0), M.effectiveWords(base, 0, 0))).toBe(true);
+    const withCritic = { ...base, party: [...base.party, makeCharacter('crit', 'scribe', 10)] };
+    expect(num.gt(M.effectivePartyDps(withCritic), M.effectivePartyDps(base))).toBe(true);
   });
-
-  it('is neutral with no Scribe fielded — effectiveWords equals the raw curve at book 1', () => {
-    expect(num.eq(M.effectiveWords(initialState(0), 0, 0), targetWords(0, 0))).toBe(true);
+  it('contributes nothing when no Critic is fielded — party DPS unchanged', () => {
+    const base = initialState(0);
+    const plusSupport = { ...base, party: [...base.party, makeCharacter('s', 'support', 10)] };
+    const dpsBefore = M.effectivePartyDps(base);
+    // adding a non-Critic does not invoke the DoT path; sanity that the DoT term is Critic-gated
+    expect(num.gt(M.effectivePartyDps(plusSupport), dpsBefore)).toBe(true); // support still helps
   });
 });

@@ -58,9 +58,8 @@ export function effectiveBossRegen(s: GameState, zoneIndex: number, encounterInd
 }
 
 export function effectiveWords(s: GameState, zoneIndex: number, encounterIndex: number): Num {
-  const scribeMult = 1 + abilitySum(s.party, 'words', s.stars, zoneIndex) * legacyMult(s.legacy);
   const setMult = activeSetBonus(s.party).wordsMult;
-  return mul(mul(mul(mul(targetWords(zoneIndex, encounterIndex), bookDifficulty(s)), n(pageTurnerMult(s))), n(scribeMult)), n(setMult));
+  return mul(mul(mul(targetWords(zoneIndex, encounterIndex), bookDifficulty(s)), n(pageTurnerMult(s))), n(setMult));
 }
 
 // A character's power including its CLASS star multiplier (stars live on state).
@@ -70,6 +69,7 @@ export function effectiveCharacterPower(state: GameState, c: Character): Num {
 
 export function effectivePartyDps(s: GameState): Num {
   const zoneIndex = s.zone.zoneIndex;
+  const encounterIndex = s.zone.encounterIndex;
   const lm = legacyMult(s.legacy);
   let sum = ZERO;
   for (const c of s.party) {
@@ -86,7 +86,12 @@ export function effectivePartyDps(s: GameState): Num {
     ? 1 + findClass('protagonist').ability.mag * distinctClassCount(s.party) * starAbilityMult(s.stars.protagonist) * lm
     : 1; // Plot Armor is a party-variety signature — NOT affinity-scaled (§9)
   const setMult = activeSetBonus(s.party).dpsMult;
-  return mul(mul(mul(mul(sum, n(sharpMult(s))), n(supportMult)), n(plotArmorMult)), n(setMult));
+  const direct = mul(mul(mul(mul(sum, n(sharpMult(s))), n(supportMult)), n(plotArmorMult)), n(setMult));
+  // The Critic's DoT: % of the CURRENT encounter's max HP per second, added independently of the
+  // direct-attack multipliers. Strong vs high-HP bosses; caps clear-time against the HP wall.
+  const dotSum = abilitySum(s.party, 'dot', s.stars, zoneIndex) * lm;
+  const dotBonus = mul(n(dotSum), effectiveTargetMaxHp(s, zoneIndex, encounterIndex));
+  return add(direct, dotBonus);
 }
 
 export function effectiveLevelCost(s: GameState, level: number): Num {
