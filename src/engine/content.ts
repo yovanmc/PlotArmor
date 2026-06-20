@@ -143,7 +143,7 @@ export function targetsClearedInBook(zoneIndex: number, encounterIndex: number):
 // Prestige depth (v2): escalation, royalty faucet, upgrade bounds — ALL tunable
 // ---------------------------------------------------------------------------
 
-export const BOOK_SCALE = 3;        // per-book difficulty/size growth; D(b) = BOOK_SCALE^(b-1)
+export const BOOK_SCALE = 3.5;      // per-book difficulty/size growth; D(b) = BOOK_SCALE^(b-1)
 export const ROYALTY_K = n(1);      // royalty payout coefficient
 export const ROYALTY_W0 = n(10000); // royalty payout divisor (manuscript scale)
 
@@ -308,10 +308,10 @@ export function setTier(count: number): number {
 export const WORLD_SET_BONUS: SetBonusDef[] = [
   { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 0 Wild West — frontier hustle
   { axis: 'regenCut', tiers: [0.05, 0.12, 0.25] }, // 1 Zombie Apocalypse — break the horde
-  { axis: 'dps',      tiers: [0.15, 0.35, 0.75] }, // 2 Space — "speed"
+  { axis: 'dps',      tiers: [0.10, 0.20, 0.35] }, // 2 Space — "speed"
   { axis: 'words',    tiers: [0.20, 0.50, 1.00] }, // 3 High Fantasy — epic tomes
   { axis: 'editDrop', tiers: [0.25, 0.60, 1.20] }, // 4 Pirate Seas — plunder
-  { axis: 'dps',      tiers: [0.15, 0.35, 0.75] }, // 5 Noir City — sharp investigation
+  { axis: 'dps',      tiers: [0.10, 0.20, 0.35] }, // 5 Noir City — sharp investigation
   { axis: 'regenCut', tiers: [0.05, 0.12, 0.25] }, // 6 Eldritch Horror — dread weakens foes
   { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 7 Prehistoric — primal abundance
 ];
@@ -321,14 +321,14 @@ export const WORLD_SET_BONUS: SetBonusDef[] = [
 // the CURRENT zone. While in its element, its WHOLE contribution (power + class
 // ability) is scaled by 1 + AFFINITY_MAG. Distinct from the makeup-based set
 // bonus (§6b): affinity is dynamic per-zone. Harness-/owner-tuned placeholder.
-export const AFFINITY_MAG = 0.5;
+export const AFFINITY_MAG = 0.7;
 
 // --- Ensemble (diversity) set — Slice-4 sibling -----------------------------
 // Fielding N DISTINCT worlds grants an always-on Ensemble bonus that AMPLIFIES
 // zone affinity (go broad -> your in-element characters hit harder). Mirrors the
 // same-world set (SET_THRESHOLDS). Harness-/owner-tuned placeholders.
 export const ENSEMBLE_THRESHOLDS: [number, number, number] = [3, 4, 5];
-export const ENSEMBLE_AFFINITY_AMP: [number, number, number] = [0.5, 1.0, 2.0];
+export const ENSEMBLE_AFFINITY_AMP: [number, number, number] = [0.8, 1.6, 3.0];
 
 export function ensembleTier(distinctCount: number): number {
   if (distinctCount >= ENSEMBLE_THRESHOLDS[2]) return 3;

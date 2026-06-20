@@ -168,6 +168,27 @@ describe('balance: the core loop closes', () => {
     expect(results.every((r) => r.completed)).toBe(true);
   });
 
+  // --- tuning-pass parity/pacing bands (magnitudes set in the tuning pass) ---
+  it('rainbow loadouts compete with mono (loadout parity band 0.85-1.15)', () => {
+    const { ratio } = compareLoadouts();
+    expect(ratio).toBeGreaterThanOrEqual(0.85);
+    expect(ratio).toBeLessThanOrEqual(1.15);
+  });
+
+  it('The Critic is on par with the flex-slot baseline (publish-time band 0.85-1.15)', () => {
+    const ratio = publishTime(['debuffer', 'support', 'scribe'])
+      / publishTime(['debuffer', 'support', 'sidekick']);
+    expect(ratio).toBeGreaterThanOrEqual(0.85);
+    expect(ratio).toBeLessThanOrEqual(1.15);
+  });
+
+  it('book 8 lands in the steeper late-game band (1-2h) and still completes', () => {
+    const book8 = results.find((r) => r.book === 8)!;
+    expect(book8.completed).toBe(true);
+    expect(book8.seconds).toBeGreaterThanOrEqual(3600);
+    expect(book8.seconds).toBeLessThanOrEqual(7200);
+  });
+
   // Slice 3a: variants are earned by clearing world bosses. Each book clears all
   // 8 worlds once, unlocking one class's variant per world per book, so after 8
   // books every class should own every world's skin (the full 5x8 collection).

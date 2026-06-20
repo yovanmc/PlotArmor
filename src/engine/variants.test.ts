@@ -67,12 +67,12 @@ describe('set bonus', () => {
   });
 
   it('applies the world axis at the right tier (Space = DPS)', () => {
-    // 5 on Space (world 2, dps tier 3 = +0.75)
-    expect(activeSetBonus(partyOnWorlds([2, 2, 2, 2, 2])).dpsMult).toBeCloseTo(1.75, 5);
-    // 3 on Space (tier 2 = +0.35)
-    expect(activeSetBonus(partyOnWorlds([2, 2, 2, null, null])).dpsMult).toBeCloseTo(1.35, 5);
-    // 2 on Space (tier 1 = +0.15)
-    expect(activeSetBonus(partyOnWorlds([2, 2, null, null, null])).dpsMult).toBeCloseTo(1.15, 5);
+    // 5 on Space (world 2, dps tier 3 = +0.35) — rebalanced DOWN so rainbow can compete (tuning pass)
+    expect(activeSetBonus(partyOnWorlds([2, 2, 2, 2, 2])).dpsMult).toBeCloseTo(1.35, 5);
+    // 3 on Space (tier 2 = +0.20)
+    expect(activeSetBonus(partyOnWorlds([2, 2, 2, null, null])).dpsMult).toBeCloseTo(1.20, 5);
+    // 2 on Space (tier 1 = +0.10)
+    expect(activeSetBonus(partyOnWorlds([2, 2, null, null, null])).dpsMult).toBeCloseTo(1.10, 5);
   });
 
   it('regenCut worlds add to regenCutAdd', () => {
@@ -81,9 +81,9 @@ describe('set bonus', () => {
   });
 
   it('stacks two different world sets at once', () => {
-    // 2 Space (dps tier1) + 2 Pirate (world 4, editDrop tier1)
+    // 2 Space (dps tier1 = +0.10) + 2 Pirate (world 4, editDrop tier1 = +0.25)
     const b = activeSetBonus(partyOnWorlds([2, 2, 4, 4]));
-    expect(b.dpsMult).toBeCloseTo(1.15, 5);
+    expect(b.dpsMult).toBeCloseTo(1.10, 5);
     expect(b.editDropMult).toBeCloseTo(1.25, 5);
   });
 
