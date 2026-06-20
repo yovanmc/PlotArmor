@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as num from '../engine/num';
 import { initialState, emptyUpgrades, GameState } from '../engine/state';
-import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES } from '../engine/content';
+import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, LEGACY_BASE } from '../engine/content';
 import { renderShop, wireShop } from './shop';
 
 const FIXTURE = `
@@ -22,7 +22,7 @@ describe('renderShop', () => {
     const body = document.getElementById('shop-body')!;
     expect(body.textContent).toContain('Publishing House');
     expect(body.textContent).toContain('💰 12');
-    expect(body.querySelectorAll('.shop-row').length).toBe(REPEATABLE_UPGRADES.length + ONE_TIME_UPGRADES.length + 1); // +1 for Protagonist row
+    expect(body.querySelectorAll('.shop-row').length).toBe(REPEATABLE_UPGRADES.length + ONE_TIME_UPGRADES.length + 2); // +1 Protagonist, +1 Legacy
     expect(body.textContent).toContain('Prolific');
     expect(body.textContent).toContain('Ensemble Cast');
   });
@@ -83,5 +83,24 @@ describe('Protagonist promote section (Protagonist track)', () => {
     renderShop({ ...initialState(0), royalties: num.ZERO });
     const btn = document.querySelector('#shop-body button[data-action="promote"]') as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
+  });
+});
+
+describe('Legacy section (star-prestige)', () => {
+  it('shows a Legacy buy row funded by Edits', () => {
+    renderShop({ ...initialState(0), edits: LEGACY_BASE });
+    const btn = document.querySelector('#shop-body [data-action="legacy"]') as HTMLButtonElement;
+    expect(btn).not.toBeNull();
+    expect(btn.disabled).toBe(false); // affordable
+  });
+
+  it('buying a Legacy level raises state.legacy and spends Edits', () => {
+    let state: GameState = { ...initialState(0), edits: num.mul(LEGACY_BASE, num.n(4)) };
+    const setState = (s: GameState) => { state = s; };
+    wireShop(() => state, setState);
+    document.getElementById('shop-open')!.click();
+    document.querySelector<HTMLButtonElement>('#shop-body [data-action="legacy"]')!.click();
+    expect(state.legacy).toBe(1);
+    expect(num.lt(state.edits, num.mul(LEGACY_BASE, num.n(4)))).toBe(true);
   });
 });

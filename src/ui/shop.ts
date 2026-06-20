@@ -1,8 +1,8 @@
 // src/ui/shop.ts
 import { GameState } from '../engine/state';
 import { fmt } from '../engine/num';
-import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId, MAX_STAR, protagonistPromoteCost } from '../engine/content';
-import { upgradeCost, canBuy, isOwned, buyUpgrade, canPromoteProtagonist, promoteProtagonist } from '../engine/prestige';
+import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId, MAX_STAR, protagonistPromoteCost, legacyCost } from '../engine/content';
+import { upgradeCost, canBuy, isOwned, buyUpgrade, canPromoteProtagonist, promoteProtagonist, canBuyLegacy, buyLegacy } from '../engine/prestige';
 
 function el(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -43,6 +43,15 @@ export function renderShop(state: GameState): void {
       ${promoteControl}
     </div>`;
 
+  const legacyRow = `
+    <div class="shop-row">
+      <div class="shop-row-info">
+        <div class="shop-row-name">Legacy <span class="shop-lv">Lv ${state.legacy}</span></div>
+        <div class="shop-row-desc">Spend surplus Edits: permanent +power & ability to the whole roster</div>
+      </div>
+      <button class="shop-buy" data-action="legacy" ${canBuyLegacy(state) ? '' : 'disabled'}>✏️ ${fmt(legacyCost(state.legacy))}</button>
+    </div>`;
+
   el('shop-body').innerHTML = `
     <div class="shop-head">
       <span class="shop-title">Publishing House</span>
@@ -50,6 +59,8 @@ export function renderShop(state: GameState): void {
     </div>
     <div class="shop-section-label">The Protagonist</div>
     ${protRow}
+    <div class="shop-section-label">Legacy · ✏️ ${fmt(state.edits)}</div>
+    ${legacyRow}
     <div class="shop-section-label">Upgrades</div>
     ${repeatable}
     <div class="shop-section-label">Unlocks</div>
@@ -74,6 +85,11 @@ export function wireShop(getState: () => GameState, setState: (s: GameState) => 
 
   el('shop-body').addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
+    if (target.closest('button[data-action="legacy"]')) {
+      setState(buyLegacy(getState()));
+      renderShop(getState());
+      return;
+    }
     if (target.closest('button[data-action="promote"]')) {
       setState(promoteProtagonist(getState()));
       renderShop(getState());
