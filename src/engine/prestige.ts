@@ -1,7 +1,7 @@
 // src/engine/prestige.ts
 import { Num, n, ONE, sub, mul, div, pow, gte, maxN, floorN } from './num';
 import { GameState } from './state';
-import { findUpgrade, UpgradeId, ROYALTY_K, ROYALTY_W0, MAX_STAR, protagonistPromoteCost } from './content';
+import { findUpgrade, UpgradeId, ROYALTY_K, ROYALTY_W0, MAX_STAR, protagonistPromoteCost, legacyCost } from './content';
 
 export function upgradeCost(state: GameState, id: UpgradeId): Num {
   const def = findUpgrade(id);
@@ -49,5 +49,18 @@ export function promoteProtagonist(state: GameState): GameState {
     ...state,
     royalties: sub(state.royalties, protagonistPromoteCost(cur)),
     stars: { ...state.stars, protagonist: cur + 1 },
+  };
+}
+
+export function canBuyLegacy(state: GameState): boolean {
+  return gte(state.edits, legacyCost(state.legacy));
+}
+
+export function buyLegacy(state: GameState): GameState {
+  if (!canBuyLegacy(state)) return state;
+  return {
+    ...state,
+    edits: sub(state.edits, legacyCost(state.legacy)),
+    legacy: state.legacy + 1,
   };
 }

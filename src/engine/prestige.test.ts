@@ -68,3 +68,28 @@ describe('Protagonist promotion (Protagonist track)', () => {
     expect(canPromoteProtagonist(maxed)).toBe(false);
   });
 });
+
+import { canBuyLegacy, buyLegacy } from './prestige';
+import { LEGACY_BASE } from './content';
+
+describe('star-prestige: buying Legacy with Edits', () => {
+  it('cannot buy without enough Edits, can with enough', () => {
+    const broke = { ...initialState(0), edits: num.ZERO };
+    const rich = { ...initialState(0), edits: LEGACY_BASE };
+    expect(canBuyLegacy(broke)).toBe(false);
+    expect(canBuyLegacy(rich)).toBe(true);
+  });
+
+  it('buying spends the Edits and raises the legacy level (immutably)', () => {
+    const before = { ...initialState(0), edits: num.mul(LEGACY_BASE, num.n(4)) };
+    const after = buyLegacy(before);
+    expect(after.legacy).toBe(1);
+    expect(num.lt(after.edits, before.edits)).toBe(true);
+    expect(before.legacy).toBe(0); // original untouched
+  });
+
+  it('is a no-op when Edits are insufficient', () => {
+    const broke = { ...initialState(0), edits: num.ZERO };
+    expect(buyLegacy(broke)).toBe(broke);
+  });
+});
