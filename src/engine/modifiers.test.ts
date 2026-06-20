@@ -6,6 +6,7 @@ import {
   BOSS_INDEX, OFFLINE_CAP_SECONDS, RECRUIT_CAP, GHOSTWRITER_LEVEL, BOOK_SCALE,
   NIGHT_OWL_HOURS_PER_LEVEL, MUSE_FLOOR, FRUGAL_FLOOR,
   targetInspirationRate, targetMaxHp, targetRegen, targetWords, baseLevelCost, baseRecruitCost,
+  AFFINITY_MAG,
 } from './content';
 import * as M from './modifiers';
 import { effectiveCharacterPower, effectivePartyDps } from './modifiers';
@@ -160,5 +161,54 @@ describe('set bonus in modifiers (Slice 3b)', () => {
     const base = { ...eldritch, party: eldritch.party.map((c) => ({ ...c, variantWorld: null })) };
     // boss encounter (zone 0, BOSS_INDEX) so regen is non-zero
     expect(num.lt(M.effectiveBossRegen(eldritch, 0, BOSS_INDEX), M.effectiveBossRegen(base, 0, BOSS_INDEX))).toBe(true);
+  });
+});
+
+describe('zone affinity (Slice 4)', () => {
+  // initialState(0) starts in zoneIndex 0.
+  it('a home Anti-hero (skin matches current zone) raises party DPS vs off-zone', () => {
+    const base = initialState(0);
+    const home = { ...base, party: base.party.map((c) => (c.classId === 'antihero' ? { ...c, variantWorld: 0 } : c)) };
+    const away = { ...base, party: base.party.map((c) => (c.classId === 'antihero' ? { ...c, variantWorld: 3 } : c)) };
+    expect(num.gt(M.effectivePartyDps(home), M.effectivePartyDps(away))).toBe(true);
+  });
+
+  it('is neutral for a base-skin party — DPS is identical regardless of current zone', () => {
+    const z0 = initialState(0);                       // all base looks, zone 0
+    const z5 = { ...z0, zone: { ...z0.zone, zoneIndex: 5 } };
+    expect(num.eq(M.effectivePartyDps(z0), M.effectivePartyDps(z5))).toBe(true);
+  });
+
+  it('a home Support raises party DPS vs the same Support off-zone', () => {
+    const base = { ...initialState(0), party: [makeCharacter('p', 'protagonist'), makeCharacter('s', 'support', 10)] };
+    const home = { ...base, party: base.party.map((c) => (c.classId === 'support' ? { ...c, variantWorld: 0 } : c)) };
+    const away = { ...base, party: base.party.map((c) => (c.classId === 'support' ? { ...c, variantWorld: 3 } : c)) };
+    expect(num.gt(M.effectivePartyDps(home), M.effectivePartyDps(away))).toBe(true);
+  });
+
+  it('a home Sidekick raises the Inspiration rate vs off-zone (inspRate ability scaled)', () => {
+    const base = { ...initialState(0), party: [makeCharacter('p', 'protagonist'), makeCharacter('k', 'sidekick', 10)] };
+    const home = { ...base, party: base.party.map((c) => (c.classId === 'sidekick' ? { ...c, variantWorld: 0 } : c)) };
+    const away = { ...base, party: base.party.map((c) => (c.classId === 'sidekick' ? { ...c, variantWorld: 3 } : c)) };
+    expect(num.gt(M.effectiveInspirationRate(home, 0, 0), M.effectiveInspirationRate(away, 0, 0))).toBe(true);
+  });
+
+  it('a home Debuffer cuts boss regen MORE than off-zone (regenCut ability scaled)', () => {
+    const base = { ...initialState(0), party: [makeCharacter('p', 'protagonist'), makeCharacter('d', 'debuffer', 10)] };
+    const home = { ...base, party: base.party.map((c) => (c.classId === 'debuffer' ? { ...c, variantWorld: 1 } : c)) };
+    const away = { ...base, party: base.party.map((c) => (c.classId === 'debuffer' ? { ...c, variantWorld: 3 } : c)) };
+    expect(num.lt(M.effectiveBossRegen(home, 1, BOSS_INDEX), M.effectiveBossRegen(away, 1, BOSS_INDEX))).toBe(true);
+  });
+
+  it('does NOT scale Plot Armor: a lone home Protagonist gains exactly 1 + AFFINITY_MAG (power only)', () => {
+    // Single-protagonist party: no set, no support/loneWolf terms. Away DPS =
+    // power x plotArmor. Home DPS = (power x affinity) x plotArmor (plotArmor
+    // unchanged). So home/away == 1 + AFFINITY_MAG exactly. If affinity ALSO
+    // scaled Plot Armor, this ratio would exceed 1 + AFFINITY_MAG.
+    const base = { ...initialState(0), party: [makeCharacter('p', 'protagonist')] };
+    const home = { ...base, party: [{ ...base.party[0], variantWorld: 0 }] };
+    const away = { ...base, party: [{ ...base.party[0], variantWorld: 3 }] };
+    const ratio = num.toNum(M.effectivePartyDps(home)) / num.toNum(M.effectivePartyDps(away));
+    expect(ratio).toBeCloseTo(1 + AFFINITY_MAG, 6);
   });
 });
