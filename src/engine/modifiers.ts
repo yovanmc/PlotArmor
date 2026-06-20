@@ -50,7 +50,8 @@ export function effectiveTargetMaxHp(s: GameState, zoneIndex: number, encounterI
 
 export function effectiveBossRegen(s: GameState, zoneIndex: number, encounterIndex: number): Num {
   const shopReduction = 1 - museMult(s);                              // museMult already floored; this is the shop's cut
-  const partyReduction = abilitySum(s.party, 'regenCut', s.stars, zoneIndex) * legacyMult(s.legacy);   // additional cut from Debuffers
+  // Debuffers' cut, scaled by Legacy. legacyMult raises the REDUCTION magnitude (more cut -> lower regen, the right direction); the floor below keeps it < 1.
+  const partyReduction = abilitySum(s.party, 'regenCut', s.stars, zoneIndex) * legacyMult(s.legacy);
   const setReduction = activeSetBonus(s.party).regenCutAdd;
   const combined = Math.max(PARTY_ABILITY_FLOOR, 1 - (shopReduction + partyReduction + setReduction));
   return mul(mul(targetRegen(zoneIndex, encounterIndex), bookDifficulty(s)), n(combined));

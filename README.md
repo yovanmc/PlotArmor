@@ -86,11 +86,20 @@ the existing data (no save change, no balance impact). All headless-tested (169 
 DOM smoke (equipping from the gallery updated the worn tile and the battle card, 0 console errors);
 `npm run build` is green.
 
+The late game gets a sink: a **star-prestige "Legacy" track**. Once your classes are maxed at 5★, Edits
+stop having anywhere to go — so surplus Edits now buy global **Legacy** levels in the Publishing House,
+each permanently multiplying every character's power *and* ability magnitude (a universal extra star for
+the whole roster). It's soft-gated by an escalating Edits cost, so raising stars stays the right early
+buy. Neutral at level 0 (no save/balance churn for existing games); persisted via save schema v6. All
+headless-tested (183 passing tests) plus a live DOM smoke; `npm run build` is green. The Legacy
+magnitudes are tunable placeholders for the upcoming feel pass.
+
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
 [balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md) ·
-[party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md).
+[party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md) ·
+[star-prestige design](docs/superpowers/specs/2026-06-20-plot-armor-star-prestige-design.md).
 Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
 [spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
@@ -100,7 +109,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md) ·
 [Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md) ·
 [party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md) ·
-[collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md).
+[collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md) ·
+[star-prestige](docs/superpowers/plans/2026-06-20-plot-armor-star-prestige.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
