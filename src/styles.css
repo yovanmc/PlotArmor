@@ -69,3 +69,33 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   opacity: 0.8;
   font-style: italic;
 }
+
+/* Collection gallery — dark battle theme (cyan), master-detail */
+.collection-open-btn { display: block; margin: 0.6rem auto 0; }
+.gal-card { background: #161b29; border: 1px solid var(--accent); max-width: 580px; width: 94%; text-align: left; }
+.gal-head { display: flex; justify-content: space-between; align-items: baseline; }
+.gal-title { font-size: 1.15rem; font-weight: 700; }
+.gal-completion { font-size: 0.95rem; opacity: 0.85; }
+.gal-bar { height: 6px; background: #ffffff14; border-radius: 3px; overflow: hidden; margin: 0.4rem 0 0.9rem; }
+.gal-bar-fill { height: 100%; background: var(--accent); }
+.gal-body { display: flex; gap: 1rem; flex-wrap: wrap; }
+.gal-list { flex: 1 1 200px; min-width: 190px; display: flex; flex-direction: column; gap: 0.4rem; }
+.gal-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem; border-radius: 8px; background: #ffffff08; border: 1px solid #ffffff12; cursor: pointer; }
+.gal-row-sel { background: #5ad7ff1f; border-color: var(--accent); }
+.gal-face { font-size: 1.4rem; }
+.gal-row-info { flex: 1; min-width: 0; }
+.gal-name { display: block; font-weight: 600; font-size: 0.9rem; }
+.gal-stars { color: #d9a441; font-size: 0.8rem; letter-spacing: 1px; }
+.gal-count { font-size: 0.8rem; opacity: 0.7; }
+.gal-detail { flex: 2 1 300px; min-width: 280px; }
+.gal-detail-head { font-weight: 700; margin-bottom: 0.6rem; }
+.gal-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.gal-tile { position: relative; background: #ffffff0a; border: 1px solid #ffffff14; border-radius: 8px; padding: 0.5rem 0.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; color: #eee; }
+.gal-tile-face { font-size: 1.5rem; }
+.gal-tile-label { font-size: 0.7rem; opacity: 0.85; text-align: center; }
+.gal-tile-locked { opacity: 0.32; }
+.gal-tile-worn { outline: 2px solid var(--accent); border-color: var(--accent); }
+.gal-lock { position: absolute; bottom: 2px; right: 4px; font-size: 0.7rem; }
+.gal-spark { position: absolute; top: -7px; right: -5px; font-size: 0.85rem; }
+.gal-caption { font-size: 0.8rem; opacity: 0.8; margin-top: 0.7rem; line-height: 1.4; }
+.gal-close-btn { display: block; margin: 1rem auto 0; }
