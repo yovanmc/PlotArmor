@@ -6,7 +6,7 @@ import {
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
   WORLD_FACE, worldGenre, WORLD_SET_BONUS, AFFINITY_MAG,
 } from '../engine/content';
-import { unlockedWorldsFor, setBonusBreakdown, isInElement } from '../engine/variants';
+import { setBonusBreakdown, isInElement } from '../engine/variants';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
@@ -73,15 +73,6 @@ export function render(state: GameState): void {
       const accentStyle = c.variantWorld !== null ? ` style="border-color:${ZONES[c.variantWorld].accent}"` : '';
       const inElement = isInElement(c, zoneIndex);
       const affinityTag = inElement ? `<div class="caffinity">✨ In element</div>` : '';
-      const worlds = unlockedWorldsFor(state, c.classId);
-      let variantBtn = '';
-      if (worlds.length > 0) {
-        const cycle: (number | null)[] = [null, ...worlds];
-        const idx = cycle.findIndex((w) => w === c.variantWorld);
-        const next = cycle[(idx + 1) % cycle.length];
-        variantBtn = `<button data-action="variant" data-id="${c.id}" data-next="${next === null ? 'base' : next}">🎭 Skin</button>`;
-      }
-
       return `
       <div class="card"${accentStyle}>
         <div class="cemoji">${face}</div>
@@ -92,7 +83,6 @@ export function render(state: GameState): void {
         <div class="clevel">Lv ${c.level} · pow ${fmt(effectiveCharacterPower(state, c))}</div>
         <button data-action="level" data-id="${c.id}" ${canLevel(state, c.id) ? '' : 'disabled'}>Develop (✒️${fmt(effectiveLevelCost(state, c.level))})</button>
         ${starBtn}
-        ${variantBtn}
       </div>`;
     })
     .join('');

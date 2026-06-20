@@ -72,15 +72,6 @@ describe('variant UI (Slice 3a)', () => {
     const party = document.getElementById('party')!;
     expect(party.textContent).toContain('Wild West'); // skin tag
   });
-
-  it('offers a variant cycle button only when the class has an unlocked variant', () => {
-    render(initialState(0)); // nothing unlocked
-    expect(document.querySelector('#party [data-action="variant"]')).toBeNull();
-
-    const withUnlock = { ...initialState(0), unlockedVariants: { ...makeUnlockedVariants(), antihero: [0] } };
-    render(withUnlock);
-    expect(document.querySelector('#party [data-action="variant"][data-id="c1"]')).not.toBeNull();
-  });
 });
 
 describe('set-bonus HUD (Slice 3b)', () => {
