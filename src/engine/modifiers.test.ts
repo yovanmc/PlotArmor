@@ -212,3 +212,23 @@ describe('zone affinity (Slice 4)', () => {
     expect(ratio).toBeCloseTo(1 + AFFINITY_MAG, 6);
   });
 });
+
+describe('star-prestige Legacy scaling', () => {
+  it('a Legacy level raises party DPS vs legacy 0', () => {
+    const base = initialState(0);
+    const leg = { ...base, legacy: 2 };
+    expect(num.gt(M.effectivePartyDps(leg), M.effectivePartyDps(base))).toBe(true);
+  });
+
+  it('a Legacy level raises the Inspiration rate when a Sidekick is fielded (ability scaled)', () => {
+    const base = { ...initialState(0), party: [makeCharacter('p', 'protagonist'), makeCharacter('k', 'sidekick', 10)] };
+    const leg = { ...base, legacy: 2 };
+    expect(num.gt(M.effectiveInspirationRate(leg, 0, 0), M.effectiveInspirationRate(base, 0, 0))).toBe(true);
+  });
+
+  it('is neutral at legacy 0 — effectiveCharacterPower unchanged', () => {
+    const s = initialState(0);
+    const c = s.party[0];
+    expect(num.eq(effectiveCharacterPower(s, c), effectiveCharacterPower({ ...s, legacy: 0 }, c))).toBe(true);
+  });
+});
