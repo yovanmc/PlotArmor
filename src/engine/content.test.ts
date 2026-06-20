@@ -166,6 +166,17 @@ describe('set-bonus content (Slice 3b)', () => {
   });
 });
 
+import { ensembleTier } from './content';
+
+describe('content: Ensemble (diversity) set', () => {
+  it('tiers by distinct-world count [3,4,5] -> 1/2/3', () => {
+    expect(ensembleTier(2)).toBe(0);
+    expect(ensembleTier(3)).toBe(1);
+    expect(ensembleTier(4)).toBe(2);
+    expect(ensembleTier(5)).toBe(3);
+  });
+});
+
 import { protagonistPromoteCost } from './content';
 
 describe('Protagonist promotion cost (Protagonist track)', () => {

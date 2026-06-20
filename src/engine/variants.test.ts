@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { initialState, makeCharacter } from './state';
-import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown, affinityMult } from './variants';
+import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown, affinityMult, distinctWorldsFielded, ensembleAffinityAmp } from './variants';
 import { AFFINITY_MAG } from './content';
 import { makeUnlockedVariants } from './state';
 
@@ -108,5 +108,25 @@ describe('zone affinity helper (Slice 4)', () => {
   it('is neutral (1) for a base-skin character (variantWorld null) in any zone', () => {
     const c = makeCharacter('c', 'antihero'); // variantWorld null
     expect(affinityMult(c, 0)).toBe(1);
+  });
+});
+
+describe('Ensemble (diversity) set', () => {
+  const mk = (id: string, world: number | null) => ({ ...makeCharacter(id, 'support', 1), variantWorld: world });
+  it('counts distinct fielded worlds (base look ignored)', () => {
+    expect(distinctWorldsFielded([mk('a', 2), mk('b', 2), mk('c', null)])).toBe(1);
+    expect(distinctWorldsFielded([mk('a', 0), mk('b', 1), mk('c', 2)])).toBe(3);
+  });
+  it('amplifies affinity for an in-element character when 3+ distinct worlds are fielded', () => {
+    const rainbow = [mk('a', 0), mk('b', 1), mk('c', 2)];
+    const amp = ensembleAffinityAmp(rainbow);
+    expect(amp).toBeGreaterThan(0);
+    const inEl = rainbow[0]; // wears world 0, fighting zone 0
+    expect(affinityMult(inEl, 0, amp)).toBeGreaterThan(affinityMult(inEl, 0, 0));
+  });
+  it('is neutral below the threshold (mono / <3 distinct) and off-element', () => {
+    const mono = [mk('a', 2), mk('b', 2)];
+    expect(ensembleAffinityAmp(mono)).toBe(0);
+    expect(affinityMult(mono[0], 5, 1.0)).toBe(1); // off-element: amp irrelevant
   });
 });

@@ -4,9 +4,9 @@ import { fmt, div, toNum } from '../engine/num';
 import {
   ZONES, TARGETS_PER_BOOK,
   isBossIndex, targetName, targetEmoji, targetsClearedInBook, CLASSES, MAX_STAR, starUpCost,
-  WORLD_FACE, worldGenre, WORLD_SET_BONUS, AFFINITY_MAG,
+  WORLD_FACE, worldGenre, WORLD_SET_BONUS, AFFINITY_MAG, ensembleTier, ENSEMBLE_AFFINITY_AMP,
 } from '../engine/content';
-import { setBonusBreakdown, isInElement } from '../engine/variants';
+import { setBonusBreakdown, isInElement, distinctWorldsFielded } from '../engine/variants';
 import {
   effectivePartyDps, effectiveLevelCost, effectiveRecruitCost, effectivePartyCap,
   effectiveTargetMaxHp, effectiveBossRegen, effectiveCharacterPower,
@@ -37,6 +37,11 @@ export function render(state: GameState): void {
         .join(', ')}</div>`
     : '';
 
+  const eTier = ensembleTier(distinctWorldsFielded(state.party));
+  const ensembleLine = eTier > 0
+    ? `<div>🌈 Ensemble T${eTier}: in-element ×${(1 + AFFINITY_MAG * (1 + ENSEMBLE_AFFINITY_AMP[eTier - 1])).toFixed(2)}</div>`
+    : '';
+
   const inElementCount = state.party.filter((c) => isInElement(c, zoneIndex)).length;
   const affinityLine = inElementCount > 0
     ? `<div>✨ In element: ${inElementCount} (+${Math.round(AFFINITY_MAG * 100)}% each)</div>`
@@ -51,6 +56,7 @@ export function render(state: GameState): void {
     <div>✏️ Edits: ${fmt(state.edits)}</div>
     <div>⚔️ Party DPS: ${fmt(effectivePartyDps(state))}</div>
     ${setLine}
+    ${ensembleLine}
     ${affinityLine}`;
 
   el('enemy').innerHTML = `

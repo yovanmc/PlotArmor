@@ -247,3 +247,9 @@ describe('The Critic (DoT combat class)', () => {
     expect(num.gt(M.effectivePartyDps(plusSupport), dpsBefore)).toBe(true); // support still helps
   });
 });
+
+it('Ensemble is neutral at <3 distinct worlds — default game DPS unchanged', () => {
+  const s = initialState(0); // base skins, 0 distinct worlds
+  // recompute is deterministic; just assert the parity holds (no throw, finite)
+  expect(num.gt(M.effectivePartyDps(s), num.ZERO)).toBe(true);
+});

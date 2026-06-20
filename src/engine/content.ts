@@ -323,6 +323,20 @@ export const WORLD_SET_BONUS: SetBonusDef[] = [
 // bonus (§6b): affinity is dynamic per-zone. Harness-/owner-tuned placeholder.
 export const AFFINITY_MAG = 0.5;
 
+// --- Ensemble (diversity) set — Slice-4 sibling -----------------------------
+// Fielding N DISTINCT worlds grants an always-on Ensemble bonus that AMPLIFIES
+// zone affinity (go broad -> your in-element characters hit harder). Mirrors the
+// same-world set (SET_THRESHOLDS). Harness-/owner-tuned placeholders.
+export const ENSEMBLE_THRESHOLDS: [number, number, number] = [3, 4, 5];
+export const ENSEMBLE_AFFINITY_AMP: [number, number, number] = [0.5, 1.0, 2.0];
+
+export function ensembleTier(distinctCount: number): number {
+  if (distinctCount >= ENSEMBLE_THRESHOLDS[2]) return 3;
+  if (distinctCount >= ENSEMBLE_THRESHOLDS[1]) return 2;
+  if (distinctCount >= ENSEMBLE_THRESHOLDS[0]) return 1;
+  return 0;
+}
+
 // --- Protagonist track (Royalty-funded promotion) ---------------------------
 // The Protagonist has no Edits stars; it is PROMOTED 1*->MAX_STAR with Royalties
 // in the Publishing House. Cost rises per star. Tunable placeholders (Royalties

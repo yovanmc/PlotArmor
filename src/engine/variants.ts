@@ -1,7 +1,7 @@
 // src/engine/variants.ts
 // Variant ownership (per-class unlocked world skins) + equip. Cosmetic in
 // Slice 3a; the 2/3/5 set bonus is Slice 3b. Pure functions over GameState.
-import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier, AFFINITY_MAG } from './content';
+import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier, AFFINITY_MAG, ensembleTier, ENSEMBLE_AFFINITY_AMP } from './content';
 import { GameState, Character } from './state';
 
 // On clearing world `worldIndex`'s boss, unlock the next class's variant for that
@@ -57,6 +57,17 @@ function worldCounts(party: Character[]): Map<number, number> {
   return counts;
 }
 
+// How many DISTINCT worlds are fielded (base look ignored).
+export function distinctWorldsFielded(party: Character[]): number {
+  return worldCounts(party).size;
+}
+
+// The Ensemble set amplifies affinity by this factor at the current distinct-world tier (0 at tier 0).
+export function ensembleAffinityAmp(party: Character[]): number {
+  const tier = ensembleTier(distinctWorldsFielded(party));
+  return tier === 0 ? 0 : ENSEMBLE_AFFINITY_AMP[tier - 1];
+}
+
 // Aggregate the active set bonuses across all fielded same-world groups.
 export function activeSetBonus(party: Character[]): SetBonus {
   const b: SetBonus = { dpsMult: 1, inspMult: 1, wordsMult: 1, editDropMult: 1, regenCutAdd: 0 };
@@ -97,6 +108,6 @@ export function isInElement(c: Character, zoneIndex: number): boolean {
 }
 
 // While in its element, a character's whole contribution is scaled by 1 + AFFINITY_MAG.
-export function affinityMult(c: Character, zoneIndex: number): number {
-  return isInElement(c, zoneIndex) ? 1 + AFFINITY_MAG : 1;
+export function affinityMult(c: Character, zoneIndex: number, ensembleAmp = 0): number {
+  return isInElement(c, zoneIndex) ? 1 + AFFINITY_MAG * (1 + ensembleAmp) : 1;
 }
