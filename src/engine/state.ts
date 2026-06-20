@@ -42,6 +42,7 @@ export interface GameState {
   edits: Num;
   stars: Record<ClassId, number>;
   unlockedVariants: Record<ClassId, number[]>;
+  legacy: number;
 }
 
 export function emptyUpgrades(): Upgrades {
@@ -100,5 +101,6 @@ export function initialState(nowMs: number): GameState {
     edits: ZERO,
     stars: makeStars(),
     unlockedVariants: makeUnlockedVariants(),
+    legacy: 0,
   };
 }

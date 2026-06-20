@@ -6,7 +6,7 @@ import { ClassId, findClass, CLASSES, MAX_STAR, ZONE_COUNT } from './content';
 export const SAVE_KEY = 'plotarmor.save.v1';
 // Migration is structural (the isV3Party guard inspects field shape), not version-gated.
 // SCHEMA_VERSION is stamped into the output so saves are self-describing.
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 // Derived from the authoritative class catalog so it can never drift out of sync.
 const KNOWN_CLASS_IDS = new Set<string>(CLASSES.map((c) => c.id));
@@ -27,6 +27,7 @@ interface SaveDTO {
   edits: string;
   stars: Record<string, number>;
   unlockedVariants: Record<string, number[]>;
+  legacy: number;
 }
 
 function mergeUpgrades(u: Partial<Upgrades> | undefined): Upgrades {
@@ -67,6 +68,11 @@ function validWorld(v: unknown): number | null {
   return null;
 }
 
+// A valid legacy level is a non-negative integer; anything else -> 0.
+function sanitizeLegacy(raw: unknown): number {
+  return typeof raw === 'number' && Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0;
+}
+
 // Read per-class unlocked worlds defensively: drop unknown class keys, drop
 // out-of-range worlds, dedup, default each class to []. Derived from CLASSES.
 function sanitizeUnlocked(raw: unknown): Record<ClassId, number[]> {
@@ -102,6 +108,7 @@ export function serialize(state: GameState): string {
     edits: numToStr(state.edits),
     stars: state.stars,
     unlockedVariants: state.unlockedVariants,
+    legacy: state.legacy,
   };
   return JSON.stringify(dto);
 }
@@ -149,6 +156,7 @@ export function deserialize(raw: string, nowMs: number): GameState {
     edits: numOr(dto.edits, ZERO),
     stars: sanitizeStars(dto.stars),
     unlockedVariants: sanitizeUnlocked(dto.unlockedVariants),
+    legacy: sanitizeLegacy(dto.legacy),
   };
 }
 

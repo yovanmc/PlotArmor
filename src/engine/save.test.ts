@@ -21,7 +21,7 @@ describe('save', () => {
     expect(back.upgrades.ensembleCast).toBe(true);
     expect(back.party.length).toBe(s.party.length);
     expect(back.lastSaved).toBe(1234);
-    expect(back.schemaVersion).toBe(5);
+    expect(back.schemaVersion).toBe(6);
   });
 
   it('migrates a v1 save: keeps royalties as wallet, ignores prestigeMultiplier, defaults upgrades, reseeds party', () => {
@@ -33,7 +33,7 @@ describe('save', () => {
     const s = deserialize(v1, 9);
     expect(num.eq(s.royalties, num.n(4))).toBe(true);
     expect(s.upgrades).toEqual(emptyUpgrades());
-    expect(s.schemaVersion).toBe(5);
+    expect(s.schemaVersion).toBe(6);
     expect((s as unknown as Record<string, unknown>).prestigeMultiplier).toBeUndefined();
     // classless party → reseeded; progress is intact
     expect(s.party[0].classId).toBe('protagonist');
@@ -113,7 +113,7 @@ describe('save v4: Edits + stars', () => {
     expect(num.eq(back.edits, num.n(42))).toBe(true);
     expect(back.stars.support).toBe(4);
     expect(back.stars.debuffer).toBe(2);
-    expect(back.schemaVersion).toBe(5);
+    expect(back.schemaVersion).toBe(6);
   });
 
   it('migrates a pre-v4 save: defaults Edits to 0 and all stars to 1, keeps progress', () => {
@@ -155,7 +155,7 @@ describe('save v5: variants', () => {
     expect(back.party[1].variantWorld).toBe(2);
     expect(back.unlockedVariants.antihero).toEqual([2]);
     expect(back.unlockedVariants.support).toEqual([1, 5]);
-    expect(back.schemaVersion).toBe(5);
+    expect(back.schemaVersion).toBe(6);
   });
 
   it('migrates a pre-v5 save: base look + empty unlocks, keeps progress', () => {
@@ -184,5 +184,33 @@ describe('save v5: variants', () => {
     expect(s.unlockedVariants.support).toEqual([1, 2]);     // dedup + drop out-of-range
     expect((s.unlockedVariants as Record<string, number[]>).wizard).toBeUndefined(); // unknown class dropped
     expect(s.party[0].variantWorld).toBeNull();             // out-of-range world -> base
+  });
+});
+
+describe('save v6: legacy', () => {
+  it('round-trips the legacy level', () => {
+    const fresh = { ...initialState(0), legacy: 3 };
+    const back = deserialize(serialize(fresh), 0);
+    expect(back.legacy).toBe(3);
+    expect(back.schemaVersion).toBe(6);
+  });
+
+  it('migrates a pre-v6 save (no legacy field) to legacy 0, keeping progress', () => {
+    const v5 = JSON.stringify({
+      schemaVersion: 5, lastSaved: 0, inspiration: '500', words: '0', royalties: '9',
+      party: [{ id: 'c0', name: 'The Protagonist', classId: 'protagonist', level: 1, basePower: '1', variantWorld: null }],
+      zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '1', bookComplete: false, bookNumber: 1,
+      edits: '12', stars: {}, unlockedVariants: {},
+    });
+    const s = deserialize(v5, 0);
+    expect(s.legacy).toBe(0);
+    expect(num.toNum(s.edits)).toBe(12); // other progress preserved
+  });
+
+  it('sanitizes a corrupt legacy value to a non-negative integer', () => {
+    const bad = JSON.stringify({ schemaVersion: 6, lastSaved: 0, inspiration: '0', words: '0', royalties: '0',
+      party: [], zone: { zoneIndex: 0, encounterIndex: 0 }, currentHp: '1', bookComplete: false, bookNumber: 1,
+      edits: '0', stars: {}, unlockedVariants: {}, legacy: -4.7 });
+    expect(deserialize(bad, 0).legacy).toBe(0);
   });
 });

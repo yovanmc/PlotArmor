@@ -90,3 +90,9 @@ describe('variants state (Slice 3a)', () => {
     expect(Object.values(u).every((arr) => Array.isArray(arr) && arr.length === 0)).toBe(true);
   });
 });
+
+describe('legacy state (star-prestige)', () => {
+  it('a fresh game starts at legacy 0', () => {
+    expect(initialState(0).legacy).toBe(0);
+  });
+});
