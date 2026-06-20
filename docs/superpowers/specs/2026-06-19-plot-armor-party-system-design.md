@@ -1,7 +1,7 @@
 # Plot Armor — Party System (Classes, Stars, Collection) Design Spec
 
 - **Date:** 2026-06-19
-- **Status:** **Slices 1, 2, 3a, 3b + the Protagonist track IMPLEMENTED** (2026-06-19) — Slice 1: Protagonist + 4 classes with composition abilities. Slice 2: per-class 5★ stars funded by global **Edits** from bosses (save v4). Slice 3a: `(class × world)` skins earned by clearing world bosses (deterministic, no gacha) + equip on cards (save v5). Slice 3b: the 2/3/5 per-world **set bonus**. §7 Protagonist track: Royalty-funded 1★→5★ promotion in the Publishing House scaling its power + Plot Armor. All shipped on `main`. North-star essentially complete; remaining deferred follow-ups: the full collection gallery / party-selection visual pass (§8) and Slice 4 (affinity, §9). Only tuning magnitudes/axis-mapping remain open (§12).
+- **Status:** **Slices 1, 2, 3a, 3b + the Protagonist track IMPLEMENTED** (2026-06-19) — Slice 1: Protagonist + 4 classes with composition abilities. Slice 2: per-class 5★ stars funded by global **Edits** from bosses (save v4). Slice 3a: `(class × world)` skins earned by clearing world bosses (deterministic, no gacha) + equip on cards (save v5). Slice 3b: the 2/3/5 per-world **set bonus**. §7 Protagonist track: Royalty-funded 1★→5★ promotion in the Publishing House scaling its power + Plot Armor. All shipped on `main`. Slice 4 (Zone Affinity, §9) is now **DESIGNED + LOCKED** (2026-06-19) — building next; not yet implemented. Remaining deferred follow-up: the full collection gallery / party-selection visual pass (§8). Only tuning magnitudes/axis-mapping remain open (§12).
 - **Repo:** `PlotArmor` (public, GitHub `yovanmc`), local `C:\Agent Projects\PlotArmor`
 - **Author/owner:** Yovan Collins (single-user, personal project)
 - **Builds on:** v1 engine, prestige + Publishing House shop, and the balance fix + 8 genre zones (all shipped).
@@ -16,7 +16,7 @@ A roster/collection layer on top of the idle loop:
 
 - **[LOCKED] The Protagonist** — one permanent, central character. Unlike everyone else, you don't *acquire* them at a tier; you **unlock** stat boosts and higher stars for them through a dedicated progression track.
 - **[LOCKED] Classes** — a set of role-bearing types. A class defines a stat lean + an **ability** (a party-wide effect).
-- **[LOCKED] World variants** — every class has one **cosmetic** variant per world (8 worlds). A character is a `(class × world)` skin. *Mechanically identical per class+star for now*; affinity/world-tiers are a deferred layer (§9).
+- **[LOCKED] World variants** — every class has one variant per world (8 worlds). A character is a `(class × world)` skin. Cosmetic on their own; the **set bonus** (§6b) and **affinity** (Slice 4, §9 — now designed + locked) are what give skins mechanical teeth. World power-tiers remain deferred (§9 "Further deferred").
 - **[LOCKED] Star tiers** — every non-Protagonist character has a star rating; higher stars = higher stats **and** stronger ability (rarity → power).
 - **[LOCKED] Collection vs. party** — you accumulate owned characters and **field a limited party** (cap 5, or 6 with Ensemble Cast) chosen from the collection.
 - **[LOCKED] Acquisition** — **earned from worlds**: clearing a world unlocks its variants; a star-up material earned from play raises tiers. No gacha/RNG.
@@ -128,11 +128,40 @@ These get a dedicated visual design pass (with side-by-side mockup options) when
 
 ---
 
-## 9. Deferred (post-MVP layers toward the north-star)
+## 9. Slice 4 — Zone Affinity **[LOCKED]**
 
-- **Affinity (Slice 4)** — a variant is stronger when fighting **in its home zone** (current-zone-matched). This is **distinct from the Slice 3 set bonus** (§6b), which is party-makeup-based; affinity adds the "field for cohesion vs. match the current zone" tension on top.
-- **World power-tiers** — alternatively/additionally, deeper-world variants flatly stronger.
-- **More classes / 6★+ / ascension**, richer Protagonist signature abilities, etc.
+A fielded character is **"in its element"** when its equipped skin's world matches the **current zone**: `c.variantWorld === state.zone.zoneIndex`. While in its element, a single multiplier `affinityMult = 1 + AFFINITY_MAG` scales that character's **whole contribution** — both its **power** in the DPS sum *and* its **class ability** (Support's party-DPS amp, Debuffer's regen cut, Sidekick's Inspiration rate, the Anti-hero's Lone Wolf self-amp). Bonus-only — there is **no off-zone penalty**.
+
+Affinity is **distinct from the Slice 3b set bonus** (§6b): the set bonus is party-makeup-based (same-world skins, always on); affinity is current-zone-based (dynamic as the auto-battler advances zone 0→7 through a book). Both key off the **same lever** — your equipped skins — but pull in different directions across a book, which is the intended tension:
+
+- **Mono-world loadout** → always-on set bonus **plus** a 5-character affinity spike in that one zone (great for the final-boss zone, which is always last), but dead affinity in the other 7 zones.
+- **Rainbow loadout** → no set bonus, but steady ~1-character affinity in every zone (consistent clearing).
+
+This is a per-book loadout decision, not a per-encounter one.
+
+**Deliberate exclusion:** the Protagonist's **Plot Armor** signature is **not** affinity-scaled. Plot Armor is a party-variety meta-signature (distinct-class count × the Protagonist's stars) and already scales via the Protagonist track (§7); stacking affinity on it would muddy that signature. The Protagonist still benefits from affinity through its base power in the DPS loop, so a home Protagonist is stronger — only the Plot Armor term stays clean.
+
+**No save-schema change.** Affinity is derived entirely from the existing `variantWorld` (save v5) and the live `zoneIndex` — exactly like the set bonus (§6b).
+
+**Neutral-by-default invariant (held, as in every prior slice):** a base-skin character has `variantWorld === null`, which never equals a zone index, so a fresh game and the balance harness (which fields base skins) trigger zero affinity → zero balance churn. Only new tests exercise it.
+
+**Code integration** (acyclic, follows the set-bonus pattern):
+
+- `content.ts` — `AFFINITY_MAG` (placeholder `0.5`, harness-tuned).
+- `variants.ts` — `affinityMult(c, zoneIndex)` → `c.variantWorld === zoneIndex ? 1 + AFFINITY_MAG : 1` (sibling of `activeSetBonus`).
+- `modifiers.ts` — the module-private `abilitySum` gains a `zoneIndex` param and multiplies each ability term by `affinityMult(c, zoneIndex)`; `effectivePartyDps(s)` reads `s.zone.zoneIndex`, multiplies each character's loop term (`effectiveCharacterPower × selfMult`) by its `affinityMult`, and forwards the zone to its `abilitySum` calls; `effectiveInspirationRate` / `effectiveBossRegen` already receive `zoneIndex` and just forward it. All exported `effective*` signatures are unchanged, so combat/loop/offline (which replays the same `step`, advancing zones) pick it up for free.
+
+**UI** (cheap emoji+CSS, mirrors the set-bonus surfacing):
+
+- Card: a `✨` marker (reusing the accent glow) on any fielded character in its element this zone.
+- HUD: an affinity summary line under the set line (e.g. `✨ In element: 2 (+50% each)`), shown only when ≥1 character is matched.
+
+**Open tuning (non-blocking, owner feel-pass):** the `AFFINITY_MAG` magnitude — specifically whether it makes the rainbow loadout competitive with the always-on set bonus.
+
+### Further deferred (beyond Slice 4)
+
+- **World power-tiers** — deeper-world variants flatly stronger (alternative/addition to affinity).
+- **More classes / 6★+ / ascension**, richer Protagonist signature abilities, max-star overflow → star-prestige (the overflow reserved in §6), etc.
 
 ---
 
@@ -145,8 +174,9 @@ Each slice ships working, tested software and points at the north-star.
 - **Slice 3a — Cosmetic variants (earn + equip). ✅ IMPLEMENTED 2026-06-19.** Deterministic earned acquisition (each world-boss clear unlocks the next class's variant for that world, fixed order, permanent — no gacha; full 5×8 collection over ~5 books); `Character.variantWorld` + `GameState.unlockedVariants`; equip any unlocked skin per fielded character (per-world face emoji + genre tag + accent on the card); save schema v5 with migration. Cosmetic only — NO mechanical effect (set bonus is 3b). 129 tests, build green, live DOM smoke passed (skin cycle equips face/tag/accent).
 - **Slice 3b — The 2/3/5 set bonus. ✅ IMPLEMENTED 2026-06-19.** Per-world set bonus at uniform 2/3/5 fielded-same-world-variant thresholds (tier 1/2/3); bonus axis differs per world (`WORLD_SET_BONUS` table — dps/insp/words/editDrop multiplicative, regenCut additive); `activeSetBonus(party)`/`setBonusBreakdown(party)` in `variants.ts` fold into `effectivePartyDps`/`effectiveInspirationRate`/`effectiveWords`/`effectiveBossRegen` + the boss Edit drop in `onClear`; HUD lists active sets. Neutral when no set is fielded (zero balance churn). 142 tests, build green, live DOM smoke passed (2-member Space set = +15% DPS, HUD shows/hides correctly). Axis mapping + magnitudes are tunable placeholders.
 - **Protagonist track (§7). ✅ IMPLEMENTED 2026-06-19.** Royalty-funded `promoteProtagonist` 1★→5★ in the Publishing House (`protagonistPromoteCost` curve in content, `canPromoteProtagonist`/`promoteProtagonist` in prestige); reuses `starStatMult` for base power (no modifier change) + scales Plot Armor by `starAbilityMult(stars.protagonist)`; card shows the Protagonist's real ★ pips, promotion is shop-only. No save change. Neutral at 1★. 151 tests, build green, live DOM smoke passed (promote → ★★☆☆☆, Royalties spent, DPS 2.4→3.3 reflecting both stat + Plot Armor scaling).
-- **Deferred follow-ups (not yet built):** full collection gallery / party-selection visual pass (§8 — wants a design-options pass with the owner); Slice 4 affinity (§9).
-- **Slice 4+ — Deferred layers (§9):** affinity, etc.
+- **Slice 4 — Zone Affinity (§9). DESIGNED + LOCKED 2026-06-19 (building next).** A fielded character "in its element" (skin world == current zone) gets its **whole contribution** (power + class ability) scaled by `1 + AFFINITY_MAG`; bonus-only, derived from existing `variantWorld` + live `zoneIndex` (no save change), neutral-by-default (base skins never match), Plot Armor excluded. Distinct from the makeup-based set bonus (§6b) — creates a per-book mono-vs-rainbow loadout tension. `affinityMult` in `variants.ts` folds into `effectivePartyDps` + `abilitySum` in `modifiers.ts`.
+- **Deferred follow-up (not yet built):** full collection gallery / party-selection visual pass (§8 — wants a design-options pass with the owner).
+- **Slice 5+ — Further deferred layers (§9):** world power-tiers, more classes / 6★+ / ascension, star-prestige overflow, etc.
 
 > Decomposition rationale: each slice is independently testable and valuable. Slice 1 alone already transforms the party from clones into a composition puzzle.
 
@@ -171,7 +201,7 @@ Remaining are **tuning magnitudes only** (harness-set, not blocking): `STAR_GROW
 
 ## 13. Non-goals (this design) / honesty flags
 
-- No affinity/world-tier mechanics yet (variants cosmetic — §1 caveat).
+- Affinity is now designed + locked as Slice 4 (§9); world-tier mechanics remain deferred (§9 "Further deferred").
 - The per-book leveling loop and its balance are preserved, not reworked (§2).
 - UI is sketched, not designed — it gets its own pass (§8).
 - All magnitudes (class stats, ability mags, star/Edits curves) are **harness-tuned placeholders**, not final.
