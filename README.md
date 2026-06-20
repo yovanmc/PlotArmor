@@ -15,7 +15,7 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## Status
 
-**Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins & set bonuses.** On top of v1, Royalties are a spendable
+**Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins, set bonuses & zone affinity.** On top of v1, Royalties are a spendable
 wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
 in-game via the **Publishing House** (a parchment modal opened from a live-balance
 entry button); books escalate in difficulty/size each publish, and the royalty
@@ -64,6 +64,18 @@ promotion raised the lead ★☆☆☆☆→★★☆☆☆, spent the Royalties
 reflecting both the stat and Plot Armor scaling, 0 console errors); `npm run build` is green.
 Promotion costs are tunable placeholders.
 
+Skins now also have **mechanical teeth in the current zone (Slice 4 of the party system)**: a fielded
+character "in its element" — its equipped skin's world matches the zone you're currently fighting in —
+has its **whole contribution** (its own damage *and* its class ability) scaled by a flat affinity bonus.
+This is distinct from the set bonus: the set bonus rewards a cohesive same-world party (always on);
+affinity rewards matching the *current* zone (dynamic as you advance zone-to-zone through a book). The
+two pull on the same lever — your equipped skins — so each book is a loadout choice: commit to one world
+for an always-on set bonus plus a big affinity spike in that one zone, or spread skins across worlds for
+steady affinity everywhere. The Protagonist's Plot Armor signature is deliberately left unscaled. Derived
+entirely from existing data (no save change), neutral when nobody is in their element (the balance harness
+is unaffected — book 1 still publishes in ~7.7 min, books 1–8 complete). All headless-tested (163 passing
+tests); `npm run build` is green. The affinity magnitude is a tunable placeholder.
+
 Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
 [prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
 [spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
@@ -76,7 +88,8 @@ Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
 [party Slice 2](docs/superpowers/plans/2026-06-19-plot-armor-party-slice2.md) ·
 [party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md) ·
 [party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md) ·
-[Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md).
+[Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md) ·
+[party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
