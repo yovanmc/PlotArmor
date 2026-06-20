@@ -22,7 +22,7 @@ describe('renderShop', () => {
     const body = document.getElementById('shop-body')!;
     expect(body.textContent).toContain('Publishing House');
     expect(body.textContent).toContain('💰 12');
-    expect(body.querySelectorAll('.shop-row').length).toBe(REPEATABLE_UPGRADES.length + ONE_TIME_UPGRADES.length);
+    expect(body.querySelectorAll('.shop-row').length).toBe(REPEATABLE_UPGRADES.length + ONE_TIME_UPGRADES.length + 1); // +1 for Protagonist row
     expect(body.textContent).toContain('Prolific');
     expect(body.textContent).toContain('Ensemble Cast');
   });
@@ -69,5 +69,19 @@ describe('wireShop', () => {
     expect(setState).toHaveBeenCalled();
     expect(state.upgrades.prolific).toBe(1);
     expect(num.lt(state.royalties, num.n('1e9'))).toBe(true);
+  });
+});
+
+describe('Protagonist promote section (Protagonist track)', () => {
+  it('renders a Protagonist section with a promote button', () => {
+    renderShop({ ...initialState(0), royalties: num.n('1e6') });
+    expect(document.getElementById('shop-body')!.textContent).toContain('The Protagonist');
+    expect(document.querySelector('#shop-body button[data-action="promote"]')).not.toBeNull();
+  });
+
+  it('disables promote when Royalties are insufficient', () => {
+    renderShop({ ...initialState(0), royalties: num.ZERO });
+    const btn = document.querySelector('#shop-body button[data-action="promote"]') as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
   });
 });

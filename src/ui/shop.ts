@@ -1,8 +1,8 @@
 // src/ui/shop.ts
 import { GameState } from '../engine/state';
 import { fmt } from '../engine/num';
-import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId } from '../engine/content';
-import { upgradeCost, canBuy, isOwned, buyUpgrade } from '../engine/prestige';
+import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId, MAX_STAR, protagonistPromoteCost } from '../engine/content';
+import { upgradeCost, canBuy, isOwned, buyUpgrade, canPromoteProtagonist, promoteProtagonist } from '../engine/prestige';
 
 function el(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -30,11 +30,26 @@ export function renderShop(state: GameState): void {
     .map((u) => rowHtml(state, u.id, u.name, u.desc, ''))
     .join('');
 
+  const protStars = state.stars.protagonist;
+  const promoteControl = protStars >= MAX_STAR
+    ? '<span class="shop-owned">★★★★★ Max</span>'
+    : `<button class="shop-buy" data-action="promote" ${canPromoteProtagonist(state) ? '' : 'disabled'}>💰 ${fmt(protagonistPromoteCost(protStars))}</button>`;
+  const protRow = `
+    <div class="shop-row">
+      <div class="shop-row-info">
+        <div class="shop-row-name">The Protagonist <span class="shop-lv">${'★'.repeat(protStars)}${'☆'.repeat(MAX_STAR - protStars)}</span></div>
+        <div class="shop-row-desc">Promote the lead: +stats and a stronger Plot Armor</div>
+      </div>
+      ${promoteControl}
+    </div>`;
+
   el('shop-body').innerHTML = `
     <div class="shop-head">
       <span class="shop-title">Publishing House</span>
       <span class="shop-balance">💰 ${fmt(state.royalties)}</span>
     </div>
+    <div class="shop-section-label">The Protagonist</div>
+    ${protRow}
     <div class="shop-section-label">Upgrades</div>
     ${repeatable}
     <div class="shop-section-label">Unlocks</div>
@@ -58,7 +73,13 @@ export function wireShop(getState: () => GameState, setState: (s: GameState) => 
   });
 
   el('shop-body').addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('button[data-action="buy"]');
+    const target = e.target as HTMLElement;
+    if (target.closest('button[data-action="promote"]')) {
+      setState(promoteProtagonist(getState()));
+      renderShop(getState());
+      return;
+    }
+    const btn = target.closest('button[data-action="buy"]');
     if (!btn) return;
     const id = btn.getAttribute('data-id') as UpgradeId | null;
     if (!id) return;

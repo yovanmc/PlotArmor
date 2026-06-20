@@ -100,3 +100,15 @@ describe('set-bonus HUD (Slice 3b)', () => {
     expect(document.getElementById('hud')!.textContent).not.toMatch(/set bonus/i);
   });
 });
+
+describe('Protagonist card pips (Protagonist track)', () => {
+  beforeEach(() => { document.body.innerHTML = HTML; });
+
+  it('shows star pips for the Protagonist instead of a dash', () => {
+    render(initialState(0));
+    const party = document.getElementById('party')!;
+    expect(party.textContent).toContain('★');
+    // the Protagonist card has no card-level star-up button (promotion is shop-only)
+    expect(document.querySelector('#party [data-action="starup"][data-class="protagonist"]')).toBeNull();
+  });
+});

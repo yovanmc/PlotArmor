@@ -57,9 +57,7 @@ export function render(state: GameState): void {
     .map((c) => {
       const stars = state.stars[c.classId];
       const isProtagonist = c.classId === 'protagonist';
-      const starRow = isProtagonist
-        ? '<div class="cstars">—</div>'
-        : `<div class="cstars">${'★'.repeat(stars)}${'☆'.repeat(MAX_STAR - stars)}</div>`;
+      const starRow = `<div class="cstars">${'★'.repeat(stars)}${'☆'.repeat(MAX_STAR - stars)}</div>`;
       const starBtn = (!isProtagonist && stars < MAX_STAR)
         ? `<button data-action="starup" data-class="${c.classId}" ${canStarUp(state, c.classId) ? '' : 'disabled'}>★ Up (✏️${fmt(starUpCost(stars))})</button>`
         : '';
