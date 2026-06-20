@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { initialState, makeCharacter } from './state';
-import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown } from './variants';
+import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown, affinityMult } from './variants';
+import { AFFINITY_MAG } from './content';
 import { makeUnlockedVariants } from './state';
 
 describe('variant acquisition', () => {
@@ -90,5 +91,22 @@ describe('set bonus', () => {
     const bd = setBonusBreakdown(partyOnWorlds([2, 2, 2, 4, 4]));
     expect(bd).toContainEqual({ world: 2, count: 3, tier: 2 });
     expect(bd).toContainEqual({ world: 4, count: 2, tier: 1 });
+  });
+});
+
+describe('zone affinity helper (Slice 4)', () => {
+  it('boosts a character whose skin matches the current zone', () => {
+    const c = { ...makeCharacter('c', 'antihero'), variantWorld: 2 };
+    expect(affinityMult(c, 2)).toBeCloseTo(1 + AFFINITY_MAG, 6);
+  });
+
+  it('is neutral (1) when the skin does not match the current zone', () => {
+    const c = { ...makeCharacter('c', 'antihero'), variantWorld: 2 };
+    expect(affinityMult(c, 5)).toBe(1);
+  });
+
+  it('is neutral (1) for a base-skin character (variantWorld null) in any zone', () => {
+    const c = makeCharacter('c', 'antihero'); // variantWorld null
+    expect(affinityMult(c, 0)).toBe(1);
   });
 });

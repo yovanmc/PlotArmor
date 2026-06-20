@@ -299,6 +299,13 @@ export const WORLD_SET_BONUS: SetBonusDef[] = [
   { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 7 Prehistoric — primal abundance
 ];
 
+// --- zone affinity (Slice 4) ------------------------------------------------
+// A fielded character is "in its element" when its equipped skin's world matches
+// the CURRENT zone. While in its element, its WHOLE contribution (power + class
+// ability) is scaled by 1 + AFFINITY_MAG. Distinct from the makeup-based set
+// bonus (§6b): affinity is dynamic per-zone. Harness-/owner-tuned placeholder.
+export const AFFINITY_MAG = 0.5;
+
 // --- Protagonist track (Royalty-funded promotion) ---------------------------
 // The Protagonist has no Edits stars; it is PROMOTED 1*->MAX_STAR with Royalties
 // in the Publishing House. Cost rises per star. Tunable placeholders (Royalties

@@ -1,7 +1,7 @@
 // src/engine/variants.ts
 // Variant ownership (per-class unlocked world skins) + equip. Cosmetic in
 // Slice 3a; the 2/3/5 set bonus is Slice 3b. Pure functions over GameState.
-import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier } from './content';
+import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier, AFFINITY_MAG } from './content';
 import { GameState, Character } from './state';
 
 // On clearing world `worldIndex`'s boss, unlock the next class's variant for that
@@ -84,4 +84,13 @@ export function setBonusBreakdown(party: Character[]): { world: number; count: n
     if (tier > 0) out.push({ world, count, tier });
   }
   return out;
+}
+
+// --- zone affinity (Slice 4) ------------------------------------------------
+// A fielded character is "in its element" when its equipped skin's world matches
+// the CURRENT zone (c.variantWorld === zoneIndex). While in its element, its whole
+// contribution is scaled by 1 + AFFINITY_MAG. Base-skin characters (variantWorld
+// === null) never equal a zone index, so affinity is neutral by default.
+export function affinityMult(c: Character, zoneIndex: number): number {
+  return c.variantWorld === zoneIndex ? 1 + AFFINITY_MAG : 1;
 }
