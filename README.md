@@ -13,6 +13,12 @@ The name is the joke: the author's characters survive because he's *writing* the
 > Combat auto-resolves and is lightly visualized (health bars, panels, emoji
 > stand-ins) — systems-and-numbers, no combat renderer.
 
+## How this was built
+
+This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the history and `docs/superpowers/` on purpose.
+
+The productized form of that workflow is [backend-harness](https://github.com/yovanmc/backend-harness). If you're evaluating my work: ask me why the save migration clamps every field against the class catalog instead of trusting localStorage — I'll defend the design from first principles.
+
 ## Status
 
 **Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins, set bonuses & zone affinity.** On top of v1, Royalties are a spendable
