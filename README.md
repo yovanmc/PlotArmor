@@ -1,5 +1,7 @@
 # Plot Armor
 
+[![CI](https://github.com/yovanmc/PlotArmor/actions/workflows/ci.yml/badge.svg)](https://github.com/yovanmc/PlotArmor/actions/workflows/ci.yml)
+
 A personal, single-user **idle RPG / auto-battler**. You're an author; the
 characters in your stories are your party. They auto-battle through genre-themed
 chapters (Wild West, Space, Zombies, …) to each zone's boss. Finishing the final
