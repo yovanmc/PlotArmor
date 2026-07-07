@@ -23,6 +23,8 @@ The productized form of that workflow is [backend-harness](https://github.com/yo
 
 ## Status
 
+**Forward-looking truth now lives in [ROADMAP.md](ROADMAP.md) and [NORTHSTAR.md](NORTHSTAR.md)** — the project is currently shelved (2026-07-07); this status log stays as the historical record below.
+
 **Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins, set bonuses & zone affinity.** On top of v1, Royalties are a spendable
 wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
 in-game via the **Publishing House** (a parchment modal opened from a live-balance
