@@ -4,6 +4,9 @@ State lives in `README.md` (running status log) and `docs/superpowers/specs/` +
 `docs/superpowers/plans/` (design/decision history, linked from the README).
 This file is the how-to-work-here layer, not the source of truth on progress.
 
+Forward-looking plan and status: `ROADMAP.md` + `NORTHSTAR.md` (project is
+currently SHELVED as of 2026-07-07 — motivation-gated, no active tier).
+
 ## What this is
 
 Single-user, public idle RPG / auto-battler ("the writer") — TypeScript (strict)
@@ -55,8 +58,9 @@ npm run preview    # serve the production build
 
 ## Conventions & safety
 
-- No CI workflow in this repo (no `.github/workflows`) — `npm test` and
-  `npm run build` are run locally/by-agent before calling work done.
+- CI is green since 2026-07-02: `.github/workflows/ci.yml` runs `npm ci`,
+  `npm test`, and `npm run build` on push to `main` and on pull requests. Also
+  run `npm test` / `npm run build` locally/by-agent before calling work done.
 - Commit identity: plain `git commit` as `yovanmc <yovanmc@users.noreply.github.com>`
   — never override author.
 - Design/plan-then-build convention: nontrivial features get a spec under
