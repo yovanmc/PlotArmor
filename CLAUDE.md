@@ -47,7 +47,7 @@ npm run preview    # serve the production build
 - `npm run build` (tsc strict + vite build) must be green (hard gate).
 - UI changes also get a manual live-DOM smoke pass (e.g. a HUD line updates,
   0 console errors). No screenshot harness in repo: judge visuals in a cheap
-  separate model call that returns a text verdict, not by loading PNGs into the main session.
+  separate model that returns a text verdict, never by loading PNGs here.
 
 ## Conventions & safety
 
