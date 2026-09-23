@@ -1,4 +1,3 @@
-// src/engine/prestige.ts
 import { Num, n, ONE, sub, mul, div, pow, gte, maxN, floorN } from './num';
 import { GameState } from './state';
 import { findUpgrade, UpgradeId, ROYALTY_K, ROYALTY_W0, MAX_STAR, protagonistPromoteCost, legacyCost } from './content';

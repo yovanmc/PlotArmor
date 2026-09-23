@@ -1,4 +1,3 @@
-// src/engine/progression.ts
 import { ZERO, add, mul, n } from './num';
 import { GameState, makeStartingParty } from './state';
 import { ZONE_COUNT, isBossIndex, bossEditDrop } from './content';

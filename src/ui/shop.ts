@@ -1,4 +1,3 @@
-// src/ui/shop.ts
 import { GameState } from '../engine/state';
 import { fmt } from '../engine/num';
 import { REPEATABLE_UPGRADES, ONE_TIME_UPGRADES, UpgradeId, MAX_STAR, protagonistPromoteCost, legacyCost } from '../engine/content';

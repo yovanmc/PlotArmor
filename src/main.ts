@@ -1,4 +1,3 @@
-// src/main.ts
 import './styles.css';
 import { initialState, GameState } from './engine/state';
 import { load, save } from './engine/save';
@@ -30,7 +29,6 @@ wireShop(getState, setState);
 wireGallery(getState, setState);
 startLoop(getState, setState, () => {});
 
-// "While you were writing…" summary.
 if (summary.seconds > 1) {
   const modal = document.getElementById('offline-modal')!;
   document.getElementById('offline-body')!.innerHTML =
@@ -44,7 +42,6 @@ if (summary.seconds > 1) {
   });
 }
 
-// Persistence.
 setInterval(() => save(state), AUTOSAVE_INTERVAL_MS);
 window.addEventListener('beforeunload', () => save(state));
 document.addEventListener('visibilitychange', () => {

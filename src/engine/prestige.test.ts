@@ -1,4 +1,3 @@
-// src/engine/prestige.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, emptyUpgrades } from './state';

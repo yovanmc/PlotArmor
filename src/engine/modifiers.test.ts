@@ -1,4 +1,3 @@
-// src/engine/modifiers.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, emptyUpgrades, makeCharacter, characterPower } from './state';

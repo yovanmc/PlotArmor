@@ -44,24 +44,19 @@ npm run preview    # serve the production build
   simulation asserting the loop still *closes* (book 1 publishable in single-digit
   minutes, books 1–8 all completable, no hard wall) after any balance-affecting
   change. Treat a balance.test.ts failure as a design signal, not just a bug.
-- `npm run build` (tsc strict + vite build) must be green — treated as a hard
-  gate in every README status entry.
-- UI changes additionally get a manual "live DOM smoke" pass (documented per
-  README entry, e.g. checking a HUD line updates, 0 console errors) — no
-  automated screenshot harness in-repo; per global convention, verify visually
-  via a cheap subagent returning a text verdict, not by loading PNGs into the
-  main session.
+- `npm run build` (tsc strict + vite build) must be green (hard gate).
+- UI changes also get a manual live-DOM smoke pass (e.g. a HUD line updates,
+  0 console errors). No screenshot harness in repo: judge visuals in a cheap
+  separate model that returns a text verdict, never by loading PNGs here.
 
 ## Conventions & safety
 
-- CI: `.github/workflows/ci.yml` runs `npm ci`,
-  `npm test`, and `npm run build` on push to `main` and on pull requests. Also
-  run `npm test` / `npm run build` locally/by-agent before calling work done.
+- CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test` and `npm run build`
+  on push to `main` and on pull requests. Run the last two locally before calling
+  work done.
 - Commit identity: plain `git commit` as `yovanmc <yovanmc@users.noreply.github.com>`
   — never override author.
-- Design/plan-then-build convention: nontrivial features get a spec under
-  `docs/superpowers/specs/` and a task-checklist plan under
-  `docs/superpowers/plans/` before implementation.
+- Nontrivial features get a spec and a task-checklist plan before implementation.
 - `num.ts` is the *only* file allowed to touch `break_eternity.js` directly —
   all other code goes through its wrapper (add/sub/mul/div/cmp/format).
 - `step(state, dt)` in `loop.ts` is the single source of truth for time
@@ -84,9 +79,8 @@ npm run preview    # serve the production build
 - Class/skin/set-bonus/affinity systems all route through the same
   `effective*` read-paths — when adding a new modifier, compose into those
   paths rather than special-casing a system.
-- The internal `scribe` class id was repurposed (Words class → The Critic)
-  without a save-breaking rename — prefer reusing/pivoting existing ids over
-  introducing new ones when semantics shift but persistence shouldn't break.
+- The internal `scribe` class id is The Critic (it kept its id so saves load).
+  When semantics shift but persistence must not break, reuse existing ids.
 - Tuning changes are validated against measured target bands in
   `analysis.ts`/`balance.test.ts` (e.g. rainbow/mono and Critic/baseline
   parity ratios, book-8 duration band) — treat those assertions as the

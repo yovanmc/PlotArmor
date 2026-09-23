@@ -1,4 +1,3 @@
-// src/ui/render.ts
 import { GameState } from '../engine/state';
 import { fmt, div, toNum } from '../engine/num';
 import {

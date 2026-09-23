@@ -1,4 +1,3 @@
-// src/engine/save.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as num from './num';
 import { initialState, emptyUpgrades, makeCharacter, makeUnlockedVariants } from './state';

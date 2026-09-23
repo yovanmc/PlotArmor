@@ -74,7 +74,6 @@ export const ZONES: ZoneDef[] = [
 export const ZONE_COUNT = ZONES.length;
 export const TARGETS_PER_BOOK = ZONE_COUNT * (BOSS_INDEX + 1);
 
-// --- tunable scaling curves ---
 // Character power grows MULTIPLICATIVELY per level (power = basePower * POWER_GROWTH^(level-1)).
 // This is what lets bought DPS keep pace with exponential enemy scaling; at level 1 power == basePower.
 export const POWER_GROWTH = 1.45;
@@ -139,9 +138,7 @@ export function targetsClearedInBook(zoneIndex: number, encounterIndex: number):
   return zoneIndex * (BOSS_INDEX + 1) + encounterIndex;
 }
 
-// ---------------------------------------------------------------------------
-// Prestige depth (v2): escalation, royalty faucet, upgrade bounds — ALL tunable
-// ---------------------------------------------------------------------------
+// Prestige depth: escalation, royalty faucet, upgrade bounds. ALL tunable.
 
 export const BOOK_SCALE = 3.5;      // per-book difficulty/size growth; D(b) = BOOK_SCALE^(b-1)
 export const ROYALTY_K = n(1);      // royalty payout coefficient
@@ -157,7 +154,7 @@ export const FRUGAL_FLOOR = 0.25;   // cost multiplier floor (>=25% of base; max
 export const NIGHT_OWL_HOURS_PER_LEVEL = 2; // +2h offline cap per level
 export const GHOSTWRITER_LEVEL = 5; // pre-leveled new-book start when owned
 
-// --- base spend-cost curves (the project's level/recruit cost curves) ---
+// Base spend-cost curves (level and recruit).
 const LEVEL_BASE_COST = n(10);
 const LEVEL_COST_GROWTH = 1.5;
 const RECRUIT_BASE_COST = n(100);
@@ -171,7 +168,6 @@ export function baseRecruitCost(partySize: number): Num {
   return mul(RECRUIT_BASE_COST, pow(n(RECRUIT_COST_GROWTH), partySize - 2));
 }
 
-// --- upgrade catalog (static data) ---
 export type RepeatableUpgradeId =
   | 'prolific' | 'sharpProse' | 'pageTurner' | 'muse' | 'nightOwl' | 'frugalDrafts';
 export type OneTimeUpgradeId = 'ensembleCast' | 'ghostwriter';
@@ -215,10 +211,10 @@ export function findUpgrade(id: UpgradeId): UpgradeDef {
   return def;
 }
 
-// --- party stars + the Edits economy (Slice 2) -------------------------------
+// Party stars and the Edits economy.
 // Stars are PER-CLASS (1..MAX_STAR). starStatMult scales class base power and
 // starAbilityMult scales class ability magnitude; both are 1 at 1 star so the
-// fresh game is identical to Slice 1. Edits are a global currency dropped by
+// fresh game plays as if stars did not exist. Edits are a global currency dropped by
 // bosses, spent to raise a class's star. ALL magnitudes are harness-tuned.
 export const MAX_STAR = 5;
 export const STAR_GROWTH = 1.6;          // class base-power multiplier per star
@@ -247,7 +243,7 @@ export function bossEditDrop(bookNumber: number): Num {
   return mul(EDITS_PER_BOSS, pow(n(EDIT_BOOK_GROWTH), bookNumber - 1));
 }
 
-// --- star-prestige: the Legacy track (Edits sink past 5★) --------------------
+// Star prestige: the Legacy track (Edits sink past 5★).
 // Once classes are maxed at 5★, surplus Edits buy global "Legacy" levels. Each
 // level multiplies EVERY character's power AND ability magnitude by LEGACY_GROWTH
 // (legacyMult(0) === 1, so it is neutral by default). LEGACY_BASE is high enough
@@ -264,10 +260,9 @@ export function legacyCost(level: number): Num {
   return mul(LEGACY_BASE, pow(n(LEGACY_COST_GROWTH), level));
 }
 
-// --- world variants (Slice 3a) ----------------------------------------------
+// World variants.
 // A character can wear a cosmetic skin from any world its class has unlocked.
-// Variants are (classId x worldIndex); display-only in Slice 3a (the 2/3/5 set
-// bonus is Slice 3b). Clearing a world's boss unlocks the next class's variant
+// Variants are (classId x worldIndex). Clearing a world's boss unlocks the next class's variant
 // for that world in this FIXED order (deterministic, no RNG):
 export const VARIANT_UNLOCK_ORDER: ClassId[] = [
   'protagonist', 'antihero', 'support', 'debuffer', 'sidekick', 'scribe',
@@ -280,11 +275,11 @@ export function worldGenre(worldIndex: number): string {
   return ZONES[worldIndex].genre;
 }
 
-// --- world set bonus (Slice 3b) ---------------------------------------------
+// World set bonus.
 // Fielding 2 / 3 / 5 characters wearing the SAME world's variant grants a tier
 // 1 / 2 / 3 bonus. Thresholds are uniform across worlds; the bonus AXIS differs
 // per world so each collection has its own identity. ALL magnitudes + the axis
-// mapping are harness-/owner-tuned placeholders.
+// mapping are tunable placeholders.
 export type SetAxis = 'dps' | 'insp' | 'words' | 'editDrop' | 'regenCut';
 
 export interface SetBonusDef {
@@ -316,17 +311,17 @@ export const WORLD_SET_BONUS: SetBonusDef[] = [
   { axis: 'insp',     tiers: [0.15, 0.35, 0.75] }, // 7 Prehistoric — primal abundance
 ];
 
-// --- zone affinity (Slice 4) ------------------------------------------------
+// Zone affinity.
 // A fielded character is "in its element" when its equipped skin's world matches
 // the CURRENT zone. While in its element, its WHOLE contribution (power + class
 // ability) is scaled by 1 + AFFINITY_MAG. Distinct from the makeup-based set
-// bonus (§6b): affinity is dynamic per-zone. Harness-/owner-tuned placeholder.
+// bonus: affinity is dynamic per zone. Tunable placeholder.
 export const AFFINITY_MAG = 0.7;
 
-// --- Ensemble (diversity) set — Slice-4 sibling -----------------------------
+// Ensemble (diversity) set.
 // Fielding N DISTINCT worlds grants an always-on Ensemble bonus that AMPLIFIES
 // zone affinity (go broad -> your in-element characters hit harder). Mirrors the
-// same-world set (SET_THRESHOLDS). Harness-/owner-tuned placeholders.
+// same-world set (SET_THRESHOLDS). Tunable placeholders.
 export const ENSEMBLE_THRESHOLDS: [number, number, number] = [3, 4, 5];
 export const ENSEMBLE_AFFINITY_AMP: [number, number, number] = [0.8, 1.6, 3.0];
 
@@ -337,7 +332,7 @@ export function ensembleTier(distinctCount: number): number {
   return 0;
 }
 
-// --- Protagonist track (Royalty-funded promotion) ---------------------------
+// Protagonist track (Royalty-funded promotion).
 // The Protagonist has no Edits stars; it is PROMOTED 1*->MAX_STAR with Royalties
 // in the Publishing House. Cost rises per star. Tunable placeholders (Royalties
 // are scarce, so this is a long-term prestige sink).
@@ -348,7 +343,7 @@ export function protagonistPromoteCost(currentStar: number): Num {
   return mul(PROTAGONIST_PROMOTE_BASE, pow(n(PROTAGONIST_PROMOTE_GROWTH), currentStar - 1));
 }
 
-// --- party classes (Slice 1) -------------------------------------------------
+// Party classes.
 export type ClassId = 'protagonist' | 'antihero' | 'support' | 'debuffer' | 'sidekick' | 'scribe';
 export type AbilityKind = 'plotArmor' | 'loneWolf' | 'partyDps' | 'regenCut' | 'inspRate' | 'dot';
 
@@ -356,7 +351,7 @@ export interface ClassDef {
   id: ClassId;
   name: string;
   classBasePower: Num;
-  ability: { kind: AbilityKind; mag: number }; // mag is per-level (× star later); placeholder values
+  ability: { kind: AbilityKind; mag: number }; // mag is per level, scaled by star; placeholder values
 }
 
 // ALL magnitudes + base powers are placeholders, tuned later against the balance harness.

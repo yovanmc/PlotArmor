@@ -1,4 +1,3 @@
-// src/ui/gallery.ts
 import { GameState, Character } from '../engine/state';
 import { CLASSES, ClassId, MAX_STAR, WORLD_FACE, worldGenre, ZONES } from '../engine/content';
 import { setVariant } from '../engine/variants';

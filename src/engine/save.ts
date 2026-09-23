@@ -1,4 +1,3 @@
-// src/engine/save.ts
 import { Num, ZERO, numToStr, strToNum } from './num';
 import { GameState, Character, Upgrades, initialState, emptyUpgrades, makeStartingParty, makeStars, makeUnlockedVariants } from './state';
 import { ClassId, findClass, CLASSES, MAX_STAR, ZONE_COUNT } from './content';

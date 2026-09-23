@@ -1,4 +1,3 @@
-// src/engine/state.ts
 import { Num, n, mul, pow, ZERO } from './num';
 import { targetMaxHp, POWER_GROWTH, ClassId, findClass, CLASSES } from './content';
 

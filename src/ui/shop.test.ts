@@ -1,4 +1,3 @@
-// src/ui/shop.test.ts
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as num from '../engine/num';
 import { initialState, emptyUpgrades, GameState } from '../engine/state';

@@ -67,7 +67,7 @@ describe('set bonus', () => {
   });
 
   it('applies the world axis at the right tier (Space = DPS)', () => {
-    // 5 on Space (world 2, dps tier 3 = +0.35) — rebalanced DOWN so rainbow can compete (tuning pass)
+    // 5 on Space (world 2, dps tier 3 = +0.35)
     expect(activeSetBonus(partyOnWorlds([2, 2, 2, 2, 2])).dpsMult).toBeCloseTo(1.35, 5);
     // 3 on Space (tier 2 = +0.20)
     expect(activeSetBonus(partyOnWorlds([2, 2, 2, null, null])).dpsMult).toBeCloseTo(1.20, 5);

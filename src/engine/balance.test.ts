@@ -15,7 +15,7 @@ import { levelUp, recruit, starUp, canLevel, canRecruit, canStarUp } from './eco
 import { Num, n, ZERO, sub, div, gt, toNum, fmt } from './num';
 import { compareLoadouts } from './analysis';
 
-// --- representative play: build a fixed composition, then level everyone evenly ---
+// Representative play: build a fixed composition, then level everyone evenly.
 // The party cap is 5; the start is Protagonist + Anti-hero, leaving exactly 3 recruit
 // slots. We fill them with three DISTINCT new classes — a Debuffer to break boss regen,
 // a Support to amplify party DPS, and a Sidekick for Inspiration income — so the fielded
@@ -168,7 +168,7 @@ describe('balance: the core loop closes', () => {
     expect(results.every((r) => r.completed)).toBe(true);
   });
 
-  // --- tuning-pass parity/pacing bands (magnitudes set in the tuning pass) ---
+  // Parity and pacing bands.
   it('rainbow loadouts compete with mono (loadout parity band 0.85-1.15)', () => {
     const { ratio } = compareLoadouts();
     expect(ratio).toBeGreaterThanOrEqual(0.85);
@@ -189,7 +189,7 @@ describe('balance: the core loop closes', () => {
     expect(book8.seconds).toBeLessThanOrEqual(7200);
   });
 
-  // Slice 3a: variants are earned by clearing world bosses. Each book clears all
+  // Variants are earned by clearing world bosses. Each book clears all
   // 8 worlds once, unlocking one class's variant per world per book, so after 8
   // books every class should own every world's skin (the full 5x8 collection).
   it('clearing 8 books unlocks the full variant collection through real play', () => {

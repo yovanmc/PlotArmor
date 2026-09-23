@@ -1,6 +1,5 @@
-// src/engine/variants.ts
-// Variant ownership (per-class unlocked world skins) + equip. Cosmetic in
-// Slice 3a; the 2/3/5 set bonus is Slice 3b. Pure functions over GameState.
+// Variant ownership (per-class unlocked world skins), equip, and the 2/3/5 set bonus.
+// Pure functions over GameState.
 import { ClassId, VARIANT_UNLOCK_ORDER, WORLD_SET_BONUS, setTier, AFFINITY_MAG, ensembleTier, ENSEMBLE_AFFINITY_AMP } from './content';
 import { GameState, Character } from './state';
 
@@ -97,7 +96,7 @@ export function setBonusBreakdown(party: Character[]): { world: number; count: n
   return out;
 }
 
-// --- zone affinity (Slice 4) ------------------------------------------------
+// Zone affinity.
 // A fielded character is "in its element" when its equipped skin's world matches
 // the CURRENT zone (c.variantWorld === zoneIndex). Base-skin characters
 // (variantWorld === null) never equal a zone index, so this is false by default.

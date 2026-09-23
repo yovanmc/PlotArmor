@@ -1,4 +1,3 @@
-// src/engine/progression.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState, emptyUpgrades, makeCharacter } from './state';
