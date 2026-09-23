@@ -1,4 +1,3 @@
-// src/engine/loop.ts
 import { n, add, mul } from './num';
 import { GameState } from './state';
 import { OFFLINE_MAX_ITERS } from './content';

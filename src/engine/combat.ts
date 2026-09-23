@@ -1,4 +1,3 @@
-// src/engine/combat.ts
 import { Num, n, ZERO, sub, mul, div, gt, minN } from './num';
 import { GameState } from './state';
 import { isBossIndex } from './content';
@@ -28,7 +27,7 @@ export interface AdvanceResult {
   timeUsed: number;
 }
 
-// Apply up to `dt` seconds of combat to the current target (unchanged logic).
+// Apply up to `dt` seconds of combat to the current target.
 export function advanceTarget(currentHp: Num, info: TargetInfo, dt: number): AdvanceResult {
   if (gt(info.netDps, ZERO)) {
     const ttc = div(currentHp, info.netDps).toNumber();

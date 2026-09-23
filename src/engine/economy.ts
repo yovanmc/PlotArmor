@@ -1,4 +1,3 @@
-// src/engine/economy.ts
 import { sub, gte } from './num';
 import { GameState, makeCharacter } from './state';
 import { ClassId, MAX_STAR, starUpCost } from './content';
@@ -37,7 +36,7 @@ export function recruit(state: GameState, classId: ClassId): GameState {
 }
 
 export function canStarUp(state: GameState, classId: ClassId): boolean {
-  if (classId === 'protagonist') return false; // Protagonist grows via Royalties (Slice 3)
+  if (classId === 'protagonist') return false; // Protagonist grows via Royalties
   const current = state.stars[classId];
   if (current >= MAX_STAR) return false;
   return gte(state.edits, starUpCost(current));

@@ -1,4 +1,3 @@
-// src/engine/analysis.ts
 // Pure tuning instruments: compare loadout archetypes by total book DPS output.
 // Used by the balance report to tune the Ensemble/affinity/set magnitudes to parity.
 import { GameState, initialState, makeCharacter, Character } from './state';

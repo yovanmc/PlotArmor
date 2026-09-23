@@ -1,4 +1,3 @@
-// src/engine/offline.test.ts
 import { describe, it, expect } from 'vitest';
 import * as num from './num';
 import { initialState } from './state';

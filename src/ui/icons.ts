@@ -1,4 +1,3 @@
-// src/ui/icons.ts
 // Single swap-point for every UI-chrome glyph that is currently an emoji.
 // When real graphics land, replace each value with the asset — an inline
 // `<svg>…</svg>` markup string or an `<img>` tag. Every call site builds HTML via

@@ -1,4 +1,3 @@
-// src/engine/offline.ts
 import { Num, ZERO, sub } from './num';
 import { GameState } from './state';
 import { step } from './loop';

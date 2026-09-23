@@ -1,4 +1,3 @@
-// src/engine/modifiers.ts
 import { Num, n, add, mul, pow, ZERO } from './num';
 import { GameState, Character, characterPower } from './state';
 import {
@@ -11,7 +10,7 @@ import {
 } from './content';
 import { activeSetBonus, affinityMult, ensembleAffinityAmp } from './variants';
 
-// Per-book difficulty/size factor D(b) = BOOK_SCALE^(b-1). D(1) = 1 (book 1 == v1).
+// Per-book difficulty/size factor D(b) = BOOK_SCALE^(b-1). D(1) = 1.
 export function bookDifficulty(state: GameState): Num {
   return pow(n(BOOK_SCALE), state.bookNumber - 1);
 }
@@ -87,7 +86,7 @@ export function effectivePartyDps(s: GameState): Num {
   const hasProtagonist = s.party.some((c) => c.classId === 'protagonist');
   const plotArmorMult = hasProtagonist
     ? 1 + findClass('protagonist').ability.mag * distinctClassCount(s.party) * starAbilityMult(s.stars.protagonist) * lm
-    : 1; // Plot Armor is a party-variety signature — NOT affinity-scaled (§9)
+    : 1; // Plot Armor is a party-variety signature, NOT affinity-scaled
   const setMult = activeSetBonus(s.party).dpsMult;
   const direct = mul(mul(mul(mul(sum, n(sharpMult(s))), n(supportMult)), n(plotArmorMult)), n(setMult));
   // The Critic's DoT: % of the CURRENT encounter's max HP per second, added independently of the
