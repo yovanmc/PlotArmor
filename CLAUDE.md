@@ -1,11 +1,8 @@
 # Plot Armor — agent/developer runbook
 
-State lives in `README.md` (running status log) and `docs/superpowers/specs/` +
-`docs/superpowers/plans/` (design/decision history, linked from the README).
-This file is the how-to-work-here layer, not the source of truth on progress.
-
-Forward-looking plan and status: `ROADMAP.md` + `NORTHSTAR.md` (project is
-currently SHELVED as of 2026-07-07 — motivation-gated, no active tier).
+Plan and status: `ROADMAP.md` + `NORTHSTAR.md` (project is currently SHELVED,
+motivation-gated, no active tier). This file is the how-to-work-here layer, not
+the source of truth on progress.
 
 ## What this is
 
@@ -75,7 +72,7 @@ npm run preview    # serve the production build
   persisted field needs a schema bump and a migration path, not a silent
   shape change.
 
-## Recurring gotchas (from design/status history)
+## Recurring gotchas
 
 - Big numbers are `Decimal` everywhere from day one — never fall back to
   native JS `number` math for game quantities; overflow/precision bugs hide here.

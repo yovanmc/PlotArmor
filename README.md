@@ -17,7 +17,7 @@ The name is the joke: the author's characters survive because he's *writing* the
 
 ## How this was built
 
-This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the history and `docs/superpowers/` on purpose.
+This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the git history on purpose.
 
 The productized form of that workflow is [backend-harness](https://github.com/yovanmc/backend-harness). If you're evaluating my work: ask me why the save migration clamps every field against the class catalog instead of trusting localStorage — I'll defend the design from first principles.
 
@@ -122,28 +122,6 @@ are tuned to measured target bands — rainbow/mono ≈ 0.97 and Critic/baseline
 book 8 in the 1–2 h band — locked by harness assertions. No save change (schema stays v6). All
 headless-tested (194 passing tests) plus a live DOM smoke (Ensemble HUD line, The Critic recruit + DoT
 contribution, 0 console errors); `npm run build` is green.
-
-Specs: [v1 design](docs/superpowers/specs/2026-06-19-plot-armor-design.md) ·
-[prestige design](docs/superpowers/specs/2026-06-19-plot-armor-prestige-design.md) ·
-[spend UI design](docs/superpowers/specs/2026-06-19-plot-armor-shop-ui-design.md) ·
-[balance + content design](docs/superpowers/specs/2026-06-19-plot-armor-balance-and-content-design.md) ·
-[party system design](docs/superpowers/specs/2026-06-19-plot-armor-party-system-design.md) ·
-[star-prestige design](docs/superpowers/specs/2026-06-20-plot-armor-star-prestige-design.md) ·
-[Scribe class design](docs/superpowers/specs/2026-06-20-plot-armor-scribe-class-design.md) ·
-[tuning pass design](docs/superpowers/specs/2026-06-20-plot-armor-tuning-pass-design.md).
-Plans: [v1](docs/superpowers/plans/2026-06-19-plot-armor-v1.md) ·
-[prestige](docs/superpowers/plans/2026-06-19-plot-armor-prestige.md) ·
-[spend UI](docs/superpowers/plans/2026-06-19-plot-armor-shop-ui.md) ·
-[party Slice 1](docs/superpowers/plans/2026-06-19-plot-armor-party-slice1.md) ·
-[party Slice 2](docs/superpowers/plans/2026-06-19-plot-armor-party-slice2.md) ·
-[party Slice 3a](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3a.md) ·
-[party Slice 3b](docs/superpowers/plans/2026-06-19-plot-armor-party-slice3b.md) ·
-[Protagonist track](docs/superpowers/plans/2026-06-19-plot-armor-protagonist-track.md) ·
-[party Slice 4](docs/superpowers/plans/2026-06-19-plot-armor-party-slice4.md) ·
-[collection gallery](docs/superpowers/plans/2026-06-20-plot-armor-collection-gallery.md) ·
-[star-prestige](docs/superpowers/plans/2026-06-20-plot-armor-star-prestige.md) ·
-[Scribe class](docs/superpowers/plans/2026-06-20-plot-armor-scribe-class.md) ·
-[tuning pass](docs/superpowers/plans/2026-06-20-plot-armor-tuning-pass.md).
 
 Run it locally: `npm install` then `npm run dev`.
 
