@@ -23,105 +23,20 @@ The productized form of that workflow is [backend-harness](https://github.com/yo
 
 ## Status
 
-**Forward-looking truth now lives in [ROADMAP.md](ROADMAP.md) and [NORTHSTAR.md](NORTHSTAR.md)** — the project is currently shelved (2026-07-07); this status log stays as the historical record below.
+**Status: shelved.** No development is planned right now.
 
-**Playable loop, balanced, 8 genres, class-based party with stars + collectible world skins, set bonuses & zone affinity.** On top of v1, Royalties are a spendable
-wallet feeding a permanent upgrade catalog (6 repeatable + 2 one-time), spent
-in-game via the **Publishing House** (a parchment modal opened from a live-balance
-entry button); books escalate in difficulty/size each publish, and the royalty
-payout scales with manuscript size.
-
-The core economy is now **tuned so the loop actually closes** — character power grows
-multiplicatively per level (`POWER_GROWTH`), so bought DPS keeps pace with exponential
-enemies. A greedy-play balance harness (`src/engine/balance.test.ts`) verifies book 1
-is publishable in ~10 minutes and books 1–8 all complete with no hard wall. Content is
-expanded from 3 to **8 genre zones** (Wild West, Zombie Apocalypse, Space, High Fantasy,
-Pirate Seas, Noir City, Eldritch Horror, Prehistoric).
-
-The party is now **class-based (Slice 1 of the party system)**: a fixed **Protagonist**
-plus four recruitable classes — **Anti-hero** (Lone Wolf: amps only its own DPS),
-**Support** (amps the whole party's DPS), **Debuffer** (cuts boss regen), and
-**Sidekick** (raises the Inspiration rate). You choose which class to recruit, and the
-Protagonist's **Plot Armor** scales the party's DPS by the number of *distinct* classes
-fielded, so a varied roster beats a stack of clones.
-
-Classes now also carry **per-class star tiers (Slice 2 of the party system)**: 1★–5★
-ratings funded by **Edits**, a global currency dropped by **boss kills**. Spending Edits
-raises a class's star, which multiplies both its base power and its ability magnitude on
-top of per-book leveling (the Protagonist grows on its own track instead). Stars are a
-permanent, earned mid-game boost — the harness verifies the loop still closes (book 1 in
-~8 minutes, books 1–8 complete) with stars funded from boss drops.
-
-Characters now also collect `(class × world)` skins (Slice 3 of the party system): clearing
-a world's boss deterministically unlocks the next class's variant for that world (fixed
-order, no gacha; a full 5×8 collection fills in over ~5 books), and each fielded character
-can wear any skin its class has unlocked — shown as a per-world face emoji, a genre tag, and
-the world's accent on the card. Fielding a cohesive themed party then pays off: **2 / 3 / 5
-characters wearing the same world's skin grant a tier 1 / 2 / 3 set bonus**, whose effect
-type differs per world (e.g. Space → DPS, Wild West → Inspiration, Eldritch → boss-regen
-cut, Pirate Seas → Edit drop), folded into the same `effective*` read-paths as everything
-else. Multiple sets can stack, and the HUD lists the active ones. All headless-tested (142
-passing tests; the loop still closes with set bonuses, which only ever help a deliberately
-themed party) plus a live DOM smoke (a 2-member Space set raised Party DPS +15% and the HUD
-reflected it, 0 console errors); `npm run build` is green. The per-world axis mapping and all
-magnitudes are tunable placeholders.
-
-The **Protagonist** has its own growth path — it earns no Edits stars; instead you **promote**
-it 1★→5★ by spending **Royalties** in the Publishing House. Each promotion scales its base
-power and strengthens its **Plot Armor** signature, tying the lead to the prestige economy and
-giving Royalties another sink. All headless-tested (151 passing tests) plus a live DOM smoke (a
-promotion raised the lead ★☆☆☆☆→★★☆☆☆, spent the Royalties, and lifted Party DPS 2.4→3.3 —
-reflecting both the stat and Plot Armor scaling, 0 console errors); `npm run build` is green.
-Promotion costs are tunable placeholders.
-
-Skins now also have **mechanical teeth in the current zone (Slice 4 of the party system)**: a fielded
-character "in its element" — its equipped skin's world matches the zone you're currently fighting in —
-has its **whole contribution** (its own damage *and* its class ability) scaled by a flat affinity bonus.
-This is distinct from the set bonus: the set bonus rewards a cohesive same-world party (always on);
-affinity rewards matching the *current* zone (dynamic as you advance zone-to-zone through a book). The
-two pull on the same lever — your equipped skins — so each book is a loadout choice: commit to one world
-for an always-on set bonus plus a big affinity spike in that one zone, or spread skins across worlds for
-steady affinity everywhere. The Protagonist's Plot Armor signature is deliberately left unscaled. Derived
-entirely from existing data (no save change), neutral when nobody is in their element (the balance harness
-is unaffected — book 1 still publishes in ~7.7 min, books 1–8 complete). All headless-tested (163 passing
-tests); `npm run build` is green. The affinity magnitude is a tunable placeholder.
-
-The skins finally get a home: a **Collection screen (§8 of the party system)**. A `🎴 Collection`
-button opens a master-detail modal — your five characters on the left (each with its worn skin, star
-tier, and worlds-collected count, plus an `N / 40` completion bar), and the selected character's full
-set of world skins on the right (unlocked ones in the world's accent, locked ones dimmed with 🔒, the
-worn one ringed). Click any unlocked skin to equip it on that character — this replaces the old per-card
-cycle button, which matters now that zone affinity makes skin choice strategic. It's a pure UI layer over
-the existing data (no save change, no balance impact). All headless-tested (169 passing tests) plus a live
-DOM smoke (equipping from the gallery updated the worn tile and the battle card, 0 console errors);
-`npm run build` is green.
-
-The late game gets a sink: a **star-prestige "Legacy" track**. Once your classes are maxed at 5★, Edits
-stop having anywhere to go — so surplus Edits now buy global **Legacy** levels in the Publishing House,
-each permanently multiplying every character's power *and* ability magnitude (a universal extra star for
-the whole roster). It's soft-gated by an escalating Edits cost, so raising stars stays the right early
-buy. Neutral at level 0 (no save/balance churn for existing games); persisted via save schema v6. All
-headless-tested (183 passing tests) plus a live DOM smoke; `npm run build` is green. The Legacy
-magnitudes are tunable placeholders for the upcoming feel pass.
-
-A sixth class joins the roster. It first shipped as the **Scribe** (a Words/royalty class), but a
-tuning-pass audit found Words don't gate book completion — they only set the royalty payout — so it was
-pivoted into a genuine combat class: **The Critic**, a damage-over-time boss-slayer. Its DoT ticks for a
-percentage of the *enemy's max HP* per second, so it shreds high-HP bosses, caps clear-time against the
-exponential HP wall, and punches through boss regen. The internal id stays `scribe`, so there is no save
-change (existing games keep the class). With a party cap of 5 and six classes, fielding it is a real
-5-of-6 choice.
-
-The makeup/loadout game finally gets the tension it was designed for. A **tuning pass** rebalanced
-everything against a new measurement harness (the greedy-play sim plus a loadout/parity analyzer in
-`analysis.ts`): a new **Ensemble (diversity) set** — fielding 3 / 4 / 5 *distinct* worlds — amplifies zone
-affinity, so spreading skins ("rainbow") now competes head-to-head with committing to one world ("mono"),
-and the previously dominant same-world set bonus was rebalanced down to make room. The late game is
-**steeper** (book 8 is now ~1.7 h of greedy play, up from ~36 min) while book 1 is unchanged. Magnitudes
-are tuned to measured target bands — rainbow/mono ≈ 0.97 and Critic/baseline ≈ 0.95 (both within ±15%),
-book 8 in the 1–2 h band — locked by harness assertions. No save change (schema stays v6). All
-headless-tested (194 passing tests) plus a live DOM smoke (Ensemble HUD line, The Critic recruit + DoT
-contribution, 0 console errors); `npm run build` is green.
+The game is playable and balanced across **8 genre zones** (Wild West, Zombie Apocalypse, Space,
+High Fantasy, Pirate Seas, Noir City, Eldritch Horror, Prehistoric). The party is class-based: a
+fixed **Protagonist** plus five recruitable classes (**Anti-hero**, **Support**, **Debuffer**,
+**Sidekick** and **The Critic**) with a party cap of 5 (6 with the Ensemble Cast upgrade). Classes
+earn 1★ to 5★ star tiers funded by
+**Edits** from boss kills, and the Protagonist is promoted with **Royalties** instead. Characters
+collect `(class × world)` skins, browsed and equipped from the **Collection** screen. Same-world skins
+grant set bonuses, distinct worlds grant the **Ensemble** set, and a character wearing the current
+zone's skin gets a zone affinity bonus. Royalties buy permanent upgrades in the **Publishing House**,
+and surplus Edits buy global **Legacy** levels. A greedy-play balance harness
+(`src/engine/balance.test.ts`, with the loadout analyzer in `analysis.ts`) checks that books 1 to 8
+all complete with no hard wall. Saves use schema v6 with tolerant migration. 194 headless tests.
 
 Run it locally: `npm install` then `npm run dev`.
 
