@@ -35,7 +35,7 @@ A complete, well-tested idle RPG that served its purpose: a finished core loop, 
 
 ## Current state
 - Core loop complete and playable: 8 genre zones/books, 6 classes, star tiers, collection + set bonuses, Legacy prestige, Publishing House shop, save schema v6 with tolerant migration.
-- 194 tests green (~6.5s), CI green, build green (~85KB bundle).
+- 193 tests green (~6.5s), CI green, build green (~85KB bundle).
 - The last gameplay/balance change was the tuning pass. Everything since is docs and CI work.
 - **No deployment exists** — no Pages/itch; playable only via `npm run dev`.
 - Balance numbers are sim-derived provisional values (the tuning doc's own caveat); no endgame design exists past book 8. Both are acceptable open edges for a parked project.

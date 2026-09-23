@@ -22,10 +22,6 @@ export function isVariantUnlocked(state: GameState, classId: ClassId, worldIndex
   return state.unlockedVariants[classId].includes(worldIndex);
 }
 
-export function unlockedWorldsFor(state: GameState, classId: ClassId): number[] {
-  return state.unlockedVariants[classId];
-}
-
 // Equip a world skin on a fielded character (null = base look). Equips a
 // non-null world only if that character's class has unlocked it; otherwise the
 // state is returned unchanged (same reference).
