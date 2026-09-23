@@ -25,8 +25,7 @@ Engine/render split under `src/`:
 
 Status per README: playable core loop across 8 genre zones, class-based party
 (6 classes incl. The Critic), star tiers, world-skin collection with set bonus
-+ zone affinity, Legacy prestige track, Publishing House upgrade shop. 194
-passing tests as of the last tuning pass.
++ zone affinity, Legacy prestige track, Publishing House upgrade shop.
 
 ## Commands
 
@@ -58,14 +57,14 @@ npm run preview    # serve the production build
 
 ## Conventions & safety
 
-- CI is green since 2026-07-02: `.github/workflows/ci.yml` runs `npm ci`,
+- CI: `.github/workflows/ci.yml` runs `npm ci`,
   `npm test`, and `npm run build` on push to `main` and on pull requests. Also
   run `npm test` / `npm run build` locally/by-agent before calling work done.
 - Commit identity: plain `git commit` as `yovanmc <yovanmc@users.noreply.github.com>`
   — never override author.
 - Design/plan-then-build convention: nontrivial features get a spec under
   `docs/superpowers/specs/` and a task-checklist plan under
-  `docs/superpowers/plans/` before implementation (superpowers skill workflow).
+  `docs/superpowers/plans/` before implementation.
 - `num.ts` is the *only* file allowed to touch `break_eternity.js` directly —
   all other code goes through its wrapper (add/sub/mul/div/cmp/format).
 - `step(state, dt)` in `loop.ts` is the single source of truth for time
