@@ -8,7 +8,6 @@ export const TICK_SECONDS = 0.1;
 export const OFFLINE_CAP_SECONDS = 12 * 3600;
 export const AUTOSAVE_INTERVAL_MS = 15_000;
 export const OFFLINE_MAX_ITERS = 200_000;
-export const ROYALTY_BONUS = 0.5; // permanent +50% production per royalty
 
 export interface ZoneDef {
   genre: string;

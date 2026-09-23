@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { initialState, makeCharacter } from './state';
-import { unlockNextVariant, setVariant, unlockedWorldsFor, activeSetBonus, setBonusBreakdown, affinityMult, distinctWorldsFielded, ensembleAffinityAmp } from './variants';
+import { unlockNextVariant, setVariant, activeSetBonus, setBonusBreakdown, affinityMult, distinctWorldsFielded, ensembleAffinityAmp } from './variants';
 import { AFFINITY_MAG } from './content';
 import { makeUnlockedVariants } from './state';
 
@@ -44,11 +44,6 @@ describe('equip / query', () => {
     const start = { ...initialState(0), party: [makeCharacter('c0', 'protagonist'), { ...makeCharacter('c1', 'antihero'), variantWorld: 2 }] };
     const after = setVariant(start, 'c1', null);
     expect(after.party.find((c) => c.id === 'c1')!.variantWorld).toBeNull();
-  });
-
-  it('unlockedWorldsFor returns the class list', () => {
-    const s = { ...initialState(0), unlockedVariants: { ...makeUnlockedVariants(), support: [1, 5] } };
-    expect(unlockedWorldsFor(s, 'support')).toEqual([1, 5]);
   });
 });
 
