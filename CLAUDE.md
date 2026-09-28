@@ -39,7 +39,7 @@ npm run preview    # serve the production build
 
 - Tests gate everything: each engine module is colocated with a `*.test.ts`
   and is fully headless (no DOM needed for `engine/`; `ui/` tests run under
-  jsdom per `vite.config.ts`). Run `npm test` before treating a change as done.
+  jsdom per `vite.config.ts`).
 - `src/engine/balance.test.ts` is a standing regression harness — a greedy-play
   simulation asserting the loop still *closes* (book 1 publishable in single-digit
   minutes, books 1–8 all completable, no hard wall) after any balance-affecting
@@ -51,9 +51,11 @@ npm run preview    # serve the production build
 
 ## Conventions & safety
 
+Test gate: `.github/workflows/ci.yml` · whole · ci · 0.4 min [V 2026-09-28 d5532c0f]
+
 - CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test` and `npm run build`
-  on push to `main` and on pull requests. Run the last two locally before calling
-  work done.
+  on push to `main` and on pull requests.
+- Land work by branch and PR: `gh pr checks` green, then `gh pr merge --merge --delete-branch`.
 - Commit identity: plain `git commit` as `yovanmc <yovanmc@users.noreply.github.com>`
   — never override author.
 - Nontrivial features get a spec and a task-checklist plan before implementation.
